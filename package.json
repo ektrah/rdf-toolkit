@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "rdf-toolkit",
+  "workspaces": [
+    "packages/iterable",
+    "packages/text",
+    "packages/rdf",
+    "packages/schema",
+    "packages/turtle",
+    "packages/explorer-worker",
+    "packages/explorer"
+  ],
+  "scripts": {
+    "lint": "npm run lint -ws --if-present",
+    "build": "npm run build -ws",
+    "clean": "npm run clean -ws",
+    "test": "npm test -ws --if-present"
+  }
+}

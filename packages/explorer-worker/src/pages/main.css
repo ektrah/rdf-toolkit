@@ -1,0 +1,65 @@
+main {
+    margin: 0 0 0 25vw;
+    padding: 2rem 1rem 5rem;
+}
+
+    main > * {
+        margin: 0 auto;
+        max-width: 66rem;
+    }
+
+h1, h2, h3, h4, h5, h6, th {
+    letter-spacing: 1px;
+    margin: 3rem 0 1.5rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3, h4, h5, h6, th {
+    text-transform: uppercase;
+}
+
+    h1 a, h2 a, h3 a, h4 a, h5 a, h6 a, th a {
+        color: inherit !important;
+    }
+
+th, td {
+    text-align: left;
+    vertical-align: top;
+}
+
+dt {
+    margin-top: .5em;
+}
+
+dt, caption {
+    font-style: italic;
+    color: var(--base05);
+}
+
+summary {
+    color: var(--base02);
+    cursor: pointer;
+    outline: none;
+}
+
+ul {
+    list-style: square;
+    margin: 1rem 0;
+}
+
+em {
+    font-style: italic;
+    color: var(--base07);
+}
+
+strong {
+    font-weight: 600;
+    color: var(--base07);
+}

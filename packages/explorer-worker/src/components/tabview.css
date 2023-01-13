@@ -1,0 +1,54 @@
+.tabview {
+    margin: 1.5em 0;
+}
+
+    .tabview label {
+        background: var(--base02);
+        border-color: var(--base02);
+        border-style: solid;
+        border-width: 1px 1px 0 1px;
+        color: var(--base05);
+        cursor: pointer;
+        display: inline-block;
+        font-size: smaller;
+        margin-right: 1px;
+        padding: .5em .8em;
+        user-select: none;
+    }
+
+        .tabview label:hover {
+            color: var(--base07);
+            text-decoration: underline;
+        }
+
+    .tabview .tabview-pages > * {
+        display: none;
+        margin: 0;
+    }
+
+    .tabview input {
+        display: none;
+    }
+
+        .tabview input:nth-child(1):checked ~ .tabview-tabs > :nth-child(1),
+        .tabview input:nth-child(2):checked ~ .tabview-tabs > :nth-child(2),
+        .tabview input:nth-child(3):checked ~ .tabview-tabs > :nth-child(3),
+        .tabview input:nth-child(4):checked ~ .tabview-tabs > :nth-child(4),
+        .tabview input:nth-child(5):checked ~ .tabview-tabs > :nth-child(5),
+        .tabview input:nth-child(6):checked ~ .tabview-tabs > :nth-child(6),
+        .tabview input:nth-child(7):checked ~ .tabview-tabs > :nth-child(7),
+        .tabview input:nth-child(8):checked ~ .tabview-tabs > :nth-child(8) {
+            background: var(--base01);
+            color: var(--base07);
+        }
+
+        .tabview input:nth-child(1):checked ~ .tabview-pages > :nth-child(1),
+        .tabview input:nth-child(2):checked ~ .tabview-pages > :nth-child(2),
+        .tabview input:nth-child(3):checked ~ .tabview-pages > :nth-child(3),
+        .tabview input:nth-child(4):checked ~ .tabview-pages > :nth-child(4),
+        .tabview input:nth-child(5):checked ~ .tabview-pages > :nth-child(5),
+        .tabview input:nth-child(6):checked ~ .tabview-pages > :nth-child(6),
+        .tabview input:nth-child(7):checked ~ .tabview-pages > :nth-child(7),
+        .tabview input:nth-child(8):checked ~ .tabview-pages > :nth-child(8) {
+            display: block;
+        }

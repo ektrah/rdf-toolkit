@@ -1,0 +1,15 @@
+footer {
+    padding: 2.5rem 0;
+}
+
+    footer summary {
+        color: var(--base02);
+        list-style-position: outside;
+        margin-left: 1rem;
+    }
+
+        footer summary:active,
+        footer summary:hover {
+            color: var(--base06);
+            text-decoration: underline;
+        }

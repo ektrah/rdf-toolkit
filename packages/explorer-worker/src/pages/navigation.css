@@ -1,0 +1,41 @@
+nav {
+    cursor: default;
+    display: grid;
+    grid-gap: 1em;
+    grid-template-rows: min-content minmax(0, 1fr);
+    height: 100vh;
+    left: 0;
+    padding: 1.5em 0 1em 1em;
+    position: fixed;
+    top: 0;
+    width: 25vw;
+}
+
+    nav p {
+        font-size: larger;
+        margin: 0;
+    }
+
+    nav .tabview {
+        display: grid;
+        grid-template-rows: min-content minmax(0, 1fr);
+        margin: 0;
+    }
+
+    nav .tabview-pages {
+        background: var(--base01);
+        border: 1px solid var(--base02);
+        padding: 1.5rem .5rem 5rem;
+        overflow: clip auto;
+        overscroll-behavior: none;
+    }
+
+    nav ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    nav .logo a {
+        color: var(--base07);
+        text-decoration: none;
+    }

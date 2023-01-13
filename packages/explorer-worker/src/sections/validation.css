@@ -1,0 +1,4 @@
+.validation-error,
+.validation-warning {
+    color: var(--base08);
+}

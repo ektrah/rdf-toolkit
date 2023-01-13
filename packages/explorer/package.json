@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "@rdf-toolkit/explorer",
+  "version": "0.1.0",
+  "type": "module",
+  "files": [
+    "./dist/**/*"
+  ],
+  "main": "./dist/explorer.js",
+  "eslintIgnore": [ "src/assets.ts", "src/worker/worker.js" ],
+  "scripts": {
+    "lint": "npx eslint src/",
+    "prebuild": "tsc --noEmit",
+    "build": "esbuild src/main.ts --bundle --minify --platform=browser --target=es2020 --asset-names=assets/[hash] --loader:.js=file --loader:.ttl=file --loader:.woff2=file --outfile=../../explorer/explorer.js",
+    "clean": "rimraf ../../explorer/explorer.{js,css} ../../explorer/assets/*.{js,ttl,woff2}"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "esbuild": "^0.16.17",
+    "eslint": "^8.31.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.9.4"
+  }
+}

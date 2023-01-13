@@ -1,0 +1,440 @@
+License notice for RFC 3986
+---------------------------
+
+This software contains code derived from the sample code in RFC 3986, which is
+available under the Revised BSD License as described in the IETF Trust's Legal
+Provisions Relating to IETF Documents.
+
+Copyright (c) 2005 IETF Trust and the persons identified as authors of the code
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+    * Neither the name of Internet Society, IETF or IETF Trust, nor the names of
+      specific contributors, may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+License notice for RDF Concepts
+-------------------------------
+
+This software includes material copied from
+<http://www.w3.org/1999/02/22-rdf-syntax-ns>, which is available under the
+W3C Software and Document License
+<http://www.w3.org/Consortium/Legal/copyright-software>.
+
+Copyright (c) 2019 World Wide Web Consortium, (Massachusetts Institute of
+Technology, European Research Consortium for Informatics and Mathematics, Keio
+University, Beihang).
+
+All rights reserved.
+
+This work is distributed under the W3C(R) Software and Document License in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+License notice for RDF Schema
+-----------------------------
+
+This software includes material copied from
+<http://www.w3.org/2000/01/rdf-schema>, which is available under the
+W3C Software and Document License
+<http://www.w3.org/Consortium/Legal/copyright-software>.
+
+Copyright (c) 2014 World Wide Web Consortium, (Massachusetts Institute of
+Technology, European Research Consortium for Informatics and Mathematics, Keio
+University, Beihang).
+
+All rights reserved.
+
+This work is distributed under the W3C(R) Software and Document License in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+License notice for XML Schema
+-----------------------------
+
+This software includes material copied from "RDF 1.1 Concepts and Abstract
+Syntax" <https://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/>, which is
+available under the W3C Document License
+<http://www.w3.org/Consortium/Legal/2015/doc-license>.
+
+Copyright (c) 2004-2014 W3C(R) (MIT, ERCIM, Keio, Beihang)
+
+All rights reserved.
+
+License
+
+By using and/or copying this document, or the W3C document from which this
+statement is linked, you (the licensee) agree that you have read, understood,
+and will comply with the following terms and conditions:
+
+Permission to copy, and distribute the contents of this document, or the W3C
+document from which this statement is linked, in any medium for any purpose and
+without fee or royalty is hereby granted, provided that you include the
+following on ALL copies of the document, or portions thereof, that you use:
+
+    * A link or URL to the original W3C document.
+    * The pre-existing copyright notice of the original author, or if it doesn't
+      exist, a notice (hypertext is preferred, but a textual representation is
+      permitted) of the form: "Copyright (c) [$date-of-document] World Wide Web
+      Consortium, (MIT, ERCIM, Keio, Beihang).
+      http://www.w3.org/Consortium/Legal/2015/doc-license"
+    * If it exists, the STATUS of the W3C document.
+
+When space permits, inclusion of the full text of this NOTICE should be
+provided. We request that authorship attribution be provided in any software,
+documents, or other items or products that you create pursuant to the
+implementation of the contents of this document, or any portion thereof.
+
+No right to create modifications or derivatives of W3C documents is granted
+pursuant to this license, except as follows: To facilitate implementation of
+the technical specifications set forth in this document, anyone may prepare and
+distribute derivative works and portions of this document in software, in
+supporting materials accompanying software, and in documentation of software,
+PROVIDED that all such works include the notice below. HOWEVER, the publication
+of derivative works of this document for use as a technical specification is
+expressly prohibited.
+
+In addition, "Code Components"--Web IDL in sections clearly marked as Web IDL;
+and W3C-defined markup (HTML, CSS, etc.) and computer programming language code
+clearly marked as code examples--are licensed under the W3C Software License.
+
+The notice is:
+
+    "Copyright (c) 2015 W3C(R) (MIT, ERCIM, Keio, Beihang). This software or
+    document includes material copied from or derived from [title and URI of
+    the W3C document]." 
+
+Disclaimers
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS
+OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE; NOR THAT THE
+IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY THIRD PARTY PATENTS,
+COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE DOCUMENT OR THE PERFORMANCE
+OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+
+The name and trademarks of copyright holders may NOT be used in advertising or
+publicity pertaining to this document or its contents without specific, written
+prior permission. Title to copyright in this document will at all times remain
+with copyright holders.
+
+
+License notice for OWL 2 Schema
+-------------------------------
+
+This software includes material copied from <http://www.w3.org/2002/07/owl>,
+which is available under the W3C Software and Document License
+<http://www.w3.org/Consortium/Legal/copyright-software>.
+
+Copyright (c) 2009 World Wide Web Consortium, (Massachusetts Institute of
+Technology, European Research Consortium for Informatics and Mathematics, Keio
+University, Beihang).
+
+All rights reserved.
+
+This work is distributed under the W3C(R) Software and Document License in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+License notice for RDF/JS Types
+-------------------------------
+
+This software uses RDF/JS Types, which are available under the MIT License.
+
+Copyright (c) 2020 RDF JavaScript Libraries
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+License notice for VSCode Language Server Types
+-----------------------------------------------
+
+This software bundles the VSCode Language Server types, which are available
+under the MIT License.
+
+Copyright (c) Microsoft Corporation
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+License notice for Roslyn
+-------------------------
+
+This software contains code derived from the .NET Compiler Platform ("Roslyn"),
+which is available under the MIT License.
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+License notice for commonmark.js
+--------------------------------
+
+This software bundles commonmark.js, which is available under the 2-Clause BSD
+License.
+
+Copyright (c) 2014 John MacFarlane
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+License notice for Tree Views in CSS
+------------------------------------
+
+This software includes Kate Rose Morley's Tree Views in CSS, which is available
+under the terms of the Creative Commons CC0 1.0 Universal Legal Code.
+
+
+License notice for Base16 framework
+-----------------------------------
+
+This software uses Chris Kempson's Base16 framework, which is available under
+the MIT License.
+
+Copyright (c) 2012 Chris Kempson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+License notice for Espresso color scheme
+----------------------------------------
+
+This software bundles the Espresso scheme, which was adapted by Alex Mirrington
+from the iTerm2 Espresso theme, which in turn was ported from the original macOS
+Terminal.app theme. The greyscale colors in the scheme are from Chris Kempson's
+Tomorrow theme.
+
+Copyright (c) 2019 Alex Mirrington
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+License notice for Iosevka font
+-------------------------------
+
+This software includes a custom build of Iosevka, which is available under the
+SIL Open Font License, Version 1.1.
+
+Copyright (c) 2015-2022 Renzhi Li
+
+SIL OPEN FONT LICENSE
+
+Version 1.1 - 26 February 2007
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development
+of collaborative font projects, to support the font creation efforts of academic
+and linguistic communities, and to provide a free and open framework in which
+fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The fonts,
+including any derivative works, can be bundled, embedded, redistributed and/or
+sold with any software provided that any reserved names are not used by
+derivative works. The fonts and derivatives, however, cannot be released under
+any other type of license. The requirement for fonts to remain under this
+license does not apply to any document created using the fonts or their
+derivatives.
+
+DEFINITIONS
+
+"Font Software" refers to the set of files released by the Copyright Holder(s)
+    under this license and clearly marked as such. This may include source
+    files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the copyright
+    statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+    distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting, or
+    substituting - in part or in whole - any of the components of the Original
+    Version, by changing formats or by porting the Font Software to a new
+    environment.
+
+"Author" refers to any designer, engineer, programmer, technical writer or other
+    person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+the Font Software, to use, study, copy, merge, embed, modify, redistribute, and
+sell modified and unmodified copies of the Font Software, subject to the
+following conditions:
+
+1) Neither the Font Software nor any of its individual components, in Original
+   or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+   redistributed and/or sold with any software, provided that each copy contains
+   the above copyright notice and this license. These can be included either as
+   stand-alone text files, human-readable headers or in the appropriate
+   machine-readable metadata fields within text or binary files as long as those
+   fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s)
+   unless explicit written permission is granted by the corresponding Copyright
+   Holder. This restriction only applies to the primary font name as presented
+   to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software
+   shall not be used to promote, endorse or advertise any Modified Version,
+   except to acknowledge the contribution(s) of the Copyright Holder(s) and the
+   Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be
+   distributed entirely under this license, and must not be distributed under
+   any other license. The requirement for fonts to remain under this license
+   does not apply to any document created using the Font Software.
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR
+OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT,
+INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR
+FROM OTHER DEALINGS IN THE FONT SOFTWARE.

@@ -1,0 +1,95 @@
+.rdf-iri {
+    overflow-wrap: anywhere;
+    text-decoration: none !important;
+}
+
+.rdf-iri-openangle,
+.rdf-iri-closeangle {
+    color: var(--base05);
+}
+
+.rdf-pname-ln .rdf-iri-prefixlabel {
+    background: var(--base02);
+    border-radius: 4px;
+    color: var(--base05);
+    font-size: small;
+    letter-spacing: initial;
+    padding: 3px 4px 2px;
+    vertical-align: text-top;
+}
+
+.rdf-pname-ln .rdf-iri-colon {
+    color: transparent !important;
+    letter-spacing: -1px;
+    margin: 0 -.1em;
+}
+
+a[href].rdf-pname-ln:active .rdf-iri-localname,
+a[href].rdf-pname-ln:hover .rdf-iri-localname,
+a[href].rdf-iri:active .rdf-iri-ref,
+a[href].rdf-iri:hover .rdf-iri-ref,
+a[href].rdf-iri-blanknode:active,
+a[href].rdf-iri-blanknode:hover {
+    text-decoration: underline !important;
+}
+
+.rdf-blanknode,
+.rdf-iri-blanknode {
+    color: var(--base07);
+}
+
+.rdf-string {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.rdf-langstring-tag,
+.rdf-literal-caretcaret {
+    color: var(--base04);
+}
+
+.rdf-anyURI::before {
+    border-bottom: 1px solid var(--base04);
+    border-left: 1px solid var(--base04);
+    color: var(--base04);
+    content: "\2197";
+    display: inline-block;
+    font-size: .6em;
+    line-height: 1;
+    margin-right: 4px;
+    padding: 0 0 1px 1px;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+.rdf-provenance {
+    color: var(--base03);
+    display: inline-block;
+    font-size: small;
+    letter-spacing: initial;
+}
+
+    .rdf-provenance * {
+        color: inherit !important;
+    }
+
+    .rdf-provenance .rdf-pname-ln .rdf-iri-prefixlabel {
+        background: var(--base01);
+        vertical-align: bottom;
+    }
+
+.rdf-deprecated::after {
+    color: var(--base08);
+    content: '(deprecated)';
+    display: inline-block;
+    font-size: small;
+    letter-spacing: initial;
+    padding-left: .3rem;
+}
+
+.rdf-error .rdf-iri-localname,
+.rdf-error .rdf-iri-ref,
+.rdf-error.rdf-custom,
+.rdf-error.rdf-pname-ns {
+    border-bottom: 2px dotted var(--base08);
+}

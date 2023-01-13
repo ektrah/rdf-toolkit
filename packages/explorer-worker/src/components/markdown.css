@@ -1,0 +1,80 @@
+.markdown {
+    color: var(--base06);
+    counter-reset: section;
+    counter-reset: subsection;
+    counter-reset: subsubsection;
+    counter-reset: subsubsubsection;
+}
+
+    .markdown h3 {
+        color: var(--base07);
+        counter-increment: section;
+        counter-reset: subsection;
+        counter-reset: subsubsection;
+        counter-reset: subsubsubsection;
+    }
+
+        .markdown h3::before {
+            content: counter(section) ".\2002";
+        }
+
+        .markdown h3 + h4 {
+            margin-top: 1rem;
+        }
+
+    .markdown h4 {
+        color: var(--base07);
+        counter-increment: subsection;
+        counter-reset: subsubsection;
+        counter-reset: subsubsubsection;
+    }
+
+        .markdown h4::before {
+            content: counter(section) "." counter(subsection) "\2003";
+        }
+
+        .markdown h4 + h5 {
+            margin-top: 1rem;
+        }
+
+    .markdown h5 {
+        color: var(--base07);
+        counter-increment: subsubsection;
+        counter-reset: subsubsubsection;
+    }
+
+        .markdown h5::before {
+            content: counter(section) "." counter(subsection) "." counter(subsubsection) "\2003";
+        }
+
+        .markdown h5 + h6 {
+            margin-top: 1rem;
+        }
+
+    .markdown h6 {
+        color: var(--base07);
+        counter-increment: subsubsubsection;
+    }
+
+        .markdown h6::before {
+            content: counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) "\2003";
+        }
+
+    .markdown p {
+        margin: 1rem 0;
+    }
+
+    .markdown ul {
+        padding-left: 2rem;
+    }
+
+    .markdown em,
+    .markdown strong {
+        color: var(--base07);
+        font: inherit;
+        text-decoration: underline;
+    }
+
+    .markdown .markdown-html {
+        color: var(--base04);
+    }

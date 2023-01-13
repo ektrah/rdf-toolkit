@@ -1,0 +1,44 @@
+{
+  "name": "@rdf-toolkit/schema",
+  "version": "0.1.0",
+  "description": "",
+  "homepage": "https://github.com/siemens/rdf-toolkit#readme",
+  "bugs": {
+    "url": "https://github.com/siemens/rdf-toolkit/issues"
+  },
+  "license": "MIT",
+  "author": "Klaus Hartke",
+  "type": "module",
+  "files": [
+    "./dist/**/*"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/main.d.ts",
+        "default": "./dist/main.js"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siemens/rdf-toolkit.git"
+  },
+  "scripts": {
+    "lint": "npx eslint src/",
+    "build": "tsc --build",
+    "clean": "rimraf dist/**/*.{js,d.ts,map}"
+  },
+  "dependencies": {
+    "@rdf-toolkit/iterable": "^0.1.0",
+    "@rdf-toolkit/rdf": "^0.1.0",
+    "@rdf-toolkit/text": "^0.1.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "eslint": "^8.31.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.9.4"
+  }
+}

@@ -1,0 +1,4 @@
+.rdf-triples .rdf-blanknode,
+.rdf-triples .rdf-collection {
+    display: inline-grid;
+}

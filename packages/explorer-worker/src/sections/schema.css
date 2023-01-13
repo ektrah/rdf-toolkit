@@ -1,0 +1,59 @@
+table.properties {
+    overflow-wrap: anywhere;
+    table-layout: fixed;
+    width: 100%;
+}
+
+    table.properties th,
+    table.properties td {
+        border-bottom: 1px solid var(--base01);
+        padding: 5px 2ex 5px 0;
+    }
+
+        table.properties th:last-child,
+        table.properties td:last-child {
+            padding-right: 0;
+        }
+
+    table.properties p,
+    table.properties ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        table.properties p + p,
+        table.properties p + ul,
+        table.properties ul + p,
+        table.properties ul + ul {
+            margin-top: .5em;
+        }
+
+.schema-columns {
+    column-count: 3;
+    column-fill: balance;
+    column-gap: 2rem;
+}
+
+.schema-label {
+    color: var(--base03);
+    font-size: small;
+    margin: 0;
+}
+
+    .schema-label * {
+        color: inherit !important;
+    }
+
+    .schema-label .rdf-pname-ln .rdf-iri-prefixlabel {
+        background: var(--base01);
+        vertical-align: bottom;
+    }
+
+.schema-keyword {
+    color: var(--base07);
+}
+
+.schema-list {
+    display: inline-grid;
+}

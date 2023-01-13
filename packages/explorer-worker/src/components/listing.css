@@ -1,0 +1,65 @@
+.listing {
+    background: var(--base01);
+    border: 1px solid var(--base02);
+    color: var(--base06);
+    margin: 1.5rem 0;
+    padding: 0;
+    white-space: pre;
+}
+
+    .listing pre {
+        margin: 1em;
+        overflow-x: auto;
+    }
+
+    .listing table {
+        border-spacing: 0;
+        counter-reset: line-number;
+        line-height: 1.5;
+        margin: 1em;
+        overflow-wrap: anywhere;
+        table-layout: auto;
+        white-space: pre-wrap;
+    }
+
+    .listing td {
+        padding: 0 .5em;
+        vertical-align: top;
+    }
+
+    .listing tr:hover td {
+        background: var(--base02);
+        color: var(--base07);
+    }
+
+    .listing td:first-child {
+        color: var(--base03);
+        overflow-wrap: normal;
+        text-align: right;
+        white-space: pre;
+        width: 0;
+    }
+
+        .listing td:first-child::before {
+            content: counter(line-number);
+            counter-increment: line-number;
+        }
+
+    .listing td:last-child {
+        padding: 0 .5em 0 4em;
+        text-indent: -3.5em;
+        width: auto;
+    }
+
+.listing-tab {
+    color: var(--base02);
+}
+
+    .listing-tab::after {
+        content: "\2192\0020";
+    }
+
+.listing-no-newline {
+    color: var(--base03);
+    font-size: small;
+}

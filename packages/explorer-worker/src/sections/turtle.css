@@ -1,0 +1,19 @@
+.turtle-keyword {
+    color: var(--base07);
+}
+
+.turtle-langtag {
+    color: var(--base04);
+}
+
+.turtle-comment {
+    color: var(--base04);
+}
+
+.turtle-punctuator {
+    color: var(--base05);
+}
+
+.turtle-error {
+    border-bottom: 2px dotted var(--base08);
+}

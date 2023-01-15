@@ -141,9 +141,9 @@ function renderDefinition(class_: Class, context: RenderContext): HtmlContent {
             class_.description ? renderMarkdown(class_.description, context, IRI.is(class_.id) ? class_.id : null) : null
         }
         {
-            renderTabView("definition", [
+            renderTabView("class-definition", [
                 {
-                    id: "definition-schema",
+                    id: "class-definition-schema",
                     label: "Schema",
                     content: renderClassCode(class_, context)
                 },

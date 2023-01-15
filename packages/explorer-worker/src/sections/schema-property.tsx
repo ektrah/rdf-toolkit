@@ -40,9 +40,9 @@ function renderProperty(property: Property, context: RenderContext): HtmlContent
             property.description ? renderMarkdown(property.description, context, property.id) : null
         }
         {
-            renderTabView("definition", [
+            renderTabView("property-definition", [
                 {
-                    id: "definition-schema",
+                    id: "property-definition-schema",
                     label: "Schema",
                     content: renderPropertyCode(property, context)
                 },

@@ -1,6 +1,7 @@
 import { Ix } from "@rdf-toolkit/iterable";
 import { OWLEngine } from "./engines/owl.js";
 import { RDFSEngine } from "./engines/rdfs.js";
+import { SHACLEngine } from "./engines/shacl.js";
 import { RichGraph } from "./graphs/rich.js";
 import { IRI, IRIOrBlankNode, Literal, Term } from "./terms.js";
 import { Triple } from "./triples.js";
@@ -64,6 +65,7 @@ interface Engine {
 class GraphBuilder {
     private readonly rdfsEngine: RDFSEngine = new RDFSEngine();
     private readonly owlEngine: OWLEngine = new OWLEngine();
+    private readonly shaclEngine: SHACLEngine = new SHACLEngine();
 
     private readonly dataset: Iterable<Iterable<Triple>>;
     private readonly triples: Triple[];
@@ -76,7 +78,8 @@ class GraphBuilder {
         for (const triple of triples) {
             const a = this.rdfsEngine.ingest(triple);
             const b = this.owlEngine.ingest(triple);
-            if (a || b) {
+            const c = this.shaclEngine.ingest(triple);
+            if (a || b || c) {
                 this.triples.push(triple);
             }
         }
@@ -87,11 +90,13 @@ class GraphBuilder {
             for (const triple of triples) {
                 this.rdfsEngine.ingest(triple);
                 this.owlEngine.ingest(triple);
+                this.shaclEngine.ingest(triple);
             }
         }
 
         this.ingest(this.rdfsEngine.beforeinterpret());
         this.ingest(this.owlEngine.beforeinterpret());
+        this.ingest(this.shaclEngine.beforeinterpret());
 
         let length;
         do {
@@ -101,6 +106,7 @@ class GraphBuilder {
                 for (const triple of triples) {
                     this.ingest(this.rdfsEngine.interpret(triple));
                     this.ingest(this.owlEngine.interpret(triple));
+                    this.ingest(this.shaclEngine.interpret(triple));
                 }
             }
         }
@@ -108,6 +114,7 @@ class GraphBuilder {
 
         this.ingest(this.rdfsEngine.afterinterpret());
         this.ingest(this.owlEngine.afterinterpret());
+        this.ingest(this.shaclEngine.afterinterpret());
 
         return new RichGraph(this.dataset, this.rdfsEngine);
     }

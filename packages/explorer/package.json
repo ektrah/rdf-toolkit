@@ -7,7 +7,9 @@
     "./dist/**/*"
   ],
   "main": "./dist/explorer.js",
-  "eslintIgnore": [ "src/assets.ts", "src/worker/worker.js" ],
+  "eslintIgnore": [
+    "src/worker/worker.js"
+  ],
   "scripts": {
     "lint": "npx eslint src/",
     "prebuild": "tsc --noEmit",
@@ -15,10 +17,10 @@
     "clean": "rimraf ../../explorer/explorer.{js,css} ../../explorer/assets/*.{js,ttl,woff2}"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.48.1",
-    "@typescript-eslint/parser": "^5.48.1",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
     "esbuild": "^0.16.17",
-    "eslint": "^8.31.0",
+    "eslint": "^8.32.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.9.4"
   }

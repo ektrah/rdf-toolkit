@@ -175,7 +175,7 @@ a {
     a:active,
     a:hover {
         text-decoration: underline;
-        color: var(--base07);
+        color: var(--base07) !important;
     }
 
     a[href^='http://example.com/.well-known/genid/'] {
@@ -186,16 +186,6 @@ a {
     a[href^='http://www.w3.org/2002/07/owl#'],
     a[href^='http://www.w3.org/ns/shacl#'] {
         color: var(--base0B);
-    }
-
-    a[href^='https://brickschema.org/schema/Brick#'],
-    a[href^='https://brickschema.org/schema/BrickShape#'] {
-        color: var(--base0C);
-    }
-
-    a[href='https://w3id.org/rec'],
-    a[href^='https://w3id.org/rec#'] {
-        color: var(--base0D);
     }
 
     a[href='http://www.w3.org/1999/02/22-rdf-syntax-ns'],

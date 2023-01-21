@@ -29,7 +29,9 @@ a[href].rdf-pname-ln:hover .rdf-iri-localname,
 a[href].rdf-iri:active .rdf-iri-ref,
 a[href].rdf-iri:hover .rdf-iri-ref,
 a[href].rdf-iri-blanknode:active,
-a[href].rdf-iri-blanknode:hover {
+a[href].rdf-iri-blanknode:hover,
+a[href].rdf-custom:active,
+a[href].rdf-custom:hover {
     text-decoration: underline !important;
 }
 
@@ -69,7 +71,8 @@ a[href].rdf-iri-blanknode:hover {
     letter-spacing: initial;
 }
 
-    .rdf-provenance * {
+    .rdf-provenance *,
+    .rdf-provenance a {
         color: inherit !important;
     }
 

@@ -25,10 +25,21 @@
  * SOFTWARE.
  */
 
-import { Assets } from "./assets.js";
 import "./main.css";
 import { Backend, Frontend, WorkerChannel } from "./shared.js";
+import owlDocumentURL from "./vocab/owl.ttl";
+import rdfDocumentURL from "./vocab/rdf.ttl";
+import rdfsDocumentURL from "./vocab/rdfs.ttl";
+import xsdDocumentURL from "./vocab/xsd.ttl";
 import "./worker/worker.css";
+import workerScriptURL from "./worker/worker.js";
+
+const REDIRECTIONS: Readonly<Record<string, string>> = {
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns": rdfDocumentURL,
+    "http://www.w3.org/2000/01/rdf-schema": rdfsDocumentURL,
+    "http://www.w3.org/2001/XMLSchema": xsdDocumentURL,
+    "http://www.w3.org/2002/07/owl": owlDocumentURL,
+};
 
 if (!window.Worker) {
     document.write("Your browser doesn't support web workers.");
@@ -47,7 +58,7 @@ else if (typeof fetch !== "function") {
 }
 else {
     const documentTitle = document.title;
-    const worker = new Worker(Assets.workerScript);
+    const worker = new Worker(workerScriptURL);
     const navigationPane = document.createElement("nav");
     const mainContent = document.createElement("main");
     const dialog = document.createElement("dialog");
@@ -200,8 +211,12 @@ else {
 
         const documents: { readonly uri: string, readonly response: Promise<Response> }[] = [];
 
-        for (const uri in Assets.vocabularies) {
-            documents.push({ uri, response: fetch(new URL(Assets.vocabularies[uri], window.location.href)) });
+        const links = document.getElementsByTagName("link");
+        for (let i = 0; i < links.length; i++) {
+            const link = links.item(i);
+            if (link?.type === "application/turtle") {
+                documents.push({ uri: new URL(link.href, document.location.href).href, response: fetch(new URL(REDIRECTIONS[link.href] || link.href, document.location.href)) });
+            }
         }
 
         for (const document of documents) {

@@ -116,6 +116,8 @@ else {
 
     const backend: Backend = WorkerChannel.connect<Frontend, Backend>(worker, () => frontend);
 
+    let unsavedChanges = false;
+
     worker.onerror = window.onunhandledrejection = window.onerror = function () {
         progress.className = "progress-bar loaded";
         frontend.showDialog("<p>Oops!</p><p>Something went wrong.</p><p>Please check the developer console for more information.</p>");
@@ -186,6 +188,7 @@ else {
             const sourceText = await document.arrayBuffer;
             const sourceTextHash = await crypto.subtle.digest("SHA-256", sourceText);
             backend.compile(document.uri, sourceText, sourceTextHash);
+            unsavedChanges = true;
         }
 
         backend.aftercompile();
@@ -195,6 +198,16 @@ else {
     window.onhashchange = function () {
         progress.className = "progress-bar loading";
         backend.navigateTo(location.hash.startsWith("#") ? location.hash.substr("#".length) : "");
+    }
+
+    window.onbeforeunload = function (ev) {
+        if (unsavedChanges) {
+            ev.preventDefault();
+            return ev.returnValue = "Are you sure you want to exit?";
+        }
+        else {
+            return undefined;
+        }
     }
 
     window.onload = async function () {

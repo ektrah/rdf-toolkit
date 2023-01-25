@@ -1,3 +1,4 @@
+import { IRIReference } from "@rdf-toolkit/text";
 import { SyntaxToken, SyntaxTokens, TokenKind } from "./token.js";
 import { SyntaxTrivia } from "./trivia.js";
 
@@ -261,6 +262,201 @@ export type SyntaxNode =
     | AnonSyntax;
 
 export namespace SyntaxNode {
+
+    export function createDocument(statements: readonly StatementSyntax[], trailingTrivia: readonly SyntaxTrivia[] = []): DocumentSyntax {
+        return {
+            kind: SyntaxKind.Document,
+            statements,
+            endOfFile: SyntaxToken.create(TokenKind.EndOfFile, undefined, undefined, trailingTrivia)
+        };
+    }
+
+    export function createPrefixDirective(prefixLabel: string, iriReference: IRIReference, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.carriageReturnLineFeed]): PrefixDirectiveSyntax {
+        return {
+            kind: SyntaxKind.PrefixDirective,
+            keyword: SyntaxToken.create(TokenKind.AtPrefixKeyword, undefined, undefined, leadingTrivia, [SyntaxTrivia.space]),
+            prefixLabel: SyntaxToken.create(TokenKind.PNAME_NS, { prefixLabel }, undefined, undefined, [SyntaxTrivia.space]),
+            iriReference: SyntaxToken.create(TokenKind.IRIREF, iriReference, undefined, undefined, [SyntaxTrivia.space]),
+            dotToken: SyntaxToken.create(TokenKind.Dot, undefined, undefined, undefined, trailingTrivia)
+        };
+    }
+
+    export function createBaseDirective(iriReference: IRIReference, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.carriageReturnLineFeed]): BaseDirectiveSyntax {
+        return {
+            kind: SyntaxKind.BaseDirective,
+            keyword: SyntaxToken.create(TokenKind.AtBaseKeyword, undefined, undefined, leadingTrivia, [SyntaxTrivia.space]),
+            iriReference: SyntaxToken.create(TokenKind.IRIREF, iriReference, undefined, undefined, [SyntaxTrivia.space]),
+            dotToken: SyntaxToken.create(TokenKind.Dot, undefined, undefined, undefined, trailingTrivia)
+        };
+    }
+
+    export function createSubjectPredicateObjectList(subject: SubjectSyntax, predicateObjectList: PredicateObjectListSyntax, trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.carriageReturnLineFeed]): SubjectPredicateObjectListSyntax {
+        return {
+            kind: SyntaxKind.SubjectPredicateObjectList,
+            subject,
+            predicateObjectList,
+            dotToken: SyntaxToken.create(TokenKind.Dot, undefined, undefined, undefined, trailingTrivia)
+        };
+    }
+
+    export function createBlankNodePredicateObjectList(blankNode: BlankNodePropertyListSyntax, predicateObjectList?: PredicateObjectListSyntax, trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.carriageReturnLineFeed]): BlankNodePredicateObjectListSyntax {
+        return {
+            kind: SyntaxKind.BlankNodePredicateObjectList,
+            blankNode,
+            predicateObjectList,
+            dotToken: SyntaxToken.create(TokenKind.Dot, undefined, undefined, undefined, trailingTrivia)
+        };
+    }
+
+    export function createPredicateObjectList(first: VerbObjectListSyntax, separatingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space], ...rest: readonly VerbObjectListSyntax[]): PredicateObjectListSyntax {
+        function createTail(index: number): PredicateObjectListTailSyntax | undefined {
+            return index >= rest.length ? undefined : {
+                kind: SyntaxKind.PredicateObjectListTail,
+                semicolonToken: SyntaxToken.create(TokenKind.Semicolon, undefined, undefined, undefined, separatingTrivia),
+                verbObjectList: rest[index],
+                tail: createTail(index + 1)
+            };
+        }
+
+        return {
+            kind: SyntaxKind.PredicateObjectList,
+            verbObjectList: first,
+            tail: createTail(0)
+        };
+    }
+
+    export function createVerbObjectList(verb: PredicateSyntax, objectList: ObjectListSyntax): VerbObjectListSyntax {
+        return {
+            kind: SyntaxKind.VerbObjectList,
+            verb,
+            objectList
+        };
+    }
+
+    export function createObjectList(first: ObjectSyntax, separatingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space], ...rest: readonly ObjectSyntax[]): ObjectListSyntax {
+        function createTail(index: number): ObjectListTailSyntax | undefined {
+            return index >= rest.length ? undefined : {
+                kind: SyntaxKind.ObjectListTail,
+                commaToken: SyntaxToken.create(TokenKind.Comma, undefined, undefined, undefined, separatingTrivia),
+                object: rest[index],
+                tail: createTail(index + 1)
+            };
+        }
+
+        return {
+            kind: SyntaxKind.ObjectList,
+            object: first,
+            tail: createTail(0)
+        };
+    }
+
+    export function createA(leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): ASyntax {
+        return {
+            kind: SyntaxKind.A,
+            keyword: SyntaxToken.create(TokenKind.AKeyword, undefined, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createBlankNodePropertyList(predicateObjectList: PredicateObjectListSyntax, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): BlankNodePropertyListSyntax {
+        return {
+            kind: SyntaxKind.BlankNodePropertyList,
+            openBracketToken: SyntaxToken.create(TokenKind.OpenBracket, undefined, undefined, leadingTrivia, undefined),
+            predicateObjectList,
+            closeBracketToken: SyntaxToken.create(TokenKind.CloseBracket, undefined, undefined, undefined, trailingTrivia)
+        };
+    }
+
+    export function createCollection(objects: readonly ObjectSyntax[], leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): CollectionSyntax {
+        return {
+            kind: SyntaxKind.Collection,
+            openParenToken: SyntaxToken.create(TokenKind.OpenParen, undefined, undefined, leadingTrivia, undefined),
+            objects,
+            closeParenToken: SyntaxToken.create(TokenKind.CloseParen, undefined, undefined, undefined, trailingTrivia)
+        };
+    }
+
+    export function createIntegerLiteral(value: bigint, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): IntegerLiteralSyntax {
+        return {
+            kind: SyntaxKind.IntegerLiteral,
+            token: SyntaxToken.create(TokenKind.INTEGER, value, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createDecimalLiteral(value: number, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): DecimalLiteralSyntax {
+        return {
+            kind: SyntaxKind.DecimalLiteral,
+            token: SyntaxToken.create(TokenKind.DECIMAL, value, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createDoubleLiteral(value: number, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): DoubleLiteralSyntax {
+        return {
+            kind: SyntaxKind.DoubleLiteral,
+            token: SyntaxToken.create(TokenKind.DOUBLE, value, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createRDFLiteral(value: string, datatypeIRI: IRISyntax, leadingTrivia: readonly SyntaxTrivia[] = []): RDFLiteralSyntax {
+        return {
+            kind: SyntaxKind.RDFLiteral,
+            token: SyntaxToken.create(TokenKind.STRING_LITERAL_QUOTE, value, undefined, leadingTrivia, undefined),
+            suffix: {
+                kind: SyntaxKind.DatatypeAnnotation,
+                caretCaretToken: SyntaxToken.create(TokenKind.CaretCaret, undefined),
+                iri: datatypeIRI
+            }
+        };
+    }
+
+    export function createStringLiteral(value: string, language?: string, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): RDFLiteralSyntax {
+        return language ? {
+            kind: SyntaxKind.RDFLiteral,
+            token: SyntaxToken.create(TokenKind.STRING_LITERAL_QUOTE, value, undefined, leadingTrivia, undefined),
+            suffix: {
+                kind: SyntaxKind.LanguageTag,
+                token: SyntaxToken.create(TokenKind.LANGTAG, language, undefined, undefined, trailingTrivia),
+            }
+        } : {
+            kind: SyntaxKind.RDFLiteral,
+            token: SyntaxToken.create(TokenKind.STRING_LITERAL_QUOTE, value, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createBooleanLiteral(value: boolean, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): BooleanLiteralSyntax {
+        return {
+            kind: SyntaxKind.BooleanLiteral,
+            token: SyntaxToken.create(value ? TokenKind.TrueKeyword : TokenKind.FalseKeyword, undefined, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createIRIReference(value: IRIReference, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): IRIReferenceSyntax {
+        return {
+            kind: SyntaxKind.IRIReference,
+            token: SyntaxToken.create(TokenKind.IRIREF, value, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createPrefixedName(prefixLabel: string, localName: string, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): PrefixedNameSyntax {
+        return {
+            kind: SyntaxKind.PrefixedName,
+            token: SyntaxToken.create(TokenKind.PNAME_LN, { prefixLabel, localName }, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createBlankNodeLabel(localName: string, leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): BlankNodeLabelSyntax {
+        return {
+            kind: SyntaxKind.BlankNodeLabel,
+            token: SyntaxToken.create(TokenKind.BLANK_NODE_LABEL, { localName }, undefined, leadingTrivia, trailingTrivia)
+        };
+    }
+
+    export function createAnon(leadingTrivia: readonly SyntaxTrivia[] = [], trailingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space]): AnonSyntax {
+        return {
+            kind: SyntaxKind.Anon,
+            openBracketToken: SyntaxToken.create(TokenKind.OpenBracket, undefined, undefined, leadingTrivia, undefined),
+            closeBracketToken: SyntaxToken.create(TokenKind.CloseBracket, undefined, undefined, undefined, trailingTrivia)
+        };
+    }
 
     export function is(node: SyntaxTrivia | SyntaxToken | SyntaxNode): node is SyntaxNode {
         return node.kind >= 300;

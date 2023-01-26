@@ -6,6 +6,7 @@ import { TurtleParser } from "./parser.js";
 import { TurtleScanner } from "./scanner.js";
 import { DocumentSyntax, SyntaxNode, SyntaxToken } from "./syntax.js";
 
+export * from "./syntax-visitor.js";
 export * from "./syntax.js";
 
 export interface ParserState {

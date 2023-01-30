@@ -33,7 +33,7 @@ function renderPropertyCode(property: Property, context: RenderContext): HtmlCon
     </>);
 }
 
-function renderProperty(property: Property, context: RenderContext): HtmlContent {
+function renderPropertyDefinition(property: Property, context: RenderContext): HtmlContent {
     return <section>
         <h2>Definition</h2>
         {
@@ -49,6 +49,23 @@ function renderProperty(property: Property, context: RenderContext): HtmlContent
             ])
         }
     </section>;
+}
+
+function renderPropertyDomain(property: Property, context: RenderContext): HtmlContent {
+    return Ix.from(property.domainIncludes)
+        .map(class_ => <li>{renderRdfTerm(class_, context, { rawBlankNodes: true })}</li>)
+        .wrap(classes =>
+            <section>
+                <h2>Domain Includes</h2>
+                <ul class="schema-columns">{classes}</ul>
+            </section>, null);
+}
+
+function renderProperty(property: Property, context: RenderContext): HtmlContent {
+    return <>
+        {renderPropertyDefinition(property, context)}
+        {renderPropertyDomain(property, context)}
+    </>;
 }
 
 export default function render(subject: IRI, context: RenderContext): HtmlContent {

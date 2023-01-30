@@ -79,6 +79,7 @@ export class SchemaBuilder {
         }>,
         readonly properties: Map<IRI, {
             description: string | undefined,
+            readonly domainIncludes: Set<IRIOrBlankNode>
         }>,
     };
 
@@ -166,12 +167,25 @@ export class SchemaBuilder {
         if (!p) {
             this.schema.properties.set(property, p = {
                 description: undefined,
+                domainIncludes: new Set(),
             });
         }
 
         if (typeof p.description === "undefined") {
             p.description = description;
         }
+    }
+
+    addPropertyClass(property: IRI, class_: IRIOrBlankNode): void {
+        let p = this.schema.properties.get(property);
+        if (!p) {
+            this.schema.properties.set(property, p = {
+                description: undefined,
+                domainIncludes: new Set(),
+            });
+        }
+
+        p.domainIncludes.add(class_);
     }
 
     toSchema(dataset: Iterable<Iterable<Triple>>, graph: Graph): Schema {
@@ -188,11 +202,10 @@ export class SchemaBuilder {
 
                         description: c[1].description,
 
-                        subClassOf: getDirectSuperClasses(c[0], graph)
-                            .sort((a, b) => a.compareTo(b))
-                            .toArray(),
+                        subClassOf: Array.from(getDirectSuperClasses(c[0], graph))
+                            .sort((a, b) => a.compareTo(b)),
 
-                        properties: Ix.from(c[1].properties)
+                        properties: Array.from(c[1].properties)
                             .sort((a, b) => a[0].compareTo(b[0]))
                             .map(p => ({
                                 id: p[0],
@@ -207,16 +220,15 @@ export class SchemaBuilder {
                                         .concatMap(x => mapNodeKind(x)))
                                     .concatIfEmpty((graph.isInstanceOf(p[0], Owl.ObjectProperty) ? Ix.of(Owl.Thing) : Ix.empty)
                                         .concat(graph.isInstanceOf(p[0], Owl.DatatypeProperty) ? Ix.of(Rdfs.Literal) : Ix.empty))
-                                    .sort((a, b) => a.compareTo(b))
-                                    .toArray(),
+                                    .toArray()
+                                    .sort((a, b) => a.compareTo(b)),
 
                                 minCount: typeof p[1].minCount === "undefined" ? 0n : p[1].minCount,
 
                                 maxCount: typeof p[1].maxCount === "undefined" ? -1n : p[1].maxCount,
 
                                 deprecated: graph.isDeprecated(p[0])
-                            }))
-                            .toArray(),
+                            })),
 
                         deprecated: graph.isDeprecated(c[0])
                     })),
@@ -232,9 +244,10 @@ export class SchemaBuilder {
 
                         description: p[1].description,
 
-                        subPropertyOf: graph
-                            .getDirectSuperProperties(p[0])
-                            .toArray()
+                        subPropertyOf: Array.from(graph.getDirectSuperProperties(p[0])),
+
+                        domainIncludes: Array.from(p[1].domainIncludes)
+                            .sort((a, b) => a.compareTo(b))
                     })),
 
             ontologies: Ix.from(getOntologies(dataset, graph))

@@ -66,6 +66,7 @@ function decompileOWLRestriction(restriction: IRIOrBlankNode, graph: Graph, clas
     builder.addClass(class_, getDescription(class_, graph));
     for (const property of properties) {
         builder.addClassProperty(class_, property, getDescription(property, graph), minCount, maxCount);
+        builder.addPropertyClass(property, class_);
         for (const value of values.concatIfEmpty(graph.getPropertyRange(property).concatMap(x => splitRange(x, graph)))) {
             builder.addClassPropertyValue(class_, property, value);
         }

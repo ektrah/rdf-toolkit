@@ -36,6 +36,7 @@ export interface Property {
     readonly id: IRI;
     readonly description?: string;
     readonly subPropertyOf: readonly IRI[];
+    readonly domainIncludes: readonly IRIOrBlankNode[];
 }
 
 export interface Ontology {

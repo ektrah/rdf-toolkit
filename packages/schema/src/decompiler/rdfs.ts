@@ -43,6 +43,7 @@ export default function decompile(graph: Graph, builder: SchemaBuilder): void {
             const classDescription = getDescription(class_, graph);
             builder.addClass(class_, classDescription);
             builder.addClassProperty(class_, property, propertyDescription, undefined, undefined);
+            builder.addPropertyClass(property, class_);
             for (const value of values) {
                 builder.addClassPropertyValue(class_, property, value);
             }

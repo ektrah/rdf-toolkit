@@ -31,7 +31,7 @@ function getSuperClasses(class_: Class, schema: Schema): Ix<IRIOrBlankNode> {
     return Ix.from(superClasses);
 }
 
-function renderProperty(class_: Class, prop: ClassProperty, propertyClass: Class, context: RenderContext): HtmlContent {
+function renderClassProperty(class_: Class, prop: ClassProperty, propertyClass: Class, context: RenderContext): HtmlContent {
     return <tr>
         <td>
             <p>
@@ -51,7 +51,7 @@ function renderProperty(class_: Class, prop: ClassProperty, propertyClass: Class
     </tr>;
 }
 
-function renderProperties(class_: Class, context: RenderContext): HtmlContent {
+function renderClassProperties(class_: Class, context: RenderContext): HtmlContent {
     return <section>
         <h2>Properties</h2>
         <table class="properties">
@@ -66,7 +66,7 @@ function renderProperties(class_: Class, context: RenderContext): HtmlContent {
                 {
                     getSuperClasses(class_, context.schema)
                         .map(x => context.schema.classes.get(x))
-                        .concatMap(c => c ? Ix.from(c.properties).map(p => renderProperty(class_, p, c, context)) : Ix.empty)
+                        .concatMap(c => c ? Ix.from(c.properties).map(p => renderClassProperty(class_, p, c, context)) : Ix.empty)
                 }
             </tbody>
         </table>
@@ -134,7 +134,7 @@ function renderClassCode(class_: Class, context: RenderContext): HtmlContent {
     </>);
 }
 
-function renderDefinition(class_: Class, context: RenderContext): HtmlContent {
+function renderClassDefinition(class_: Class, context: RenderContext): HtmlContent {
     return <section>
         <h2>Definition</h2>
         {
@@ -152,7 +152,7 @@ function renderDefinition(class_: Class, context: RenderContext): HtmlContent {
     </section>;
 }
 
-function renderInstances(class_: Class, context: RenderContext): HtmlContent {
+function renderClassInstances(class_: Class, context: RenderContext): HtmlContent {
     return context.graph.getDirectInstances(class_.id)
         .sort((a, b) => a.compareTo(b))
         .map(instance => <li>{renderRdfTerm(instance, context, { rawBlankNodes: true })}</li>)
@@ -165,9 +165,9 @@ function renderInstances(class_: Class, context: RenderContext): HtmlContent {
 
 function renderClass(class_: Class, context: RenderContext): HtmlContent {
     return <>
-        {renderDefinition(class_, context)}
-        {renderInstances(class_, context)}
-        {renderProperties(class_, context)}
+        {renderClassDefinition(class_, context)}
+        {renderClassInstances(class_, context)}
+        {renderClassProperties(class_, context)}
     </>;
 }
 

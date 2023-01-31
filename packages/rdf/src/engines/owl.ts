@@ -1,19 +1,27 @@
+import { MultiMap } from "@rdf-toolkit/iterable";
 import { IRIOrBlankNode } from "../terms.js";
 import { Triple } from "../triples.js";
 import { Owl, Rdf, Rdfs } from "../vocab.js";
 
 export class OWLEngine {
 
+    readonly equivalentClassMap: MultiMap<IRIOrBlankNode, IRIOrBlankNode>;       //  {Class} -- owl:equivalentClass --> {Class}
+
     readonly firstMap: Map<IRIOrBlankNode, Triple>;
     readonly restMap: Map<IRIOrBlankNode, Triple>;
 
     constructor() {
+        this.equivalentClassMap = new MultiMap();
+
         this.firstMap = new Map();
         this.restMap = new Map();
     }
 
     ingest(triple: Triple): boolean {
         switch (triple.predicate) {
+            case Owl.equivalentClass:
+                return IRIOrBlankNode.is(triple.object) && this.equivalentClassMap.add(triple.subject, triple.object);
+
             case Rdf.first:
                 this.firstMap.set(triple.subject, triple);
                 break;
@@ -26,13 +34,22 @@ export class OWLEngine {
     }
 
     *beforeinterpret(): Generator<Triple> {
+        yield Triple.createAxiomatic(Owl.equivalentClass, Rdfs.domain, Rdfs.Class);
+        yield Triple.createAxiomatic(Owl.intersectionOf, Rdfs.domain, Rdfs.Class);
+        yield Triple.createAxiomatic(Owl.unionOf, Rdfs.domain, Rdfs.Class);
+
+        yield Triple.createAxiomatic(Owl.equivalentClass, Rdfs.range, Rdfs.Class);
+        yield Triple.createAxiomatic(Owl.intersectionOf, Rdfs.range, Rdf.List);
+        yield Triple.createAxiomatic(Owl.unionOf, Rdfs.range, Rdf.List);
     }
 
     *interpret(triple: Triple): Generator<Triple> {
 
-        // every OWL class is a subclass of owl:Thing
+        // every OWL class is a subclass of owl:Thing and equivalent to itself
         if (triple.subject !== Rdfs.Resource && triple.predicate === Rdf.type && triple.object === Owl.Class) {
-            yield Triple.createInferred(triple.subject, Rdfs.subClassOf, Owl.Thing, triple);
+            const class_ = triple.subject;
+            yield Triple.createInferred(class_, Rdfs.subClassOf, Owl.Thing, triple);
+            yield Triple.createInferred(class_, Owl.equivalentClass, class_, triple);
         }
 
         // every class in a union is a subclass of the union
@@ -68,6 +85,17 @@ export class OWLEngine {
                 else {
                     list = Rdf.nil;
                 }
+            }
+        }
+
+        // class equivalence is reflexive, symmetric, and transitive
+        if (triple.predicate === Owl.equivalentClass && IRIOrBlankNode.is(triple.object)) {
+            const class_ = triple.subject;
+            const equivalentClass = triple.object;
+            yield Triple.createInferred(class_, Owl.equivalentClass, class_, triple);
+            yield Triple.createInferred(equivalentClass, Owl.equivalentClass, class_, triple);
+            for (const transitiveEquivalentClass of this.equivalentClassMap.get(equivalentClass)) {
+                yield Triple.createInferred(class_, Owl.equivalentClass, transitiveEquivalentClass, triple);
             }
         }
     }

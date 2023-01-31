@@ -44,6 +44,7 @@ export interface Graph {
     getDirectSuperProperties(property: IRI): Ix<IRI>;
     getDirectSubProperties(property: IRI): Ix<IRI>;
 
+    getEquivalentClasses(type: IRIOrBlankNode): Ix<IRIOrBlankNode>;
     isDeprecated(resource: IRIOrBlankNode): boolean;
 }
 
@@ -116,6 +117,6 @@ class GraphBuilder {
         this.ingest(this.owlEngine.afterinterpret());
         this.ingest(this.shaclEngine.afterinterpret());
 
-        return new RichGraph(this.dataset, this.rdfsEngine);
+        return new RichGraph(this.dataset, this.rdfsEngine, this.owlEngine);
     }
 }

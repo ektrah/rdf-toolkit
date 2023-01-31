@@ -26,7 +26,7 @@ export default function decompile(graph: Graph, builder: SchemaBuilder): void {
                         }
                     }
                 }
-                for (const equivalentClass of graph.objects(queue[i], Owl.equivalentClass).ofType(IRIOrBlankNode.is)) {
+                for (const equivalentClass of graph.getEquivalentClasses(queue[i])) {
                     if (queue.indexOf(equivalentClass) < 0) {
                         queue.push(equivalentClass);
                     }

@@ -1,4 +1,5 @@
 import { Ix, MultiMap, ReadonlyMultiMap } from "@rdf-toolkit/iterable";
+import { OWLEngine } from "../engines/owl.js";
 import { RDFSEngine } from "../engines/rdfs.js";
 import { IRI, IRIOrBlankNode, Literal, Term } from "../terms.js";
 import { Triple } from "../triples.js";
@@ -24,7 +25,9 @@ export class RichGraph extends IndexedGraph {
     private readonly directSuperProperties: ReadonlyMultiMap<IRI, IRI>;
     private readonly directSubProperties: ReadonlyMultiMap<IRI, IRI>;
 
-    constructor(dataset: Iterable<Iterable<Triple>>, rdfsEngine: RDFSEngine) {
+    readonly equivalentClassMap: MultiMap<IRIOrBlankNode, IRIOrBlankNode>;              //  {Class} -- owl:equivalentClass --> {Class}
+
+    constructor(dataset: Iterable<Iterable<Triple>>, rdfsEngine: RDFSEngine, owlEngine: OWLEngine) {
         super(dataset);
 
         this.typeMap = rdfsEngine.typeMap;
@@ -43,6 +46,8 @@ export class RichGraph extends IndexedGraph {
         this.directSubClasses = direct(this.subClasses);
         this.directSuperProperties = direct(this.subPropertyOfMap);
         this.directSubProperties = direct(this.subProperties);
+
+        this.equivalentClassMap = owlEngine.equivalentClassMap;
     }
 
     // ---
@@ -148,6 +153,10 @@ export class RichGraph extends IndexedGraph {
     }
 
     // ---
+
+    getEquivalentClasses(type: IRIOrBlankNode): Ix<IRIOrBlankNode> {
+        return this.equivalentClassMap.get(type);
+    }
 
     isDeprecated(resource: IRIOrBlankNode): boolean {
         return this.isInstanceOf(resource, Owl.DeprecatedClass) ||

@@ -15,7 +15,7 @@ export type Term =
 
 export namespace IRIOrBlankNode {
 
-    export function is(term: Term): term is IRIOrBlankNode {
+    export function is(term: Term): term is IRI | BlankNode {
         return term.termType === "NamedNode" || term.termType === "BlankNode";
     }
 }

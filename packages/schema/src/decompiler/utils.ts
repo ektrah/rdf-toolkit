@@ -3,6 +3,7 @@ import { Graph } from "@rdf-toolkit/rdf/graphs";
 import { IRI, IRIOrBlankNode, Literal, Term } from "@rdf-toolkit/rdf/terms";
 import { Triple } from "@rdf-toolkit/rdf/triples";
 import { Owl, Rdf, Rdfs, Shacl, Vocabulary } from "@rdf-toolkit/rdf/vocab";
+import { IRIReference } from "@rdf-toolkit/text";
 import { Class, EntityKind, Ontology, Property, Schema } from "../main.js";
 
 const Dc11 = Vocabulary.create("http://purl.org/dc/elements/1.1/", ["description", "title", "date"]);
@@ -266,6 +267,7 @@ function getOntologies(dataset: Iterable<Iterable<Triple>>, graph: Graph): Ontol
         let id1: IRIOrBlankNode | null = null;
         let id2: IRIOrBlankNode | null = null;
         let id3: IRIOrBlankNode | null = null;
+        let id4: IRIOrBlankNode | null = null;
         for (const triple of triples) {
             switch (triple.predicate) {
                 case Rdf.type:
@@ -293,8 +295,14 @@ function getOntologies(dataset: Iterable<Iterable<Triple>>, graph: Graph): Ontol
                     }
                     break;
             }
+            if (Triple.isParsed(triple) && !id4) {
+                const iriref = IRIReference.parse(triple.location.uri);
+                if (iriref && iriref.scheme) {
+                    id4 = IRI.create(iriref);
+                }
+            }
         }
-        const id = id1 || id2 || id3;
+        const id = id1 || id2 || id3 || id4;
         if (id) {
             ontologies.push({
                 kind: EntityKind.Ontology,

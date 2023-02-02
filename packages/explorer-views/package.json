@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "name": "@rdf-toolkit/explorer-views",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "lint": "npx eslint src/",
+    "build": "tsc --noEmit",
+    "clean": ""
+  },
+  "devDependencies": {
+    "@rdf-toolkit/iterable": "^0.1.0",
+    "@rdf-toolkit/rdf": "^0.1.0",
+    "@rdf-toolkit/schema": "^0.1.0",
+    "@rdf-toolkit/text": "^0.1.0",
+    "@rdf-toolkit/turtle": "^0.1.0",
+    "@types/commonmark": "^0.27.5",
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "commonmark": "^0.30.0",
+    "eslint": "^8.33.0",
+    "typescript": "^4.9.4"
+  }
+}

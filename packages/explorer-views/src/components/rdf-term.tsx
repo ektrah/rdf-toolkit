@@ -225,8 +225,7 @@ function renderLiteral(literal: Literal, context: RenderContext, options: Render
 
     if (literal.datatype === Xsd.anyURI && options.anyURIAsLink) {
         try {
-            const url = new URL(literal.value, Xsd.anyURI.value).href;
-            return <a class="rdf-anyURI" href={url} rel="external" target="_blank">{options.linkContents || url}</a>;
+            return <a class="rdf-anyURI" href={literal.value} rel="external" target="_blank">{options.linkContents || literal.value}</a>;
         } catch { }
     }
 

@@ -25,8 +25,8 @@
  * SOFTWARE.
  */
 
+import { Backend, Frontend, WorkerChannel } from "@rdf-toolkit/explorer-shared";
 import "./main.css";
-import { Backend, Frontend, WorkerChannel } from "./shared.js";
 import owlDocumentURL from "./vocab/owl.ttl";
 import rdfDocumentURL from "./vocab/rdf.ttl";
 import rdfsDocumentURL from "./vocab/rdfs.ttl";

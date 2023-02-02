@@ -7,6 +7,8 @@
     "packages/rdf",
     "packages/schema",
     "packages/turtle",
+    "packages/explorer-shared",
+    "packages/explorer-views",
     "packages/explorer-worker",
     "packages/explorer"
   ],

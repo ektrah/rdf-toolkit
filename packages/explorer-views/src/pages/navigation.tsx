@@ -1,6 +1,6 @@
 import { Ix } from "@rdf-toolkit/iterable";
 import { IRI, IRIOrBlankNode } from "@rdf-toolkit/rdf/terms";
-import { Owl, Rdf, Rdfs } from "@rdf-toolkit/rdf/vocab";
+import { Owl, Rdfs } from "@rdf-toolkit/rdf/vocab";
 import { Class, Ontology, Property } from "@rdf-toolkit/schema";
 import renderRdfTerm, { RenderOptions } from "../components/rdf-term.js";
 import renderTabView from "../components/tabview.js";

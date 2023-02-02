@@ -2,9 +2,9 @@
   "name": "@rdf-toolkit/rdf",
   "version": "0.1.0",
   "description": "",
-  "homepage": "https://github.com/siemens/rdf-toolkit#readme",
+  "homepage": "https://github.com/ektrah/rdf-toolkit#readme",
   "bugs": {
-    "url": "https://github.com/siemens/rdf-toolkit/issues"
+    "url": "https://github.com/ektrah/rdf-toolkit/issues"
   },
   "license": "MIT",
   "author": "Klaus Hartke",
@@ -40,7 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/siemens/rdf-toolkit.git"
+    "url": "git+https://github.com/ektrah/rdf-toolkit.git"
   },
   "scripts": {
     "lint": "npx eslint src/",

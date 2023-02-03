@@ -235,12 +235,12 @@ declare global {
                 src: string;
                 srcset?: string;
                 sizes?: string;
-                crossorigin?: string;
+                crossorigin?: "anonymous" | "use-credentials";
                 usemap?: string;
                 ismap?: boolean;
                 width?: number;
                 height?: number;
-                referrerpolicy?: string;
+                referrerpolicy?: "" | "no-referrer" | "no-referrer-when-downgrade" | "same-origin" | "origin" | "strict-origin" | "origin-when-cross-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
                 decoding?: string;
                 loading?: string;
             };
@@ -356,8 +356,20 @@ declare global {
             // 4.12 Scripting
             //
 
-            //script
-            //noscript
+            script: GlobalAttributes & {
+                src?: string;
+                type?: string;
+                nomodule?: boolean;
+                async?: boolean;
+                defer?: boolean;
+                crossorigin?: "anonymous" | "use-credentials";
+                integrity?: string;
+                referrerpolicy?: "" | "no-referrer" | "no-referrer-when-downgrade" | "same-origin" | "origin" | "strict-origin" | "origin-when-cross-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
+                blocking?: "render";
+            };
+
+            noscript: GlobalAttributes;
+
             //template
             //slot
             //canvas

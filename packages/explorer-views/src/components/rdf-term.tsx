@@ -52,19 +52,23 @@ function renderCompactedBlankNode(node: BlankNode, context: RenderContext, optio
             case Owl.unionOf:
             case Owl.oneOf:
             case Owl.onProperty:
-                if (Triple.isInferred(triple)) {
-                    break;
+                if (!Triple.isInferred(triple)) {
+                    content.push(<span>
+                        {first ? "[ " : "; "}
+                        {render(triple.predicate, context, options)}
+                        {" "}
+                        {render(triple.object, context, options)}
+                    </span>);
+                    first = false;
                 }
-                content.push(<span>
-                    {first ? "[ " : "; "}
-                    {render(triple.predicate, context, options)}
-                    {" "}
-                    {render(triple.object, context, options)}
-                </span>);
-                first = false;
-                continue;
+                else {
+                    omitted = true;
+                }
+                break;
+            default:
+                omitted = true;
+                break;
         }
-        omitted = true;
     }
 
     if (omitted) {

@@ -67,13 +67,17 @@ function renderCompactedBlankNode(node: BlankNode, context: RenderContext, optio
     }
 
     if (omitted) {
+        const href = context.rewriteHref ? context.rewriteHref(node.value) : node.value;
+        const data = context.rewriteHrefAsData ? context.rewriteHrefAsData(node.value) : undefined;
+
         const css = [
             "rdf-iri-blanknode",
             "rdf-iri",
             !options.hideError && context.graph.triples(node).every(Triple.isInferred) ? "rdf-error" : null,
             !options.hideDeprecationHint && context.graph.isDeprecated(node) ? "rdf-deprecated" : null,
         ];
-        content.push(<span>{first ? "[ " : "; "}<a class={css} href={node.value}>&#x2026;</a></span>);
+
+        content.push(<span>{first ? "[ " : "; "}<a class={css} href={href} data-href={data}>&#x2026;</a></span>);
         first = false;
     }
 
@@ -145,6 +149,9 @@ function renderShortenedIRI(iri: IRIOrBlankNode, options: RenderOptions): string
 }
 
 function renderExpandedIRI(iri: IRIOrBlankNode, context: RenderContext, options: RenderOptions): HtmlContent {
+    const href = context.rewriteHref ? context.rewriteHref(iri.value) : iri.value;
+    const data = context.rewriteHrefAsData ? context.rewriteHrefAsData(iri.value) : undefined;
+
     const css = [
         "rdf-iri",
         !options.hideError && context.graph.triples(iri).every(Triple.isInferred) ? "rdf-error" : null,
@@ -152,7 +159,7 @@ function renderExpandedIRI(iri: IRIOrBlankNode, context: RenderContext, options:
         options.linkContents ? "rdf-custom" : null,
     ];
 
-    return <a class={css} href={iri.value}>
+    return <a class={css} href={href} data-href={data}>
         {options.linkContents || <>
             <span class="rdf-iri-openangle">&lt;</span>
             <span class="rdf-iri-ref">{renderShortenedIRI(iri, options)}</span>
@@ -163,6 +170,9 @@ function renderExpandedIRI(iri: IRIOrBlankNode, context: RenderContext, options:
 
 function renderCompactedIRI(iri: IRIOrBlankNode, context: RenderContext, options: RenderOptions): HtmlContent {
     if (iri === Rdf.type) {
+        const href = context.rewriteHref ? context.rewriteHref(iri.value) : iri.value;
+        const data = context.rewriteHrefAsData ? context.rewriteHrefAsData(iri.value) : undefined;
+
         const css = [
             "rdf-iri",
             !options.hideError && context.graph.triples(iri).every(Triple.isInferred) ? "rdf-error" : null,
@@ -170,13 +180,16 @@ function renderCompactedIRI(iri: IRIOrBlankNode, context: RenderContext, options
             options.linkContents ? "rdf-custom" : null,
         ];
 
-        return <a class={css} href={iri.value}>
+        return <a class={css} href={href} data-href={data}>
             {options.linkContents || SyntaxToken.create(TokenKind.AKeyword, undefined).text}
         </a>;
     }
 
     const prefixedName = context.lookupPrefixedName(iri.value);
     if (prefixedName) {
+        const href = context.rewriteHref ? context.rewriteHref(iri.value) : iri.value;
+        const data = context.rewriteHrefAsData ? context.rewriteHrefAsData(iri.value) : undefined;
+
         const css = [
             prefixedName.localName.length ? "rdf-pname-ln" : "rdf-pname-ns",
             "rdf-iri",
@@ -185,7 +198,7 @@ function renderCompactedIRI(iri: IRIOrBlankNode, context: RenderContext, options
             options.linkContents ? "rdf-custom" : null,
         ];
 
-        return <a class={css} href={iri.value}>
+        return <a class={css} href={href} data-href={data}>
             {options.linkContents || <>
                 {prefixedName.prefixLabel.length ? <span class="rdf-iri-prefixlabel">{prefixedName.prefixLabel}</span> : null}
                 <span class="rdf-iri-colon">:</span>

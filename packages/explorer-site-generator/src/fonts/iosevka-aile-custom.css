@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'Iosevka Aile Custom';
+    font-display: block;
+    font-weight: 300;
+    font-stretch: normal;
+    font-style: normal;
+    src: url('./iosevka-aile-custom-light.woff2') format('woff2');
+}

@@ -10,7 +10,8 @@
     "packages/explorer-shared",
     "packages/explorer-views",
     "packages/explorer-worker",
-    "packages/explorer"
+    "packages/explorer",
+    "packages/explorer-site-generator"
   ],
   "scripts": {
     "lint": "npm run lint -ws --if-present",

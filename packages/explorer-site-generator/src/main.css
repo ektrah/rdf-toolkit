@@ -1,0 +1,90 @@
+@import url("./fonts/iosevka-aile-custom.css");
+@import url("./themes/espresso.css");
+
+*, *:before, *:after {
+    box-sizing: inherit;
+    font: inherit;
+}
+
+html {
+    box-sizing: border-box;
+    overscroll-behavior: none;
+}
+
+body {
+    background: var(--base00);
+    color: var(--base07);
+    font: 300 17px/1.6 "Iosevka Aile Custom", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-feature-settings: "calt" 0;
+    margin: 0;
+    overflow-y: scroll;
+    padding: 0;
+}
+
+a {
+    color: var(--base0A);
+    text-decoration: none;
+}
+
+    a:active,
+    a:hover {
+        text-decoration: underline;
+        color: var(--base07) !important;
+    }
+
+/*@import url("./links.css");*/
+
+a {
+    color: var(--base0A);
+    text-decoration: none;
+}
+
+    a:active,
+    a:hover {
+        text-decoration: underline;
+        color: var(--base07) !important;
+    }
+
+    a[href^='http://example.com/.well-known/genid/'] {
+        color: var(--base05);
+    }
+
+    a[href='http://www.w3.org/2002/07/owl'],
+    a[href^='http://www.w3.org/2002/07/owl#'],
+    a[href^='http://www.w3.org/ns/shacl#'] {
+        color: var(--base0B);
+    }
+
+    a[href='http://www.w3.org/1999/02/22-rdf-syntax-ns'],
+    a[href^='http://www.w3.org/1999/02/22-rdf-syntax-ns#'],
+    a[href='http://www.w3.org/2000/01/rdf-schema'],
+    a[href^='http://www.w3.org/2000/01/rdf-schema#'] {
+        color: var(--base0E);
+    }
+
+    a[href='http://www.w3.org/2001/XMLSchema'],
+    a[href^='http://www.w3.org/2001/XMLSchema#'] {
+        color: var(--base0F);
+    }
+
+    a[href^='https://brickschema.org/schema/Brick#'],
+    a[href^='https://brickschema.org/schema/BrickShape#'] {
+        color: var(--base0C);
+    }
+
+    a[href='https://w3id.org/rec'],
+    a[href^='https://w3id.org/rec#'] {
+        color: var(--base0D);
+    }
+
+nav a[href='http://www.w3.org/2002/07/owl#Thing'] .rdf-iri-localname {
+    border: 2px solid var(--base0B);
+    border-radius: 4px;
+    padding: 3px 5px 2px;
+}
+
+nav a[href='http://www.w3.org/2000/01/rdf-schema#Resource'] .rdf-iri-localname {
+    border: 2px solid var(--base0E);
+    border-radius: 4px;
+    padding: 3px 5px 2px;
+}

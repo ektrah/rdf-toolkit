@@ -2,6 +2,7 @@ import { Ix } from "@rdf-toolkit/iterable";
 import { BlankNode, IRIOrBlankNode, Literal, Term } from "@rdf-toolkit/rdf/terms";
 import { Triple } from "@rdf-toolkit/rdf/triples";
 import { Owl, Rdf, Xsd } from "@rdf-toolkit/rdf/vocab";
+import { IRIReference } from "@rdf-toolkit/text";
 import { SyntaxToken, TokenKind } from "@rdf-toolkit/turtle";
 import { RenderContext } from "../context.js";
 import { HtmlContent } from "../jsx/html.js";
@@ -237,9 +238,10 @@ function renderLiteral(literal: Literal, context: RenderContext, options: Render
     }
 
     if (literal.datatype === Xsd.anyURI && options.anyURIAsLink) {
-        try {
+        const iriref = IRIReference.parse(literal.value);
+        if (iriref && iriref.scheme) {
             return <a class="rdf-anyURI" href={literal.value} rel="external" target="_blank">{options.linkContents || literal.value}</a>;
-        } catch { }
+        }
     }
 
     if (!options.rawLiterals) {

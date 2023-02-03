@@ -28,9 +28,9 @@ function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, p
     return roots;
 }
 
-export default function render(context: RenderContext): HtmlContent {
+export default function render(title: string | undefined, context: RenderContext): HtmlContent {
     return <>
-        <p class="logo"><a href="">&#x1F141;&#x1F133;&#x1F135; Explorer</a></p>
+        <p class="logo">{title || "\u{1F141}\u{1F133}\u{1F135} Explorer"}</p>
         {
             renderTabView("navigation", [
                 {

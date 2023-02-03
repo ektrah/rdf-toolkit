@@ -101,7 +101,7 @@ class BackendImpl implements Backend, RenderContext {
 
             this.frontend.showProgress("Building index\u2026");
             this.prefixes = new PrefixTable(this.namespaces);
-            this.frontend.replaceNavigation(renderHTML(renderNavigation(this)));
+            this.frontend.replaceNavigation(renderHTML(renderNavigation(undefined, this)));
 
             if (this.diagnostics.errors + this.diagnostics.warnings === 0) {
                 this.frontend.hideProgress();

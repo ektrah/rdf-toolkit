@@ -1,7 +1,6 @@
-import { RenderContext } from "../context.js";
-import { HtmlContent } from "../jsx/html.js";
-import renderFooter from "../sections/footer.js";
-import "./home.css";
+import { RenderContext } from "@rdf-toolkit/explorer-views/context";
+import { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
+import renderFooter from "@rdf-toolkit/explorer-views/sections/footer";
 
 export default function render(context: RenderContext): HtmlContent {
     return <>

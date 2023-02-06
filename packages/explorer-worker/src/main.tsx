@@ -28,7 +28,6 @@
 import { Backend, Frontend, WorkerChannel } from "@rdf-toolkit/explorer-shared";
 import { RenderContext } from "@rdf-toolkit/explorer-views/context";
 import renderHTML from "@rdf-toolkit/explorer-views/jsx/html";
-import renderHome from "@rdf-toolkit/explorer-views/pages/home";
 import renderMain from "@rdf-toolkit/explorer-views/pages/main";
 import renderNavigation from "@rdf-toolkit/explorer-views/pages/navigation";
 import { Ix } from "@rdf-toolkit/iterable";
@@ -38,6 +37,7 @@ import { ParsedTriple } from "@rdf-toolkit/rdf/triples";
 import { Schema } from "@rdf-toolkit/schema";
 import { DiagnosticBag, TextDocument } from "@rdf-toolkit/text";
 import { SyntaxTree } from "@rdf-toolkit/turtle";
+import renderHome from "./home.js";
 import { PrefixTable } from "./prefixes.js";
 
 const utf8Decoder: TextDecoder = new TextDecoder();

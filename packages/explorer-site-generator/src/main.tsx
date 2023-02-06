@@ -2,9 +2,10 @@
 
 import { RenderContext } from "@rdf-toolkit/explorer-views/context";
 import renderHTML, { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
-import renderHome from "@rdf-toolkit/explorer-views/pages/home";
 import renderMain from "@rdf-toolkit/explorer-views/pages/main";
 import renderNavigation from "@rdf-toolkit/explorer-views/pages/navigation";
+import renderFooter from "@rdf-toolkit/explorer-views/sections/footer";
+import { Ix } from "@rdf-toolkit/iterable";
 import { Graph } from "@rdf-toolkit/rdf/graphs";
 import { BlankNode, IRI, IRIOrBlankNode } from "@rdf-toolkit/rdf/terms";
 import { ParsedTriple } from "@rdf-toolkit/rdf/triples";
@@ -22,7 +23,7 @@ import scriptFileName from "./scripts/explorer.asset.js";
 interface IconConfig {
     readonly type: string;
     readonly sizes?: string;
-    readonly path: string;
+    readonly file: string;
 }
 
 namespace IconConfig {
@@ -32,7 +33,7 @@ namespace IconConfig {
         return typeof candidate !== "undefined"
             && typeof candidate.type === "string"
             && (typeof candidate.sizes === "undefined" || typeof candidate.sizes === "string")
-            && typeof candidate.path === "string"
+            && typeof candidate.file === "string"
             ? true : false;
     }
 }
@@ -41,6 +42,7 @@ interface SiteConfig {
     readonly title: string;
     readonly icons: ReadonlyArray<IconConfig>;
     readonly sources: Readonly<Record<string, string>>;
+    readonly assets: Readonly<Record<string, string>>;
     readonly outDir: string;
     readonly baseURL: string;
 }
@@ -53,6 +55,7 @@ namespace SiteConfig {
             && typeof candidate.title === "string"
             && Array.isArray(candidate.icons) && candidate.icons.every(IconConfig.is)
             && candidate.sources !== null && typeof candidate.sources === "object"
+            && candidate.assets !== null && typeof candidate.assets === "object"
             && typeof candidate.outDir === "string"
             && typeof candidate.baseURL === "string"
             ? true : false;
@@ -118,72 +121,105 @@ class Website implements RenderContext {
             this.schema = Schema.decompile(this.dataset, this.graph);
             this.prefixes = new PrefixTable(this.namespaces);
 
-            for (const class_ of this.graph.classes()) {
-                const prefixedName = this.prefixes.lookup(class_.value);
+            const terms = Ix.from(this.schema.classes.keys())
+                .concat(this.schema.properties.keys())
+                .concat(this.schema.ontologies.keys())
+                .concat(Object.keys(this.documents).map(IRI.create))
+                .toSet();
+
+            for (const term of terms) {
+                const prefixedName = this.prefixes.lookup(term.value);
                 if (prefixedName) {
-                    this.outputs[class_.value] = path.join(prefixedName.prefixLabel, prefixedName.localName);
+                    this.outputs[term.value] = path.join(prefixedName.prefixLabel, prefixedName.localName);
                 }
                 else {
-                    const string = class_.value;
+                    const string = term.value;
                     let hash = 0;
                     for (let i = 0; i < string.length; i++) {
                         const char = string.charCodeAt(i);
                         hash = ((hash << 5) - hash) + char;
                         hash = hash & hash;
                     }
-                    this.outputs[class_.value] = (hash & ((1 << 31) - 1)).toString().padStart(10, "0");
+                    this.outputs[term.value] = (hash & ((1 << 31) - 1)).toString().padStart(10, "0");
                 }
             }
         }
     }
 }
 
+function renderHome(context: Website, head: HtmlContent, navigation: HtmlContent): string {
+    return "<!DOCTYPE html>\n" + renderHTML(<html lang="en-US">
+        <head>
+            <meta charset="utf-8" />
+            <title>{context.title}</title>
+            {head}
+        </head>
+        <body>
+            <nav>
+                {navigation}
+            </nav>
+            <main>
+                <section>
+                    <h1>{context.title}</h1>
+                </section>
+                <footer>
+                    {renderFooter(context)}
+                </footer>
+            </main>
+        </body>
+    </html>);
+}
+
+function render404(context: Website, head: HtmlContent, navigation: HtmlContent): string {
+    return "<!DOCTYPE html>\n" + renderHTML(<html lang="en-US">
+        <head>
+            <meta charset="utf-8" />
+            <title>Page not found &ndash; {context.title}</title>
+            {head}
+        </head>
+        <body>
+            <nav>
+                {navigation}
+            </nav>
+            <main>
+                <section>
+                    <h1>Page not found</h1>
+                    <p>We are sorry, the page you requested cannot be found.</p>
+                    <p>The URL may be misspelled or the page you're looking for is no longer available.</p>
+                </section>
+                <footer>
+                    {renderFooter(context)}
+                </footer>
+            </main>
+        </body>
+    </html>);
+}
+
 function renderPage(iri: string, context: Website, head: HtmlContent, navigation: HtmlContent): string {
-    if (iri === "") {
-        const main = renderHome(context);
+    const subject: IRIOrBlankNode = iri.startsWith("http://example.com/.well-known/genid/")
+        ? BlankNode.create(iri.substr("http://example.com/.well-known/genid/".length))
+        : IRI.create(iri);
 
-        return "<!DOCTYPE html>\n" + renderHTML(<html lang="en-US">
-            <head>
-                <meta charset="utf-8" />
-                <title>{context.title}</title>
-                {head}
-            </head>
-            <body>
-                <nav>
-                    {navigation}
-                </nav>
-                <main>
-                    {main}
-                </main>
-            </body>
-        </html>);
-    }
-    else {
-        const subject: IRIOrBlankNode = iri.startsWith("http://example.com/.well-known/genid/")
-            ? BlankNode.create(iri.substr("http://example.com/.well-known/genid/".length))
-            : IRI.create(iri);
+    const prefixedName = context.lookupPrefixedName(subject.value);
+    const title = prefixedName ? prefixedName.prefixLabel + ":" + prefixedName.localName : "<" + subject.value + ">";
 
-        const prefixedName = context.lookupPrefixedName(subject.value);
-        const title = prefixedName ? prefixedName.prefixLabel + ":" + prefixedName.localName : "<" + subject.value + ">";
+    const main = renderMain(subject, iri in context.documents ? context.documents[iri] : null, context);
 
-        const main = renderMain(subject, iri in context.documents ? context.documents[iri] : null, context);
-
-        return "<!DOCTYPE html>\n" + renderHTML(<html lang="en-US">
-            <head>
-                <meta charset="utf-8" />
-                <title>{title} &ndash; {context.title}</title>
-                {head}
-            </head>
-            <body>
-                <nav>
-                    {navigation}
-                </nav>
-                <main>
-                    {main}
-                </main>
-            </body>
-        </html>);
-    }
+    return "<!DOCTYPE html>\n" + renderHTML(<html lang="en-US">
+        <head>
+            <meta charset="utf-8" />
+            <title>{title} &ndash; {context.title}</title>
+            {head}
+        </head>
+        <body>
+            <nav>
+                {navigation}
+            </nav>
+            <main>
+                {main}
+            </main>
+        </body>
+    </html>);
 }
 
 const sentinelBaseURL = "https://127.0.0.1/";
@@ -194,7 +230,7 @@ function resolveHref(url: string, base: string): string {
 }
 
 function main(args: readonly string[]): number {
-    const configFilePath = args[2] || path.resolve("siteconfig.json");
+    const configFilePath = path.resolve(args[2] || "./siteconfig.json");
     const configPath = path.dirname(configFilePath);
     const config = JSON.parse(fs.readFileSync(configFilePath, { encoding: "utf-8" }));
 
@@ -205,6 +241,7 @@ function main(args: readonly string[]): number {
     const baseURL = new URL(config.baseURL, sentinelBaseURL).href;
     const outDir = path.resolve(configPath, config.outDir);
     const homeFileName = "index.html";
+    const errorFileName = "404.html";
     const cssFileName = "style.css";
 
     const diagnostics = DiagnosticBag.create();
@@ -225,7 +262,7 @@ function main(args: readonly string[]): number {
     }
 
     const head = <>
-        {config.icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(iconConfig.path, context.baseURL)} />)}
+        {config.icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(iconConfig.file, context.baseURL)} />)}
         <link rel="stylesheet" href={resolveHref(cssFileName, context.baseURL)} />
         <script src={resolveHref(scriptFileName, context.baseURL)}></script>
     </>;
@@ -234,6 +271,7 @@ function main(args: readonly string[]): number {
 
     {
         const cssFilePath = path.join(outDir, cssFileName);
+        console.log(cssFilePath);
         const css = fs.readFileSync(path.format({ ...path.parse(args[1]), base: "", ext: ".css" }));
         fs.mkdirSync(path.dirname(cssFilePath), { recursive: true });
         fs.writeFileSync(cssFilePath, css);
@@ -241,6 +279,7 @@ function main(args: readonly string[]): number {
 
     {
         const scriptFilePath = path.join(outDir, scriptFileName);
+        console.log(scriptFilePath);
         const script = fs.readFileSync(path.format({ ...path.parse(args[1]), base: scriptFileName }));
         fs.mkdirSync(path.dirname(scriptFilePath), { recursive: true });
         fs.writeFileSync(scriptFilePath, script);
@@ -248,27 +287,47 @@ function main(args: readonly string[]): number {
 
     {
         const fontFilePath = path.join(outDir, fontFileName);
+        console.log(fontFilePath);
         const font = fs.readFileSync(path.format({ ...path.parse(args[1]), base: fontFileName }));
         fs.mkdirSync(path.dirname(fontFilePath), { recursive: true });
         fs.writeFileSync(fontFilePath, font);
     }
 
     for (const iconConfig of config.icons) {
-        const iconFilePath = path.join(outDir, iconConfig.path);
-        const icon = fs.readFileSync(path.resolve(configPath, iconConfig.path));
+        const iconFilePath = path.join(outDir, iconConfig.file);
+        console.log(iconFilePath);
+        const icon = fs.readFileSync(path.resolve(configPath, iconConfig.file));
         fs.mkdirSync(path.dirname(iconFilePath), { recursive: true });
         fs.writeFileSync(iconFilePath, icon);
     }
 
+    for (const filePath in config.assets) {
+        const assetFilePath = path.join(outDir, config.assets[filePath]);
+        console.log(assetFilePath);
+        const asset = fs.readFileSync(path.resolve(configPath, filePath));
+        fs.mkdirSync(path.dirname(assetFilePath), { recursive: true });
+        fs.writeFileSync(assetFilePath, asset);
+    }
+
     {
         const homeFilePath = path.join(outDir, homeFileName);
-        const home = renderPage("", context, head, navigation);
+        console.log(homeFilePath);
+        const home = renderHome(context, head, navigation);
         fs.mkdirSync(path.dirname(homeFilePath), { recursive: true });
         fs.writeFileSync(homeFilePath, home);
     }
 
+    {
+        const errorFilePath = path.join(outDir, errorFileName);
+        console.log(errorFilePath);
+        const error = render404(context, head, navigation);
+        fs.mkdirSync(path.dirname(errorFilePath), { recursive: true });
+        fs.writeFileSync(errorFilePath, error);
+    }
+
     for (const iri in context.outputs) {
         const pageFilePath = path.join(outDir, context.outputs[iri] + ".html");
+        console.log(pageFilePath);
         const page = renderPage(iri, context, head, navigation);
         fs.mkdirSync(path.dirname(pageFilePath), { recursive: true });
         fs.writeFileSync(pageFilePath, page);
@@ -289,12 +348,12 @@ Example configuration:
             {
                 "type": "image/png",
                 "sizes": "32x32",
-                "path": "./favicon32.png"
+                "file": "./favicon32.png"
             },
             {
                 "type": "image/png",
                 "sizes": "16x16",
-                "path": "./favicon16.png"
+                "file": "./favicon16.png"
             }
         ],
         "sources": {
@@ -302,6 +361,10 @@ Example configuration:
             "http://www.w3.org/2000/01/rdf-schema": "./vocab/rdfs.ttl",
             "http://www.w3.org/2001/XMLSchema": "./vocab/xsd.ttl",
             "http://www.w3.org/2002/07/owl": "./vocab/owl.ttl",
+            "http://www.w3.org/ns/shacl": "./vocab/shacl.ttl"
+        },
+        "assets": {
+            "./robots.txt": "robots.txt"
         },
         "outDir": "./public/",
         "baseURL": "/"

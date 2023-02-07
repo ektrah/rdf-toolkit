@@ -72,34 +72,36 @@ function* splitDomain(node: IRIOrBlankNode, graph: Graph): Generator<IRIOrBlankN
     }
 }
 
-export function* splitRange(node: Term, graph: Graph): Generator<Term> {
-    let didYield = false;
-    for (const triple of IRIOrBlankNode.is(node) ? graph.triples(node) : Ix.empty) {
-        switch (triple.predicate) {
-            case Owl.onClass:
-            case Owl.onDataRange:
-            case Owl.allValuesFrom:
-            case Owl.someValuesFrom:
-            case Owl.hasValue:
-                didYield = true;
-                yield* splitRange(triple.object, graph);
-                break;
-            case Owl.unionOf:
-            case Owl.oneOf:
-                if (IRIOrBlankNode.is(triple.object)) {
-                    for (const item of Ix.from(graph.list(triple.object))) {
-                        didYield = true;
-                        yield item;
+export function splitRange(node: Term, graph: Graph): Iterable<Term> {
+    const result: Term[] = [];
+    if (IRIOrBlankNode.is(node)) {
+        for (const triple of graph.triples(node)) {
+            switch (triple.predicate) {
+                case Owl.onClass:
+                case Owl.onDataRange:
+                case Owl.allValuesFrom:
+                case Owl.someValuesFrom:
+                case Owl.hasValue:
+                    result.push(...splitRange(triple.object, graph));
+                    break;
+                case Owl.unionOf:
+                case Owl.oneOf:
+                    if (IRIOrBlankNode.is(triple.object)) {
+                        for (const item of Ix.from(graph.list(triple.object))) {
+                            result.push(item);
+                        }
                     }
-                }
-                break;
-            case Owl.onDatatype:
-                didYield = true;
-                yield triple.object;
-                break;
+                    break;
+                case Owl.onDatatype:
+                    result.push(triple.object);
+                    break;
+                case Owl.onProperty:
+                    return [node];
+            }
         }
     }
-    if (!didYield) {
-        yield node;
+    if (!result.length) {
+        result.push(node);
     }
+    return result;
 }

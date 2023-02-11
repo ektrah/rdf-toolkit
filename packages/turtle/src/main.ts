@@ -26,13 +26,23 @@ export interface SyntaxTree {
 export namespace SyntaxTree {
 
     export function tokenize(document: TextDocument, diagnostics: DiagnosticBag): IterableIterator<SyntaxToken> {
-        return new TurtleScanner(document, diagnostics);
+        switch (document.languageId) {
+            case "turtle":
+                return new TurtleScanner(document, diagnostics);
+            default:
+                throw new Error();
+        }
     }
 
     export function parse(document: TextDocument, diagnostics: DiagnosticBag): SyntaxTree {
-        const scanner = new TurtleScanner(document, diagnostics);
-        const parser = new TurtleParser(scanner, document, diagnostics);
-        return new FullSyntaxTree(document, parser.parse());
+        switch (document.languageId) {
+            case "turtle":
+                const scanner = new TurtleScanner(document, diagnostics);
+                const parser = new TurtleParser(scanner, document, diagnostics);
+                return new FullSyntaxTree(document, parser.parse());
+            default:
+                throw new Error();
+        }
     }
 
     export function compileTriples(syntaxTree: SyntaxTree, diagnostics: DiagnosticBag, options?: { returnParserState?: false }): ParsedTriple[];

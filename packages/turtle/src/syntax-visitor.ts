@@ -1,8 +1,13 @@
+import { SyntaxTree } from "./main.js";
 import { AnonSyntax, ASyntax, BaseDirectiveSyntax, BlankNodeLabelSyntax, BlankNodePredicateObjectListSyntax, BlankNodePropertyListSyntax, BlankNodeSyntax, BooleanLiteralSyntax, CollectionSyntax, DatatypeAnnotationSyntax, DecimalLiteralSyntax, DirectiveSyntax, DocumentSyntax, DoubleLiteralSyntax, IntegerLiteralSyntax, IRIReferenceSyntax, IRISyntax, LanguageTagSyntax, LiteralSyntax, ObjectListSyntax, ObjectListTailSyntax, ObjectSyntax, PredicateObjectListSyntax, PredicateObjectListTailSyntax, PredicateSyntax, PrefixDirectiveSyntax, PrefixedNameSyntax, RDFLiteralSyntax, SparqlBaseDirectiveSyntax, SparqlPrefixDirectiveSyntax, StatementSyntax, SubjectPredicateObjectListSyntax, SubjectSyntax, SyntaxKind, SyntaxToken, SyntaxTrivia, TriplesSyntax, VerbObjectListSyntax } from "./syntax.js";
 
 export class SyntaxVisitor {
 
     constructor(private readonly descentIntoTrivia = false) {
+    }
+
+    visit(syntaxTree: SyntaxTree): void {
+        this.visitDocument(syntaxTree.root);
     }
 
     visitDocument(node: DocumentSyntax): void {
@@ -314,6 +319,10 @@ export class SyntaxVisitor {
 export class SyntaxRewriter {
 
     constructor(private readonly descentIntoTrivia = false) {
+    }
+
+    rewrite(syntaxTree: SyntaxTree): SyntaxTree {
+        return SyntaxTree.create(syntaxTree.document.uri, syntaxTree.document.version + 1, this.rewriteDocument(syntaxTree.root));
     }
 
     rewriteDocument(node: DocumentSyntax): DocumentSyntax {

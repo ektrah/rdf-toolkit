@@ -25,6 +25,20 @@ export interface SyntaxTree {
 
 export namespace SyntaxTree {
 
+    export function create(documentURI: string, documentVersion: number, root: DocumentSyntax): SyntaxTree {
+        let content = "";
+        for (const token of SyntaxNode.iterateTokens(root)) {
+            for (const trivia of token.leadingTrivia) {
+                content += trivia.text;
+            }
+            content += token.text;
+            for (const trivia of token.trailingTrivia) {
+                content += trivia.text;
+            }
+        }
+        return new FullSyntaxTree(TextDocument.create(documentURI, "turtle", documentVersion, content), root);
+    }
+
     export function tokenize(document: TextDocument, diagnostics: DiagnosticBag): IterableIterator<SyntaxToken> {
         switch (document.languageId) {
             case "turtle":

@@ -31,7 +31,7 @@ export namespace IRIReference {
                 path = removeDotSegments(R.path);
                 query = R.query;
             } else {
-                if (R.path == "") {
+                if (R.path === "") {
                     path = Base.path;
                     if (typeof R.query === "string") {
                         query = R.query;
@@ -83,8 +83,7 @@ function mergePaths(base: IRIReference, relativePath: string): string {
         return "/" + relativePath;
     }
     else {
-        const pos = base.path.lastIndexOf("/");
-        return (pos >= 0) ? base.path.substr(0, pos) + relativePath : relativePath;
+        return base.path.substr(0, base.path.lastIndexOf("/") + 1) + relativePath;
     }
 }
 

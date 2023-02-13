@@ -1,21 +1,9 @@
 import { BlankNode, IRI, IRIOrBlankNode, Literal, Term } from "@rdf-toolkit/rdf/terms";
 import { ParsedTriple, Triple, TripleLocation } from "@rdf-toolkit/rdf/triples";
 import { Rdf } from "@rdf-toolkit/rdf/vocab";
-import { Diagnostic, DiagnosticBag, DiagnosticSeverity, IRIReference, Range, TextDocument } from "@rdf-toolkit/text";
+import { Diagnostic, DiagnosticBag, DiagnosticSeverity, IRIReference, Range } from "@rdf-toolkit/text";
+import { ParserState, SyntaxTree } from "./syntax-tree.js";
 import { BlankNodeLabelSyntax, BlankNodePredicateObjectListSyntax, BooleanLiteralSyntax, CollectionSyntax, DocumentSyntax, IRISyntax, ObjectListSyntax, ObjectListTailSyntax, ObjectSyntax, PredicateObjectListSyntax, PredicateObjectListTailSyntax, PredicateSyntax, PrefixedNameSyntax, RDFLiteralSyntax, SubjectPredicateObjectListSyntax, SubjectSyntax, SyntaxKind, SyntaxNode, SyntaxToken, SyntaxTokenValue, TokenKind, VerbObjectListSyntax } from "./syntax.js";
-
-export type SyntaxTree = {
-    getRange(node: SyntaxToken | SyntaxNode): Range;
-    readonly document: TextDocument;
-    readonly root: DocumentSyntax,
-}
-
-export type CompilerState = {
-    readonly baseIRI: string;
-    readonly bnodeLabels: Record<string, BlankNode>,
-    readonly namespaces: Record<string, string>,
-    readonly triples: Array<ParsedTriple>,
-}
 
 export class TurtleCompiler {
 
@@ -60,7 +48,7 @@ export class TurtleCompiler {
         return BlankNode.create("b" + (this.bnodeCounter++).toString().padStart(10, "0"));
     }
 
-    compile(): CompilerState {
+    compile(): ParserState {
         this.compileDocument(this.syntaxTree.root);
         return {
             baseIRI: IRIReference.recompose(this.baseIRI),

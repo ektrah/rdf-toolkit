@@ -322,7 +322,7 @@ export class SyntaxRewriter {
     }
 
     rewrite(syntaxTree: SyntaxTree): SyntaxTree {
-        return SyntaxTree.create(syntaxTree.document.uri, syntaxTree.document.version + 1, this.rewriteDocument(syntaxTree.root));
+        return SyntaxTree.create(syntaxTree.document.uri, syntaxTree.document.languageId, syntaxTree.document.version + 1, this.rewriteDocument(syntaxTree.root));
     }
 
     rewriteDocument(node: DocumentSyntax): DocumentSyntax {

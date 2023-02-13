@@ -3,10 +3,13 @@ import { Diagnostic, DiagnosticBag, DiagnosticSeverity, Range, TextDocument } fr
 import { AnonSyntax, BlankNodePropertyListSyntax, DatatypeAnnotationSyntax, DocumentSyntax, IRISyntax, LanguageTagSyntax, ObjectListSyntax, ObjectListTailSyntax, ObjectSyntax, PredicateObjectListSyntax, PredicateObjectListTailSyntax, PredicateSyntax, StatementSyntax, SubjectSyntax, SyntaxKind, SyntaxToken, SyntaxTokens, SyntaxTokenValue, SyntaxTokenValues, TokenKind, TriplesSyntax, VerbObjectListSyntax } from "./syntax.js";
 
 export class TurtleParser {
+    private readonly iterator: Iterator<SyntaxToken>;
+
     private current: SyntaxToken;
     private faulty: boolean;
 
-    constructor(private readonly iterator: Iterator<SyntaxToken>, private readonly document: TextDocument, private readonly diagnostics: DiagnosticBag) {
+    constructor(tokens: Iterable<SyntaxToken>, private readonly document: TextDocument, private readonly diagnostics: DiagnosticBag) {
+        this.iterator = tokens[Symbol.iterator]();
         this.current = this.scan();
         this.faulty = false;
     }

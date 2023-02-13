@@ -78,9 +78,9 @@ class BackendImpl implements Backend, RenderContext {
         this.diagnostics.clear();
     }
 
-    compile(documentURI: string, sourceText: ArrayBuffer, sourceTextHash: ArrayBuffer): void {
+    compile(documentURI: string, sourceText: ArrayBuffer, sourceTextHash: ArrayBuffer, sourceLanguage: string): void {
         this.frontend.showProgress(`Compiling <${documentURI}>\u2026`);
-        const document = this.documents[documentURI] = TextDocument.create(documentURI, "turtle", 0, utf8Decoder.decode(sourceText));
+        const document = this.documents[documentURI] = TextDocument.create(documentURI, sourceLanguage, 0, utf8Decoder.decode(sourceText));
         const syntaxTree = SyntaxTree.parse(document, this.diagnostics);
         if (this.diagnostics.errors === 0) {
             const parserState = SyntaxTree.compileTriples(syntaxTree, this.diagnostics, { returnParserState: true });

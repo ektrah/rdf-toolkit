@@ -37,7 +37,7 @@ export type Frontend = {
 
 export type Backend = {
     beforecompile(): void;
-    compile(documentURI: string, sourceText: ArrayBuffer, sourceTextHash: ArrayBuffer): void;
+    compile(documentURI: string, sourceText: ArrayBuffer, sourceTextHash: ArrayBuffer, sourceLanguage: string): void;
     aftercompile(): void;
 
     navigateTo(iri: string): void;

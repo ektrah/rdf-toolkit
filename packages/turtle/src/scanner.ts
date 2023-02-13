@@ -10,8 +10,9 @@ export class TurtleScanner implements IterableIterator<SyntaxToken> {
     private current: SyntaxTrivia | SyntaxToken;
     private done: boolean;
 
-    constructor(private readonly document: TextDocument, private readonly diagnostics: DiagnosticBag) {
+    constructor(private readonly document: TextDocument, startIndex: number, private readonly diagnostics: DiagnosticBag) {
         this.trivia = [];
+        this.regexp.lastIndex = startIndex;
         this.current = this.scan(this.regexp.exec(this.document.getText()));
         this.done = false;
     }

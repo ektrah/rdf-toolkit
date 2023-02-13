@@ -173,13 +173,17 @@ else {
         progress.className = "progress-bar loading";
         backend.beforecompile();
 
-        const documents: { readonly uri: string, readonly arrayBuffer: Promise<ArrayBuffer> }[] = [];
+        const documents: { readonly uri: string, readonly language: string, readonly arrayBuffer: Promise<ArrayBuffer> }[] = [];
 
         if (ev.dataTransfer) {
             for (let i = 0; i < ev.dataTransfer.items.length; i++) {
                 const file = ev.dataTransfer.items[i].getAsFile();
                 if (file) {
-                    documents.push({ uri: new URL("file:///" + file.name).href, arrayBuffer: file.arrayBuffer() });
+                    documents.push({
+                        uri: new URL("file:///" + file.name).href,
+                        language: /\.mk?d$/i.test(file.name) ? "markdown" : "turtle",
+                        arrayBuffer: file.arrayBuffer()
+                    });
                 }
             }
         }
@@ -187,7 +191,7 @@ else {
         for (const document of documents) {
             const sourceText = await document.arrayBuffer;
             const sourceTextHash = await crypto.subtle.digest("SHA-256", sourceText);
-            backend.compile(document.uri, sourceText, sourceTextHash);
+            backend.compile(document.uri, sourceText, sourceTextHash, document.language);
             unsavedChanges = true;
         }
 
@@ -222,13 +226,17 @@ else {
         progress.className = "progress-bar loading";
         backend.beforecompile();
 
-        const documents: { readonly uri: string, readonly response: Promise<Response> }[] = [];
+        const documents: { readonly uri: string, readonly language: string, readonly response: Promise<Response> }[] = [];
 
         const links = document.getElementsByTagName("link");
         for (let i = 0; i < links.length; i++) {
             const link = links.item(i);
             if (link?.type === "application/turtle") {
-                documents.push({ uri: new URL(link.href, document.location.href).href, response: fetch(new URL(REDIRECTIONS[link.href] || link.href, document.location.href)) });
+                documents.push({
+                    uri: new URL(link.href, document.location.href).href,
+                    language: "turtle",
+                    response: fetch(new URL(REDIRECTIONS[link.href] || link.href, document.location.href))
+                });
             }
         }
 
@@ -237,7 +245,7 @@ else {
             if (!response.ok) continue;
             const sourceText = await response.arrayBuffer();
             const sourceTextHash = await crypto.subtle.digest("SHA-256", sourceText);
-            backend.compile(document.uri, sourceText, sourceTextHash);
+            backend.compile(document.uri, sourceText, sourceTextHash, document.language);
         }
 
         backend.aftercompile();

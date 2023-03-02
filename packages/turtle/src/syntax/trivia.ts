@@ -20,7 +20,10 @@ export namespace SyntaxTrivia {
     export const space: SyntaxTrivia = Object.freeze<SyntaxTrivia>({ kind: TriviaKind.Whitespace, text: " " });
     export const tab: SyntaxTrivia = Object.freeze<SyntaxTrivia>({ kind: TriviaKind.Whitespace, text: "\t" });
 
-    export function createWhitespace(text: string): SyntaxTrivia {
+    export function createWhitespace(text: string): SyntaxTrivia;
+    export function createWhitespace(numberOfSpaces: number): SyntaxTrivia;
+    export function createWhitespace(textOrNumberOfSpaces: string | number): SyntaxTrivia {
+        const text = typeof textOrNumberOfSpaces === "number" ? " ".repeat(textOrNumberOfSpaces) : textOrNumberOfSpaces;
         switch (text) {
             case space.text: return space;
             case tab.text: return tab;

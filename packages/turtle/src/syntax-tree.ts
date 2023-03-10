@@ -24,17 +24,7 @@ export interface SyntaxTree {
 export namespace SyntaxTree {
 
     export function create(uri: string, languageId: string, version: number, root: DocumentSyntax): SyntaxTree {
-        let content = "";
-        for (const token of SyntaxNode.iterateTokens(root)) {
-            for (const trivia of token.leadingTrivia) {
-                content += trivia.text;
-            }
-            content += token.text;
-            for (const trivia of token.trailingTrivia) {
-                content += trivia.text;
-            }
-        }
-        return new FullSyntaxTree(TextDocument.create(uri, languageId, version, content), root);
+        return new FullSyntaxTree(TextDocument.create(uri, languageId, version, SyntaxNode.toString(root)), root);
     }
 
     export function tokenize(document: TextDocument, diagnostics: DiagnosticBag): IterableIterator<SyntaxToken> {
@@ -83,15 +73,15 @@ class FullSyntaxTree implements SyntaxTree {
     }
 
     getRange(node: SyntaxToken | SyntaxNode): Range {
-        const firstToken = SyntaxToken.is(node) ? node : SyntaxNode.firstToken(node);
-        const lastToken = SyntaxToken.is(node) ? node : SyntaxNode.lastToken(node);
+        const firstToken = SyntaxToken.is(node) ? node : SyntaxNode.getFirstToken(node);
+        const lastToken = SyntaxToken.is(node) ? node : SyntaxNode.getLastToken(node);
         return Range.create(
             this.document.positionAt(firstToken.offset),
             this.document.positionAt(lastToken.offset + lastToken.text.length));
     }
 
     getPosition(node: SyntaxToken | SyntaxNode): Position {
-        const token = SyntaxToken.is(node) ? node : SyntaxNode.firstToken(node);
+        const token = SyntaxToken.is(node) ? node : SyntaxNode.getFirstToken(node);
         return this.document.positionAt(token.offset);
     }
 }

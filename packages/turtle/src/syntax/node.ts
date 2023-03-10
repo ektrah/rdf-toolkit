@@ -308,20 +308,28 @@ export namespace SyntaxNode {
         };
     }
 
-    export function createPredicateObjectList(first: VerbObjectListSyntax, separatingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space], ...rest: readonly VerbObjectListSyntax[]): PredicateObjectListSyntax {
-        function createTail(index: number): PredicateObjectListTailSyntax | undefined {
-            return index >= rest.length ? undefined : {
+    export function createPredicateObjectList(items: Iterable<VerbObjectListSyntax>, separator?: SyntaxTokens[TokenKind.Semicolon]): PredicateObjectListSyntax {
+        const iterator = items[Symbol.iterator]();
+
+        function createTail(): PredicateObjectListTailSyntax | undefined {
+            const { done, value } = iterator.next();
+            return done ? undefined : {
                 kind: SyntaxKind.PredicateObjectListTail,
-                semicolonToken: SyntaxToken.create(TokenKind.Semicolon, undefined, undefined, undefined, separatingTrivia),
-                verbObjectList: rest[index],
-                tail: createTail(index + 1)
+                semicolonToken: separator || SyntaxToken.create(TokenKind.Semicolon, undefined, undefined, undefined, [SyntaxTrivia.space]),
+                verbObjectList: value,
+                tail: createTail()
             };
+        }
+
+        const { done, value } = iterator.next();
+        if (done) {
+            throw new RangeError();
         }
 
         return {
             kind: SyntaxKind.PredicateObjectList,
-            verbObjectList: first,
-            tail: createTail(0)
+            verbObjectList: value,
+            tail: createTail()
         };
     }
 
@@ -333,20 +341,28 @@ export namespace SyntaxNode {
         };
     }
 
-    export function createObjectList(first: ObjectSyntax, separatingTrivia: readonly SyntaxTrivia[] = [SyntaxTrivia.space], ...rest: readonly ObjectSyntax[]): ObjectListSyntax {
-        function createTail(index: number): ObjectListTailSyntax | undefined {
-            return index >= rest.length ? undefined : {
+    export function createObjectList(items: Iterable<ObjectSyntax>, separator?: SyntaxTokens[TokenKind.Comma]): ObjectListSyntax {
+        const iterator = items[Symbol.iterator]();
+
+        function createTail(): ObjectListTailSyntax | undefined {
+            const { done, value } = iterator.next();
+            return done ? undefined : {
                 kind: SyntaxKind.ObjectListTail,
-                commaToken: SyntaxToken.create(TokenKind.Comma, undefined, undefined, undefined, separatingTrivia),
-                object: rest[index],
-                tail: createTail(index + 1)
+                commaToken: separator || SyntaxToken.create(TokenKind.Comma, undefined, undefined, undefined, [SyntaxTrivia.space]),
+                object: value,
+                tail: createTail()
             };
+        }
+
+        const { done, value } = iterator.next();
+        if (done) {
+            throw new RangeError();
         }
 
         return {
             kind: SyntaxKind.ObjectList,
-            object: first,
-            tail: createTail(0)
+            object: value,
+            tail: createTail()
         };
     }
 
@@ -462,6 +478,20 @@ export namespace SyntaxNode {
         return node.kind >= 300;
     }
 
+    export function* iteratePredicateObjectList(node: PredicateObjectListSyntax | undefined): Generator<VerbObjectListSyntax, void> {
+        for (let current: PredicateObjectListSyntax | PredicateObjectListTailSyntax | undefined = node; current; current = current.tail) {
+            if (current.verbObjectList) {
+                yield current.verbObjectList;
+            }
+        }
+    }
+
+    export function* iterateObjectList(node: ObjectListSyntax | undefined): Generator<ObjectSyntax, void> {
+        for (let current: ObjectListSyntax | ObjectListTailSyntax | undefined = node; current; current = current.tail) {
+            yield current.object;
+        }
+    }
+
     export function* iterateTokens(node: SyntaxNode): Generator<SyntaxToken, void> {
         for (const key in node) {
             const value = node[key as keyof SyntaxNode] as SyntaxKind | SyntaxToken | SyntaxNode | SyntaxNode[] | undefined;
@@ -481,27 +511,41 @@ export namespace SyntaxNode {
         }
     }
 
-    export function firstToken(node: SyntaxNode): SyntaxToken {
+    export function toString(node: SyntaxNode): string {
+        let text = "";
+        for (const token of iterateTokens(node)) {
+            for (const trivia of token.leadingTrivia) {
+                text += trivia.text;
+            }
+            text += token.text;
+            for (const trivia of token.trailingTrivia) {
+                text += trivia.text;
+            }
+        }
+        return text;
+    }
+
+    export function getFirstToken(node: SyntaxNode): SyntaxToken {
         switch (node.kind) {
             case SyntaxKind.Document:
-                return node.statements.length ? firstToken(node.statements[0]) : node.endOfFile;
+                return node.statements.length ? getFirstToken(node.statements[0]) : node.endOfFile;
             case SyntaxKind.PrefixDirective:
             case SyntaxKind.BaseDirective:
             case SyntaxKind.SparqlBaseDirective:
             case SyntaxKind.SparqlPrefixDirective:
                 return node.keyword;
             case SyntaxKind.SubjectPredicateObjectList:
-                return firstToken(node.subject);
+                return getFirstToken(node.subject);
             case SyntaxKind.BlankNodePredicateObjectList:
-                return firstToken(node.blankNode);
+                return getFirstToken(node.blankNode);
             case SyntaxKind.PredicateObjectList:
-                return firstToken(node.verbObjectList);
+                return getFirstToken(node.verbObjectList);
             case SyntaxKind.PredicateObjectListTail:
                 return node.semicolonToken;
             case SyntaxKind.VerbObjectList:
-                return firstToken(node.verb);
+                return getFirstToken(node.verb);
             case SyntaxKind.ObjectList:
-                return firstToken(node.object);
+                return getFirstToken(node.object);
             case SyntaxKind.ObjectListTail:
                 return node.commaToken;
             case SyntaxKind.A:
@@ -528,7 +572,7 @@ export namespace SyntaxNode {
         }
     }
 
-    export function lastToken(node: SyntaxNode): SyntaxToken {
+    export function getLastToken(node: SyntaxNode): SyntaxToken {
         switch (node.kind) {
             case SyntaxKind.Document:
                 return node.endOfFile;
@@ -542,15 +586,15 @@ export namespace SyntaxNode {
             case SyntaxKind.BlankNodePredicateObjectList:
                 return node.dotToken;
             case SyntaxKind.PredicateObjectList:
-                return lastToken(node.tail ? node.tail : node.verbObjectList);
+                return getLastToken(node.tail ? node.tail : node.verbObjectList);
             case SyntaxKind.PredicateObjectListTail:
-                return node.verbObjectList ? lastToken(node.verbObjectList) : node.semicolonToken;
+                return node.verbObjectList ? getLastToken(node.verbObjectList) : node.semicolonToken;
             case SyntaxKind.VerbObjectList:
-                return lastToken(node.objectList);
+                return getLastToken(node.objectList);
             case SyntaxKind.ObjectList:
-                return lastToken(node.tail ? node.tail : node.object);
+                return getLastToken(node.tail ? node.tail : node.object);
             case SyntaxKind.ObjectListTail:
-                return lastToken(node.object);
+                return getLastToken(node.object);
             case SyntaxKind.A:
                 return node.keyword;
             case SyntaxKind.BlankNodePropertyList:
@@ -562,11 +606,11 @@ export namespace SyntaxNode {
             case SyntaxKind.DoubleLiteral:
                 return node.token;
             case SyntaxKind.RDFLiteral:
-                return node.suffix ? lastToken(node.suffix) : node.token;
+                return node.suffix ? getLastToken(node.suffix) : node.token;
             case SyntaxKind.LanguageTag:
                 return node.token;
             case SyntaxKind.DatatypeAnnotation:
-                return lastToken(node.iri);
+                return getLastToken(node.iri);
             case SyntaxKind.BooleanLiteral:
             case SyntaxKind.IRIReference:
             case SyntaxKind.PrefixedName:

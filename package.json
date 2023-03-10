@@ -5,13 +5,14 @@
     "packages/iterable",
     "packages/text",
     "packages/rdf",
-    "packages/schema",
     "packages/turtle",
+    "packages/schema",
     "packages/explorer-shared",
     "packages/explorer-views",
     "packages/explorer-worker",
     "packages/explorer",
-    "packages/explorer-site-generator"
+    "packages/explorer-site",
+    "packages/cli"
   ],
   "scripts": {
     "lint": "npm run lint -ws --if-present",

@@ -6,7 +6,5 @@
 .vs
 [Bb]in
 [Oo]bj
-explorer/assets
-explorer/explorer.css
-explorer/explorer.js
+explorer/public
 node_modules

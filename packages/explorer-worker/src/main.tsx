@@ -121,7 +121,7 @@ class BackendImpl implements Backend, RenderContext {
         }
         else {
             const subject: IRIOrBlankNode = iri.startsWith("http://example.com/.well-known/genid/")
-                ? BlankNode.create(iri.substr("http://example.com/.well-known/genid/".length))
+                ? BlankNode.create(iri.slice("http://example.com/.well-known/genid/".length))
                 : IRI.create(iri);
 
             const prefixedName = this.lookupPrefixedName(subject.value);

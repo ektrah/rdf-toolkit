@@ -27,19 +27,8 @@
 
 import { Backend, Frontend, WorkerChannel } from "@rdf-toolkit/explorer-shared";
 import "./main.css";
-import owlDocumentURL from "./vocab/owl.ttl";
-import rdfDocumentURL from "./vocab/rdf.ttl";
-import rdfsDocumentURL from "./vocab/rdfs.ttl";
-import xsdDocumentURL from "./vocab/xsd.ttl";
-import "./worker/worker.css";
-import workerScriptURL from "./worker/worker.js";
-
-const REDIRECTIONS: Readonly<Record<string, string>> = {
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns": rdfDocumentURL,
-    "http://www.w3.org/2000/01/rdf-schema": rdfsDocumentURL,
-    "http://www.w3.org/2001/XMLSchema": xsdDocumentURL,
-    "http://www.w3.org/2002/07/owl": owlDocumentURL,
-};
+import "./worker/worker.min.css";
+import workerScriptURL from "./worker/worker.min.js";
 
 if (!window.Worker) {
     document.write("Your browser doesn't support web workers.");
@@ -181,7 +170,7 @@ else {
                 if (file) {
                     documents.push({
                         uri: new URL("file:///" + file.name).href,
-                        language: /\.mk?d$/i.test(file.name) ? "markdown" : "turtle",
+                        language: /[.](?:md|mkdn?|mdwn|mdown|markdown)$/i.test(file.name) ? "markdown" : "turtle",
                         arrayBuffer: file.arrayBuffer()
                     });
                 }
@@ -196,12 +185,12 @@ else {
         }
 
         backend.aftercompile();
-        backend.navigateTo(location.hash.startsWith("#") ? location.hash.substr("#".length) : "");
+        backend.navigateTo(location.hash.startsWith("#") ? location.hash.slice("#".length) : "");
     }
 
     window.onhashchange = function () {
         progress.className = "progress-bar loading";
-        backend.navigateTo(location.hash.startsWith("#") ? location.hash.substr("#".length) : "");
+        backend.navigateTo(location.hash.startsWith("#") ? location.hash.slice("#".length) : "");
     }
 
     window.onbeforeunload = function (ev) {
@@ -231,11 +220,11 @@ else {
         const links = document.getElementsByTagName("link");
         for (let i = 0; i < links.length; i++) {
             const link = links.item(i);
-            if (link?.type === "application/turtle") {
+            if (link && (link.type === "text/turtle" || link.type === "text/markdown")) {
                 documents.push({
-                    uri: new URL(link.href, document.location.href).href,
-                    language: "turtle",
-                    response: fetch(new URL(REDIRECTIONS[link.href] || link.href, document.location.href))
+                    uri: new URL(link.dataset["uri"] || link.href, document.location.href).href,
+                    language: link.type === "text/markdown" ? "markdown" : "turtle",
+                    response: fetch(new URL(link.href, document.location.href))
                 });
             }
         }
@@ -249,6 +238,6 @@ else {
         }
 
         backend.aftercompile();
-        backend.navigateTo(location.hash.startsWith("#") ? location.hash.substr("#".length) : "");
+        backend.navigateTo(location.hash.startsWith("#") ? location.hash.slice("#".length) : "");
     }
 }

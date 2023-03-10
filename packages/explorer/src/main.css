@@ -200,6 +200,16 @@ a {
         color: var(--base0F);
     }
 
+    a[href^='https://brickschema.org/schema/Brick#'],
+    a[href^='https://brickschema.org/schema/BrickShape#'] {
+        color: var(--base0C);
+    }
+
+    a[href='https://w3id.org/rec'],
+    a[href^='https://w3id.org/rec#'] {
+        color: var(--base0D);
+    }
+
 nav a[href='http://www.w3.org/2002/07/owl#Thing'] .rdf-iri-localname {
     border: 2px solid var(--base0B);
     border-radius: 4px;

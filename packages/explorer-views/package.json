@@ -8,17 +8,19 @@
     "build": "tsc --noEmit",
     "clean": ""
   },
-  "devDependencies": {
+  "dependencies": {
     "@rdf-toolkit/iterable": "^0.1.0",
     "@rdf-toolkit/rdf": "^0.1.0",
     "@rdf-toolkit/schema": "^0.1.0",
     "@rdf-toolkit/text": "^0.1.0",
     "@rdf-toolkit/turtle": "^0.1.0",
+    "commonmark": "^0.30.0"
+  },
+  "devDependencies": {
     "@types/commonmark": "^0.27.5",
-    "@typescript-eslint/eslint-plugin": "^5.53.0",
-    "@typescript-eslint/parser": "^5.53.0",
-    "commonmark": "^0.30.0",
-    "eslint": "^8.34.0",
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.35.0",
     "typescript": "^4.9.5"
   }
 }

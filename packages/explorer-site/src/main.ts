@@ -7,7 +7,7 @@ window.onclick = function (ev) {
             if (!rel) {
                 ev.preventDefault();
                 if (href) {
-                    window.location = href;
+                    window.location.href = href;
                 }
             }
             break;

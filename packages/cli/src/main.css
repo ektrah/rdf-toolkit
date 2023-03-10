@@ -1,5 +1,5 @@
-@import url("./fonts/iosevka-aile-custom.css");
-@import url("./themes/espresso.css");
+@import url("./assets/fonts/iosevka-aile-custom.css");
+@import url("./assets/themes/espresso.css");
 
 *, *:before, *:after {
     box-sizing: inherit;

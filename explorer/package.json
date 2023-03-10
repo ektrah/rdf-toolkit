@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "npx rdf make explorer",
+    "clean": "rimraf ./public/**/*.*"
+  },
+  "devDependencies": {
+    "@rdf-toolkit/cli": "^0.1.0",
+    "rimraf": "^3.0.2"
+  }
+}

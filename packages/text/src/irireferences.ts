@@ -83,7 +83,7 @@ function mergePaths(base: IRIReference, relativePath: string): string {
         return "/" + relativePath;
     }
     else {
-        return base.path.substr(0, base.path.lastIndexOf("/") + 1) + relativePath;
+        return base.path.slice(0, base.path.lastIndexOf("/") + 1) + relativePath;
     }
 }
 
@@ -92,16 +92,16 @@ function removeDotSegments(input: string): string {
 
     while (input.length > 0) {
         if (input.startsWith("../")) {
-            input = input.substr(3);
+            input = input.slice(3);
         }
         else if (input.startsWith("./") || input.startsWith("/./")) {
-            input = input.substr(2);
+            input = input.slice(2);
         }
         else if (input === "/.") {
             input = "/";
         }
         else if (input.startsWith("/../")) {
-            input = input.substr(3);
+            input = input.slice(3);
             const pos = output.lastIndexOf("/");
             output = (pos >= 0) ? output.substring(0, pos) : "";
         }
@@ -115,8 +115,8 @@ function removeDotSegments(input: string): string {
         }
         else {
             const q = input.indexOf("/", input.startsWith("/") ? 1 : 0);
-            output += (q >= 0) ? input.substr(0, q) : input;
-            input = (q >= 0) ? input.substr(q) : "";
+            output += (q >= 0) ? input.slice(0, q) : input;
+            input = (q >= 0) ? input.slice(q) : "";
         }
     }
 

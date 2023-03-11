@@ -30,7 +30,7 @@ export class PrefixTable {
     lookup(iri: string): { readonly localName: string; readonly prefixLabel: string; } | null {
         for (const [namespace, prefixLabel] of this.table) {
             if (iri.startsWith(namespace)) {
-                return { prefixLabel, localName: iri.substr(namespace.length) };
+                return { prefixLabel, localName: iri.slice(namespace.length) };
             }
         }
         return null;

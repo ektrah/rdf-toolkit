@@ -1,4 +1,7 @@
-import { Diagnostic, DiagnosticSeverity, DocumentUri } from "vscode-languageserver-types";
+import { CodeDescription, Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DiagnosticTag } from "vscode-languageserver-types";
+import { DocumentUri } from "./documents.js";
+
+export { CodeDescription, Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DiagnosticTag };
 
 export interface DiagnosticBag {
     [Symbol.iterator](): IterableIterator<[DocumentUri, Diagnostic]>;

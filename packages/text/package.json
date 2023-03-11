@@ -30,12 +30,13 @@
     "clean": "rimraf dist/**/*.{js,d.ts,map}"
   },
   "dependencies": {
+    "vscode-languageserver-textdocument": "^1.0.9",
     "vscode-languageserver-types": "^3.17.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
-    "eslint": "^8.35.0",
+    "eslint": "^8.36.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.9.5"
   }

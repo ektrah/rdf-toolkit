@@ -15,15 +15,14 @@ import * as path from "path";
 import * as url from "url";
 import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
-import { ProjectConfig } from "../configuration.js";
 import { PrefixTable } from "../prefixes.js";
+import { Project } from "../project.js";
 import { Site } from "../site.js";
 
 const DEFAULT_TITLE = "RDF Explorer";
-const DEFAULT_OUTPUT = "./public/";
 const DEFAULT_BASE = "https://example.com/";
 
-const HOME_FILE_NAME = "index.html";
+const INDEX_FILE_NAME = "index.html";
 const ERROR_FILE_NAME = "404.html";
 const CSS_FILE_NAME = "style.css";
 const FONT_FILE_NAME = path.basename(fontAssetFilePath);
@@ -114,7 +113,7 @@ class Website implements RenderContext {
     }
 }
 
-function renderHome(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
+function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
     return <html lang="en-US">
         <head>
             <meta charset="utf-8" />
@@ -202,44 +201,28 @@ export default function main(args: { base: string | undefined, output: string | 
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
 
-    const configFilePath = args.project;
-    const configPath = path.dirname(configFilePath);
-    const config = JSON.parse(fs.readFileSync(configFilePath, { encoding: "utf-8" }));
+    const project = new Project(args.project).load();
+    const files = project.config.files || {};
+    const icons = project.config.siteOptions?.icons || [];
+    const assets = project.config.siteOptions?.assets || {};
+    const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE, new URL(args.base || project.config.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
+    const site = new Site(project, args.output);
 
-    if (!ProjectConfig.is(config)) {
-        throw new Error("Invalid project file");
+    const diagnostics = DiagnosticBag.create();
+    context.beforecompile();
+    for (const documentURI in files) {
+        context.compile(documentURI, project.resolve(files[documentURI]));
     }
-
-    config.files ||= {};
-    config.siteOptions ||= {};
-    config.siteOptions.title ||= DEFAULT_TITLE;
-    config.siteOptions.icons ||= [];
-    config.siteOptions.assets ||= {};
-    config.siteOptions.baseURL = new URL(args.base || config.siteOptions.baseURL || DEFAULT_BASE, DEFAULT_BASE).href;
-    config.siteOptions.outDir = args.output || config.siteOptions.outDir || DEFAULT_OUTPUT;
-
-    const context = new Website(config.siteOptions.title, config.siteOptions.baseURL);
-
-    {
-        const diagnostics = DiagnosticBag.create();
-
-        context.beforecompile();
-        for (const documentURI in config.files) {
-            context.compile(documentURI, path.resolve(configPath, config.files[documentURI]));
-        }
-        context.aftercompile();
-
-        for (const [documentURI, diagnostic] of diagnostics) {
-            console.dir(diagnostic);
-        }
-
-        if (diagnostics.errors) {
-            throw new Error("Errors");
-        }
+    context.aftercompile();
+    for (const [documentURI, diagnostic] of diagnostics) {
+        console.dir(diagnostic);
+    }
+    if (diagnostics.errors) {
+        throw new Error("Errors");
     }
 
     const links = <>
-        {config.siteOptions.icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(iconConfig.file, context.baseURL)} />)}
+        {icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(path.basename(iconConfig.asset), context.baseURL)} />)}
         <link rel="stylesheet" href={resolveHref(CSS_FILE_NAME, context.baseURL)} />
     </>;
 
@@ -247,28 +230,24 @@ export default function main(args: { base: string | undefined, output: string | 
         <script src={resolveHref(SCRIPT_FILE_NAME, context.baseURL)}></script>
     </>;
 
-    const navigation = renderNavigation(config.siteOptions.title, context);
+    const navigation = renderNavigation(context.title, context);
 
-    {
-        const site = new Site(configPath, config.siteOptions.outDir);
+    site.writeFile(CSS_FILE_NAME, fs.readFileSync(path.format({ ...path.parse(moduleFilePath), base: "", ext: ".css" })));
+    site.writeFile(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
+    site.writeFile(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
 
-        site.writeFile(CSS_FILE_NAME, fs.readFileSync(path.format({ ...path.parse(moduleFilePath), base: "", ext: ".css" })));
-        site.writeFile(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
-        site.writeFile(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
+    for (const iconConfig of icons) {
+        site.writeFile(path.basename(iconConfig.asset), project.readFile(iconConfig.asset));
+    }
 
-        for (const iconConfig of config.siteOptions.icons) {
-            site.writeFile(path.basename(iconConfig.file), fs.readFileSync(path.resolve(configPath, iconConfig.file)));
-        }
+    for (const filePath in assets) {
+        site.writeFile(assets[filePath], project.readFile(filePath));
+    }
 
-        for (const filePath in config.siteOptions.assets) {
-            site.writeFile(config.siteOptions.assets[filePath], fs.readFileSync(path.resolve(configPath, filePath)));
-        }
+    site.writeFile(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
+    site.writeFile(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
 
-        site.writeFile(HOME_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderHome(context, links, scripts, navigation))));
-        site.writeFile(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
-
-        for (const iri in context.outputs) {
-            site.writeFile(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
-        }
+    for (const iri in context.outputs) {
+        site.writeFile(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
     }
 }

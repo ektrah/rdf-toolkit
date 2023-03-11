@@ -10,7 +10,7 @@ RDF Toolkit doesn't have any releases yet, so it must be built from source using
 ```bash
 $ git clone --depth 1 https://github.com/ektrah/rdf-toolkit.git
 $ cd rdf-toolkit
-$ npm run ci
+$ npm ci
 $ npm run build
 ```
 
@@ -33,6 +33,16 @@ This command will generate a static website from the contents of Turtle and RDF 
 ### serve
 
 This command will start a local HTTP server and serve the graph explorer or the static website created with the `make explorer` and `make site` commands, respectively.
+
+
+### add file
+
+This command will add a Turtle file to the configuration file.
+
+
+### remove file
+
+This command will remove a Turtle file from the configuration file.
 
 
 ## Configuration

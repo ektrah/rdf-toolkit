@@ -4,9 +4,11 @@ import * as path from "path";
 import * as process from "process";
 import yargs, { Options } from "yargs";
 import * as yargs_helpers from "yargs/helpers";
-import makeExplorer from "./commands/interactive-site-generator.js";
-import serveSite from "./commands/site-server.js";
-import makeStaticSite from "./commands/static-site-generator.js";
+import addFile from "./commands/add-file.js";
+import makeExplorer from "./commands/make-explorer.js";
+import makeSite from "./commands/make-site.js";
+import removeFile from "./commands/remove-file.js";
+import serve from "./commands/serve.js";
 import "./main.css";
 
 const baseOption = {
@@ -16,7 +18,7 @@ const baseOption = {
         nargs: 1,
         type: "string"
     }
-} satisfies { [key in string]: Options };
+} satisfies Record<string, Options>;
 
 const outputOption = {
     "output": {
@@ -26,17 +28,17 @@ const outputOption = {
         type: "string",
         coerce: (arg: string) => path.resolve(arg),
     }
-} satisfies { [key in string]: Options };
+} satisfies Record<string, Options>;
 
 const projectOption = {
     "project": {
-        description: "Specify the project file to use",
+        description: "Specify the project file",
         nargs: 1,
         type: "string",
         default: "./rdf.json",
         coerce: (arg: string) => path.resolve(arg),
     }
-} satisfies { [key in string]: Options };
+} satisfies Record<string, Options>;
 
 yargs(yargs_helpers.hideBin(process.argv))
     .parserConfiguration({
@@ -46,6 +48,43 @@ yargs(yargs_helpers.hideBin(process.argv))
     })
     .scriptName("rdf")
     .usage("Usage: $0 <command> [options]")
+
+    .command("add <type>", "Add the specified item",
+        yargs => yargs
+
+            .command("file <uri> <path>", "Add a file to the project",
+                yargs => yargs
+                    .positional("uri", { type: "string", coerce: (arg: string) => new URL(arg).href, description: "The URI of the file to add" }).demandOption("uri")
+                    .positional("path", { type: "string", coerce: (arg: string) => path.resolve(arg), description: "The local path of the file to add" }).demandOption("path")
+                    .help()
+                    .option(projectOption)
+                    .version(false)
+                    .example("$0 add file http://www.w3.org/2002/07/owl ./vocab/owl.ttl", "")
+                    .strict(),
+                args => addFile(args.uri, args.path, args))
+
+            .help()
+            .version(false)
+            .demandCommand(1, 1)
+            .strict())
+
+    .command("remove <type>", "Remove the specified item",
+        yargs => yargs
+
+            .command("file <uri>", "Remove a file from the project",
+                yargs => yargs
+                    .positional("uri", { type: "string", coerce: (arg: string) => new URL(arg).href, description: "The URI of the file to remove" }).demandOption("uri")
+                    .help()
+                    .option(projectOption)
+                    .version(false)
+                    .example("$0 remove file http://www.w3.org/2002/07/owl", "")
+                    .strict(),
+                args => removeFile(args.uri, args))
+
+            .help()
+            .version(false)
+            .demandCommand(1, 1)
+            .strict())
 
     .command("make <target>", "Generate the specified target",
         yargs => yargs
@@ -68,7 +107,7 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .option(projectOption)
                     .version(false)
                     .strict(),
-                args => makeStaticSite(args))
+                args => makeSite(args))
 
             .help()
             .version(false)
@@ -78,13 +117,13 @@ yargs(yargs_helpers.hideBin(process.argv))
     .command("serve [port]", "Serve a generated site",
         yargs => yargs
             .positional("port", { type: "number", default: 8000 }).nargs("port", 1)
-            .option(baseOption)
             .help()
-            .option(outputOption)
+            .option("root", { type: "string", coerce: (arg: string) => path.resolve(arg), description: "Root directory" })
             .option(projectOption)
             .version(false)
+            .example("$0 serve 8080", "")
             .strict(),
-        args => serveSite(args.port, args))
+        args => serve(args.port, args))
 
     .help()
     .version(false)

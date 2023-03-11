@@ -48,7 +48,7 @@ declare global {
 
             link: GlobalAttributes & {
                 href?: string;
-                crossorigin?: "anonymous" | "use-credentials";
+                crossorigin?: "" | "anonymous" | "use-credentials";
                 rel?: string;
                 media?: string;
                 integrity?: string;
@@ -58,7 +58,7 @@ declare global {
                 sizes?: string;
                 imagesrcset?: string;
                 imagesizes?: string;
-                "as"?: string;
+                "as"?: "fetch" | "audio" | "audioworklet" | "document" | "embed" | "font" | "frame" | "iframe" | "image" | "manifest" | "object" | "paintworklet" | "report" | "script" | "serviceworker" | "sharedworker" | "style" | "track" | "video" | "webidentity" | "worker" | "xslt";
                 blocking?: "render";
                 color?: string;
                 disabled?: boolean;

@@ -16,7 +16,7 @@
   "scripts": {
     "lint": "npx eslint src/",
     "prebuild": "tsc --noEmit",
-    "build": "esbuild src/main.ts --bundle --minify --platform=node --format=esm --target=es2020 --external:koa --external:koa-send --asset-names=[name] --loader:.min.js=file --loader:.min.css=file --loader:.woff2=file --outfile=./dist/main.js",
+    "build": "esbuild src/main.ts --bundle --minify --platform=node --format=esm --target=es2020 --external:commonmark --external:koa --external:koa-send --external:yargs --asset-names=[name] --loader:.min.js=file --loader:.min.css=file --loader:.woff2=file --outfile=./dist/main.js",
     "clean": "rimraf ./dist/*.{js,css,woff2}"
   },
   "dependencies": {

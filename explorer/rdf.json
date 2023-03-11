@@ -5,25 +5,25 @@
       {
         "type": "image/png",
         "sizes": "32x32",
-        "file": "./favicon32.png"
+        "asset": "favicon32.png"
       },
       {
         "type": "image/png",
         "sizes": "16x16",
-        "file": "./favicon16.png"
+        "asset": "favicon16.png"
       }
     ],
     "assets": {
-      "./favicon.ico": "favicon.ico",
-      "./robots.txt": "robots.txt"
+      "favicon.ico": "favicon.ico",
+      "robots.txt": "robots.txt"
     },
-    "outDir": "./public/",
-    "baseURL": "/"
+    "baseURL": "/",
+    "outDir": "public"
   },
   "files": {
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns": "./vocab/rdf.ttl",
-    "http://www.w3.org/2000/01/rdf-schema": "./vocab/rdfs.ttl",
-    "http://www.w3.org/2001/XMLSchema": "./vocab/xsd.ttl",
-    "http://www.w3.org/2002/07/owl": "./vocab/owl.ttl"
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns": "vocab/rdf.ttl",
+    "http://www.w3.org/2000/01/rdf-schema": "vocab/rdfs.ttl",
+    "http://www.w3.org/2001/XMLSchema": "vocab/xsd.ttl",
+    "http://www.w3.org/2002/07/owl": "vocab/owl.ttl"
   }
 }

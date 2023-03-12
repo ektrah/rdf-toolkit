@@ -79,7 +79,7 @@ export default function main(args: { base: string | undefined, output: string | 
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
 
-    const project = new Project(args.project).load();
+    const project = Project.from(args.project);
     const files = project.config.files || {};
     const icons = project.config.siteOptions?.icons || [];
     const assets = project.config.siteOptions?.assets || {};

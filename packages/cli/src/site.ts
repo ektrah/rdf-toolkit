@@ -1,36 +1,39 @@
-import * as fs from "fs";
-import { SendOptions } from "koa-send";
-import * as os from "os";
-import * as path from "path";
-import prettyBytes from "pretty-bytes";
-import * as process from "process";
+import { Server } from "http";
+import Koa, { Middleware } from "koa";
+import send, { SendOptions } from "koa-send";
 import { Project } from "./project.js";
+import { Workspace } from "./workspace.js";
 
-export class Site {
-    readonly config: Readonly<SendOptions>;
-    readonly siteDirectoryPath: string;
+function serve(opts: SendOptions): Middleware<{}> {
+    return async function serve(ctx, next) {
+        if (ctx.method === "HEAD" || ctx.method === "GET") {
+            try {
+                return await send(ctx, ctx.path, opts);
+            } catch (err) {
+                if ((err as { status?: number }).status !== 404) {
+                    throw err;
+                }
+            }
+        }
 
-    constructor(private readonly project: Project, siteDirectoryPath?: string) {
-        this.siteDirectoryPath = project.resolve(siteDirectoryPath || project.config.siteOptions?.outDir || "./public/");
+        return await next();
+    }
+}
 
-        this.config = {
-            root: this.siteDirectoryPath,
+export class Site extends Workspace {
+    constructor(project: Project, siteDirectoryPath?: string) {
+        super(project.resolve(siteDirectoryPath || project.config.siteOptions?.outDir || "./public/"));
+    }
+
+    serve(port: number): Server {
+        const opts: SendOptions = {
+            root: this.directoryPath,
             index: "index.html",
             gzip: false,
             brotli: false,
             extensions: [".html"],
         };
-    }
 
-    readFile(filePath: string): Buffer {
-        filePath = path.resolve(this.siteDirectoryPath, filePath);
-        return fs.readFileSync(filePath);
-    }
-
-    writeFile(filePath: string, data: Buffer): void {
-        filePath = path.resolve(this.siteDirectoryPath, filePath);
-        process.stderr.write(`${this.project.relative(filePath)} (${prettyBytes(data.length)})${os.EOL}`);
-        fs.mkdirSync(path.dirname(filePath), { recursive: true });
-        fs.writeFileSync(filePath, data);
+        return new Koa().use(serve(opts)).listen(port);
     }
 }

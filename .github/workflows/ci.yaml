@@ -15,7 +15,7 @@ jobs:
       - run: npm run build
       - run: npm test
       - run: npm install
-      - run: npx rdf make explorer -B https://ektrah.github.io/rdf-toolkit/
+      - run: npx rdf make explorer
         working-directory: explorer
       - uses: actions/upload-pages-artifact@v1
         with:

@@ -122,7 +122,6 @@ yargs(yargs_helpers.hideBin(process.argv))
 
             .command("explorer", "Generate an interactive explorer",
                 yargs => yargs
-                    .option(baseOption)
                     .help()
                     .option(outputOption)
                     .option(projectOption)

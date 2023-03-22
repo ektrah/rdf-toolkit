@@ -23,7 +23,7 @@ const WORKER_SCRIPT_FILE_NAME = path.basename(workerScriptAssetFilePath);
 class Website {
     readonly files: Record<string, { readonly fileName: string, readonly contentType: string, readonly buffer: Buffer }> = {};
 
-    constructor(readonly title: string, readonly baseURL: string) {
+    constructor(readonly title: string) {
     }
 
     add(documentURI: string, filePath: string): void {
@@ -51,9 +51,9 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent)
             <meta charset="utf-8" />
             <title>{context.title}</title>
             {links}
-            <link rel="preload" type="font/woff2" href={resolveHref(FONT_FILE_NAME, context.baseURL)} as="font" crossorigin="anonymous" />
-            <link rel="preload" type="application/javascript" href={resolveHref(WORKER_SCRIPT_FILE_NAME, context.baseURL)} as="worker" crossorigin="anonymous" />
-            {Object.entries(context.files).map(([documentURI, item]) => <link rel="preload" type={item.contentType} href={resolveHref(item.fileName, context.baseURL)} as="fetch" crossorigin="anonymous" data-uri={documentURI} />)}
+            <link rel="preload" type="font/woff2" href={FONT_FILE_NAME} as="font" crossorigin="anonymous" />
+            <link rel="preload" type="application/javascript" href={WORKER_SCRIPT_FILE_NAME} as="worker" crossorigin="anonymous" />
+            {Object.entries(context.files).map(([documentURI, item]) => <link rel="preload" type={item.contentType} href={item.fileName} as="fetch" crossorigin="anonymous" data-uri={documentURI} />)}
         </head>
         <body>
             <noscript>Your browser does not support JavaScript or scripts are being blocked.</noscript>
@@ -62,28 +62,7 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent)
     </html>;
 }
 
-function render404(context: Website, links: HtmlContent, scripts: HtmlContent): HtmlContent {
-    return <html lang="en-US">
-        <head>
-            <meta charset="utf-8" />
-            <title>Page not found &ndash; {context.title}</title>
-            {links}
-        </head>
-        <body>
-            <h1>Page not found</h1>
-            <p>We are sorry, the page you requested cannot be found.</p>
-            <p>The URL may be misspelled or the page you're looking for is no longer available.</p>
-        </body>
-    </html>;
-}
-
-function resolveHref(url: string, base: string): string {
-    const root = new URL("/", base).href;
-    const result = new URL(url, base).href;
-    return result.startsWith(root) ? result.slice(root.length - 1) : result;
-}
-
-export default function main(args: { base: string | undefined, output: string | undefined, project: string }): void {
+export default function main(args: { output: string | undefined, project: string }): void {
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
 
@@ -91,7 +70,7 @@ export default function main(args: { base: string | undefined, output: string | 
     const files = project.config.files || {};
     const icons = project.config.siteOptions?.icons || [];
     const assets = project.config.siteOptions?.assets || {};
-    const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE, new URL(args.base || project.config.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
+    const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE);
     const site = new Site(project, args.output);
 
     for (const documentURI in files) {
@@ -99,12 +78,12 @@ export default function main(args: { base: string | undefined, output: string | 
     }
 
     const links = <>
-        {icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(path.basename(iconConfig.asset), context.baseURL)} />)}
-        <link rel="stylesheet" href={resolveHref(CSS_FILE_NAME, context.baseURL)} />
+        {icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={path.basename(iconConfig.asset)} />)}
+        <link rel="stylesheet" href={CSS_FILE_NAME} />
     </>;
 
     const scripts = <>
-        <script src={resolveHref(SCRIPT_FILE_NAME, context.baseURL)}></script>
+        <script src={SCRIPT_FILE_NAME}></script>
     </>;
 
     site.writeFile(CSS_FILE_NAME, fs.readFileSync(path.resolve(modulePath, cssAssetFilePath)));
@@ -121,7 +100,6 @@ export default function main(args: { base: string | undefined, output: string | 
     }
 
     site.writeFile(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts))));
-    site.writeFile(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts))));
 
     for (const item of Object.values(context.files)) {
         site.writeFile(item.fileName, item.buffer);

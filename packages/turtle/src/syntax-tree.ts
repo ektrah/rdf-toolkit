@@ -51,7 +51,7 @@ export namespace SyntaxTree {
                 return new FullSyntaxTree(document, parser.parse());
             }
             default:
-                throw new Error();
+                throw new Error("Unsupported file format");
         }
     }
 

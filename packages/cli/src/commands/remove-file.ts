@@ -1,9 +1,13 @@
 import * as os from "os";
 import * as process from "process";
+import { ProjectOptions } from "../options.js";
 import { Project } from "../project.js";
 
-export default function main(documentURI: string, args: { project: string }): void {
-    const project = Project.from(args.project);
+type Options = {}
+    & ProjectOptions
+
+export default function main(documentURI: string, options: Options): void {
+    const project = Project.from(options.project);
     if (project.config.files && documentURI in project.config.files) {
         delete project.config.files[documentURI];
         project.saveConfig();

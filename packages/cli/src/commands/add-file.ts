@@ -1,20 +1,31 @@
-import * as fs from "fs";
+import { DiagnosticBag } from "@rdf-toolkit/text";
 import * as os from "os";
 import * as process from "process";
+import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
+import { DiagnosticOptions, ProjectOptions } from "../options.js";
 import { Project } from "../project.js";
 
-export default async function main(documentURI: string, filePath: string, args: { fetch: boolean, project: string }): Promise<void> {
-    const project = Project.from(args.project);
+type Options = { readonly fetch?: boolean }
+    & ProjectOptions
+    & DiagnosticOptions
+
+export default async function main(documentURI: string, filePath: string, options: Options): Promise<void> {
+    const project = Project.from(options.project);
     filePath = project.relative(filePath);
 
-    if (!project.exists(filePath) && args.fetch) {
-        const response = await fetch(new URL(documentURI));
+    if (!project.exists(filePath) && options.fetch) {
+        const headers = new Headers();
+        headers.append("Accept", "text/turtle");
+        const response = await fetch(documentURI, { headers });
         if (response.ok) {
             const buffer = await response.arrayBuffer();
-            project.writeFile(filePath, Buffer.from(buffer));
+            project.write(filePath, Buffer.from(buffer));
         }
     }
-    project.access(filePath, fs.constants.R_OK);
+
+    const diagnostics = DiagnosticBag.create();
+    project.readSyntaxTree(documentURI, filePath, diagnostics);
+    printDiagnosticsAndExitOnError(diagnostics, options);
 
     project.config.files ||= {};
     if (project.config.files[documentURI] !== filePath) {

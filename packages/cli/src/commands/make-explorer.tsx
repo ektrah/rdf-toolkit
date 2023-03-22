@@ -7,8 +7,13 @@ import cssAssetFilePath from "../assets/explorer/explorer.min.css";
 import scriptAssetFilePath from "../assets/explorer/explorer.min.js";
 import fontAssetFilePath from "../assets/explorer/iosevka-aile-custom-light.woff2";
 import workerScriptAssetFilePath from "../assets/explorer/worker.min.js";
+import { ProjectOptions, MakeOptions } from "../options.js";
 import { Project } from "../project.js";
 import { Site } from "../site.js";
+
+type Options = {}
+    & MakeOptions
+    & ProjectOptions
 
 const DEFAULT_TITLE = "RDF Explorer";
 const DEFAULT_BASE = "https://example.com/";
@@ -62,16 +67,16 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent)
     </html>;
 }
 
-export default function main(args: { output: string | undefined, project: string }): void {
+export default function main(options: Options): void {
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
 
-    const project = Project.from(args.project);
+    const project = Project.from(options.project);
     const files = project.config.files || {};
     const icons = project.config.siteOptions?.icons || [];
     const assets = project.config.siteOptions?.assets || {};
     const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE);
-    const site = new Site(project, args.output);
+    const site = new Site(project, options.output);
 
     for (const documentURI in files) {
         context.add(documentURI, project.resolve(files[documentURI]));
@@ -86,22 +91,22 @@ export default function main(args: { output: string | undefined, project: string
         <script src={SCRIPT_FILE_NAME}></script>
     </>;
 
-    site.writeFile(CSS_FILE_NAME, fs.readFileSync(path.resolve(modulePath, cssAssetFilePath)));
-    site.writeFile(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
-    site.writeFile(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
-    site.writeFile(WORKER_SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, workerScriptAssetFilePath)));
+    site.write(CSS_FILE_NAME, fs.readFileSync(path.resolve(modulePath, cssAssetFilePath)));
+    site.write(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
+    site.write(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
+    site.write(WORKER_SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, workerScriptAssetFilePath)));
 
     for (const iconConfig of icons) {
-        site.writeFile(path.basename(iconConfig.asset), project.readFile(iconConfig.asset));
+        site.write(path.basename(iconConfig.asset), project.read(iconConfig.asset));
     }
 
     for (const filePath in assets) {
-        site.writeFile(assets[filePath], project.readFile(filePath));
+        site.write(assets[filePath], project.read(filePath));
     }
 
-    site.writeFile(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts))));
+    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts))));
 
     for (const item of Object.values(context.files)) {
-        site.writeFile(item.fileName, item.buffer);
+        site.write(item.fileName, item.buffer);
     }
 }

@@ -30,7 +30,7 @@ export class Project extends Workspace {
     }
 
     loadConfig(): void {
-        const value = this.readJSONFile(this.fileName);
+        const value = this.readJSON(this.fileName);
         if (!ProjectConfig.is(value)) {
             throw new Error("Invalid project configuration")
         }
@@ -38,6 +38,6 @@ export class Project extends Workspace {
     }
 
     saveConfig(): void {
-        this.writeJSONFile(this.fileName, this.config);
+        this.writeJSON(this.fileName, this.config);
     }
 }

@@ -15,9 +15,14 @@ import * as path from "path";
 import * as url from "url";
 import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
+import { ProjectOptions, MakeOptions } from "../options.js";
 import { PrefixTable } from "../prefixes.js";
 import { Project } from "../project.js";
 import { Site } from "../site.js";
+
+type Options = { readonly base?: string }
+    & MakeOptions
+    & ProjectOptions
 
 const DEFAULT_TITLE = "RDF Explorer";
 const DEFAULT_BASE = "https://example.com/";
@@ -197,16 +202,16 @@ function resolveHref(url: string, base: string): string {
     return result.startsWith(root) ? result.slice(root.length - 1) : result;
 }
 
-export default function main(args: { base: string | undefined, output: string | undefined, project: string }): void {
+export default function main(options: Options): void {
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
 
-    const project = Project.from(args.project);
+    const project = Project.from(options.project);
     const files = project.config.files || {};
     const icons = project.config.siteOptions?.icons || [];
     const assets = project.config.siteOptions?.assets || {};
-    const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE, new URL(args.base || project.config.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
-    const site = new Site(project, args.output);
+    const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.config.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
+    const site = new Site(project, options.output);
 
     const diagnostics = DiagnosticBag.create();
     context.beforecompile();
@@ -232,22 +237,22 @@ export default function main(args: { base: string | undefined, output: string | 
 
     const navigation = renderNavigation(context.title, context);
 
-    site.writeFile(CSS_FILE_NAME, fs.readFileSync(path.format({ ...path.parse(moduleFilePath), base: "", ext: ".css" })));
-    site.writeFile(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
-    site.writeFile(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
+    site.write(CSS_FILE_NAME, fs.readFileSync(path.format({ ...path.parse(moduleFilePath), base: "", ext: ".css" })));
+    site.write(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
+    site.write(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
 
     for (const iconConfig of icons) {
-        site.writeFile(path.basename(iconConfig.asset), project.readFile(iconConfig.asset));
+        site.write(path.basename(iconConfig.asset), project.read(iconConfig.asset));
     }
 
     for (const filePath in assets) {
-        site.writeFile(assets[filePath], project.readFile(filePath));
+        site.write(assets[filePath], project.read(filePath));
     }
 
-    site.writeFile(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
-    site.writeFile(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
+    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
+    site.write(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
 
     for (const iri in context.outputs) {
-        site.writeFile(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
+        site.write(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
     }
 }

@@ -29,9 +29,17 @@ class Website {
     add(documentURI: string, filePath: string): void {
         const buffer = fs.readFileSync(filePath);
 
+        const info = /[.](?:md|mkdn?|mdwn|mdown|markdown)$/i.test(filePath) ? {
+            contentType: "text/markdown",
+            fileExtension: "md"
+        } : {
+            contentType: "text/turtle",
+            fileExtension: "ttl"
+        };
+
         this.files[documentURI] = {
-            fileName: `${path.parse(filePath).name}.${crypto.createHash("sha256").update(buffer).digest("hex").slice(0, 12)}.ttl`,
-            contentType: /[.](?:md|mkdn?|mdwn|mdown|markdown)$/i.test(filePath) ? "text/markdown" : "text/turtle",
+            fileName: `${path.parse(filePath).name}.${crypto.createHash("sha256").update(buffer).digest("hex").slice(0, 12)}.${info.fileExtension}`,
+            contentType: info.contentType,
             buffer,
         };
     }

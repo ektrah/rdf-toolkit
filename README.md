@@ -52,15 +52,14 @@ The command-line interface is driven by a JSON configuration file.
 ```json
 {
   "siteOptions": {
-    "title": "RDF Explorer",
-    "outDir": "./public/",
-    "baseURL": "/"
+    "title": "Explorer",
+    "outDir": "public"
   },
   "files": {
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns": "./vocab/rdf.ttl",
-    "http://www.w3.org/2000/01/rdf-schema": "./vocab/rdfs.ttl",
-    "http://www.w3.org/2001/XMLSchema": "./vocab/xsd.ttl",
-    "http://www.w3.org/2002/07/owl": "./vocab/owl.ttl"
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns": "vocab/rdf.ttl",
+    "http://www.w3.org/2000/01/rdf-schema": "vocab/rdfs.ttl",
+    "http://www.w3.org/2001/XMLSchema": "vocab/xsd.ttl",
+    "http://www.w3.org/2002/07/owl": "vocab/owl.ttl"
   }
 }
 ```
@@ -71,6 +70,7 @@ The command-line interface is driven by a JSON configuration file.
 To build and serve an example site:
 
 ```bash
+$ npm i @rdf-toolkit/cli
 $ cd explorer
 $ npx rdf make explorer
 $ npx rdf serve

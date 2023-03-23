@@ -17,7 +17,6 @@
       "favicon.ico": "favicon.ico",
       "robots.txt": "robots.txt"
     },
-    "baseURL": "/",
     "outDir": "public"
   },
   "files": {

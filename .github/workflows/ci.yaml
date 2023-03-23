@@ -14,7 +14,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
-      - run: npm install
+      - run: npm i @rdf-toolkit/cli
       - run: npx rdf make explorer
         working-directory: explorer
       - uses: actions/upload-pages-artifact@v1

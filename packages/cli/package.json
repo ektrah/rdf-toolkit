@@ -28,7 +28,6 @@
     "commonmark": "^0.30.0",
     "koa": "^2.14.1",
     "koa-send": "^5.0.1",
-    "pretty-bytes": "^6.1.0",
     "yargs": "^17.7.1"
   },
   "devDependencies": {

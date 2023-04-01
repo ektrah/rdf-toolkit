@@ -15,14 +15,15 @@ import * as path from "path";
 import * as url from "url";
 import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
-import { ProjectOptions, MakeOptions } from "../options.js";
+import { MakeOptions, ProjectOptions, SiteOptions } from "../options.js";
 import { PrefixTable } from "../prefixes.js";
 import { Project } from "../project.js";
 import { Site } from "../site.js";
 
-type Options = { readonly base?: string }
+type Options =
     & MakeOptions
     & ProjectOptions
+    & SiteOptions
 
 const DEFAULT_TITLE = "RDF Explorer";
 const DEFAULT_BASE = "https://example.com/";

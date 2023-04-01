@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { DocumentUri } from "@rdf-toolkit/text";
 import * as path from "path";
 import * as process from "process";
 import yargs from "yargs";
@@ -34,20 +35,31 @@ yargs(yargs_helpers.hideBin(process.argv))
     .command("add <type>", "Add an item of the specified type",
         yargs => yargs
 
-            .command("file <uri> <path>", "Add a file to the project",
+            .command("file <URL> <file>", "Add a Turtle file to the project",
                 yargs => yargs
-                    .positional("uri", { type: "string", coerce: (arg: string) => { const url = new URL(arg); url.hash = ""; return url.href }, description: "The URI of the file to add" }).demandOption("uri")
-                    .positional("path", { type: "string", coerce: (arg: string) => path.resolve(arg), description: "The local path of the file to add" }).demandOption("path")
-                    .option("fetch", { type: "boolean", default: false, description: "Fetch the file from the given URI if it does not already exist" }).alias("fetch", "f")
+                    .positional("URL", {
+                        type: "string",
+                        coerce: (arg: string): DocumentUri => { const url = new URL(arg); url.hash = ""; return url.href; },
+                        description: "The URL of the Turtle file to add",
+                    })
+                    .positional("file", {
+                        type: "string",
+                        coerce: (arg: string): string => path.resolve(arg),
+                        description: "The local path of the Turtle file to add",
+                    })
                     .help()
+                    .option(Options.noWarnings)
                     .option(Options.project)
+                    .option(Options.warnAsError)
                     .version(false)
-                    .example("$0 add file -F \"http://www.w3.org/1999/02/22-rdf-syntax-ns\" vocab/rdf.ttl", "")
-                    .example("$0 add file -F \"http://www.w3.org/2000/01/rdf-schema\" vocab/rdfs.ttl", "")
-                    .example("$0 add file -F \"http://www.w3.org/2002/07/owl\" vocab/owl.ttl", "")
-                    .example("$0 add file -F \"http://www.w3.org/ns/shacl\" vocab/shacl.ttl", "")
+                    .example("$0 add file \"http://www.w3.org/1999/02/22-rdf-syntax-ns\" vocab/rdf.ttl", "")
+                    .example("$0 add file \"http://www.w3.org/2000/01/rdf-schema\" vocab/rdfs.ttl", "")
+                    .example("$0 add file \"http://www.w3.org/2002/07/owl\" vocab/owl.ttl", "")
+                    .example("$0 add file \"http://www.w3.org/ns/shacl\" vocab/shacl.ttl", "")
+                    .demandOption("URL")
+                    .demandOption("file")
                     .strict(),
-                args => addFile(args.uri, args.path, args))
+                args => addFile(args.URL, args.file, args))
 
             .help()
             .version(false)
@@ -57,15 +69,20 @@ yargs(yargs_helpers.hideBin(process.argv))
     .command("remove <type>", "Remove an item of the specified type",
         yargs => yargs
 
-            .command("file <uri>", "Remove a file from the project",
+            .command("file <URL>", "Remove a Turtle file from the project",
                 yargs => yargs
-                    .positional("uri", { type: "string", coerce: (arg: string) => { const url = new URL(arg); url.hash = ""; return url.href }, description: "The URI of the file to remove" }).demandOption("uri")
+                    .positional("URL", {
+                        type: "string",
+                        coerce: (arg: string): DocumentUri => { const url = new URL(arg); url.hash = ""; return url.href; },
+                        description: "The URI of the Turtle file to remove",
+                    })
                     .help()
                     .option(Options.project)
                     .version(false)
                     .example("$0 remove file \"http://www.w3.org/2002/07/owl\"", "")
+                    .demandOption("URL")
                     .strict(),
-                args => removeFile(args.uri, args))
+                args => removeFile(args.URL, args))
 
             .help()
             .version(false)
@@ -118,10 +135,13 @@ yargs(yargs_helpers.hideBin(process.argv))
 
     .command("serve [port]", "Serve a generated site",
         yargs => yargs
-            .positional("port", { type: "number", default: 8000 }).nargs("port", 1)
+            .positional("port", {
+                type: "number",
+                default: 8000
+            }).nargs("port", 1)
             .help()
-            .option("root", { type: "string", coerce: (arg: string) => path.resolve(arg), description: "Root directory" })
             .option(Options.project)
+            .option(Options.root)
             .version(false)
             .example("$0 serve 8000", "")
             .strict(),
@@ -131,9 +151,9 @@ yargs(yargs_helpers.hideBin(process.argv))
     .version(false)
     .demandCommand(1, 1)
     .example("$0 init", "")
-    .example("$0 add file -F \"http://www.w3.org/1999/02/22-rdf-syntax-ns\" vocab/rdf.ttl", "")
-    .example("$0 add file -F \"http://www.w3.org/2000/01/rdf-schema\" vocab/rdfs.ttl", "")
+    .example("$0 add file \"http://www.w3.org/1999/02/22-rdf-syntax-ns\" vocab/rdf.ttl", "")
+    .example("$0 add file \"http://www.w3.org/2000/01/rdf-schema\" vocab/rdfs.ttl", "")
     .example("$0 make explorer", "")
     .example("$0 serve", "")
     .strict()
-    .parse();
+    .parseSync();

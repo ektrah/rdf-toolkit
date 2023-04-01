@@ -3,7 +3,7 @@ import * as process from "process";
 import { DiagnosticOptions } from "./options.js";
 
 export function hasErrors(diagnostics: DiagnosticBag, options: DiagnosticOptions): boolean {
-    return options.warningAsError ? !!(diagnostics.errors + diagnostics.warnings) : !!(diagnostics.errors);
+    return !!(options.warnAsError ? diagnostics.errors + diagnostics.warnings : diagnostics.errors);
 }
 
 export function printDiagnosticsAndExitOnError(diagnostics: DiagnosticBag, options: DiagnosticOptions): void {

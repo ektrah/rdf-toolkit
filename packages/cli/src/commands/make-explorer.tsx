@@ -7,19 +7,17 @@ import cssAssetFilePath from "../assets/explorer/explorer.min.css";
 import scriptAssetFilePath from "../assets/explorer/explorer.min.js";
 import fontAssetFilePath from "../assets/explorer/iosevka-aile-custom-light.woff2";
 import workerScriptAssetFilePath from "../assets/explorer/worker.min.js";
-import { ProjectOptions, MakeOptions } from "../options.js";
+import { MakeOptions, ProjectOptions } from "../options.js";
 import { Project } from "../project.js";
 import { Site } from "../site.js";
 
-type Options = {}
+type Options =
     & MakeOptions
     & ProjectOptions
 
 const DEFAULT_TITLE = "RDF Explorer";
-const DEFAULT_BASE = "https://example.com/";
 
 const INDEX_FILE_NAME = "index.html";
-const ERROR_FILE_NAME = "404.html";
 const CSS_FILE_NAME = path.basename(cssAssetFilePath);
 const FONT_FILE_NAME = path.basename(fontAssetFilePath);
 const SCRIPT_FILE_NAME = path.basename(scriptAssetFilePath);

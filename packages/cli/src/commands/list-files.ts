@@ -4,7 +4,7 @@ import * as process from "process";
 import { ProjectOptions } from "../options.js";
 import { Project } from "../project.js";
 
-type Options = {}
+type Options =
     & ProjectOptions
 
 export default function main(options: Options): void {

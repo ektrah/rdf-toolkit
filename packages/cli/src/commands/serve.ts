@@ -1,11 +1,12 @@
 import * as readline from "node:readline";
 import * as os from "os";
-import { ProjectOptions } from "../options.js";
+import { ProjectOptions, ServerOptions } from "../options.js";
 import { Project } from "../project.js";
 import { Site } from "../site.js";
 
-type Options = { readonly root?: string }
+type Options =
     & ProjectOptions
+    & ServerOptions
 
 export default function main(port: number, options: Options): void {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });

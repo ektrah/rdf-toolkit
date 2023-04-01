@@ -17,17 +17,17 @@ $ npm run build
 
 ## Usage
 
-RDF Toolkit has a command-line interface with the syntax `npx rdf <command> [options]`.
+RDF Toolkit has a command-line interface with the syntax `rdf <command> [options]`.
 
 
 ### make explorer
 
-This command will generate an HTML file that contains an interactive graph explorer that can be used to view and explore the contents of Turtle and RDF data.
+This command will generate an HTML file that contains an interactive graph explorer that can be used to view and explore the contents of Turtle documents.
 
 
 ### make site
 
-This command will generate a static website from the contents of Turtle and RDF data.
+This command will generate a static website from the contents of Turtle documents.
 
 
 ### serve
@@ -35,9 +35,19 @@ This command will generate a static website from the contents of Turtle and RDF 
 This command will start a local HTTP server and serve the graph explorer or the static website created with the `make explorer` and `make site` commands, respectively.
 
 
+### init
+
+This command will create a new configuration file.
+
+
 ### add file
 
 This command will add a Turtle file to the configuration file.
+
+
+### list files
+
+This command will list the Turtle files in the configuration file.
 
 
 ### remove file

@@ -2,16 +2,24 @@ import * as path from "path";
 import * as yargs from "yargs";
 
 export type DiagnosticOptions = {
-    readonly warningAsError?: boolean;
-    readonly suppressWarnings?: boolean;
+    readonly noWarn: boolean | undefined;
+    readonly warnAsError: boolean | undefined;
 }
 
 export type MakeOptions = {
-    readonly output?: string;
+    readonly output: string | undefined;
 }
 
 export type ProjectOptions = {
     readonly project: string;
+}
+
+export type ServerOptions = {
+    readonly root: string | undefined;
+}
+
+export type SiteOptions = {
+    readonly base: string | undefined;
 }
 
 export namespace Options {
@@ -26,7 +34,7 @@ export namespace Options {
     } satisfies Record<string, yargs.Options>;
 
     export const noWarnings = {
-        "no-warnings": {
+        "no-warn": {
             description: "Suppress all warnings",
             nargs: 0,
             type: "boolean"
@@ -45,10 +53,20 @@ export namespace Options {
 
     export const project = {
         "project": {
+            alias: "p",
             description: "Specify the project file",
             nargs: 1,
             type: "string",
             default: "./rdf.json",
+            coerce: (arg: string) => path.resolve(arg),
+        }
+    } satisfies Record<string, yargs.Options>;
+
+    export const root = {
+        "root": {
+            description: "Specify the root directory",
+            nargs: 1,
+            type: "string",
             coerce: (arg: string) => path.resolve(arg),
         }
     } satisfies Record<string, yargs.Options>;

@@ -17,8 +17,8 @@ import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
 import { MakeOptions, ProjectOptions, SiteOptions } from "../options.js";
 import { PrefixTable } from "../prefixes.js";
-import { Project } from "../project.js";
-import { Site } from "../site.js";
+import { Project } from "../workspaces/project.js";
+import { Site } from "../workspaces/site.js";
 
 type Options =
     & MakeOptions

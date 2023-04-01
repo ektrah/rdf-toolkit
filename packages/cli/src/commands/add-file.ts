@@ -2,7 +2,7 @@ import { DiagnosticBag, DocumentUri } from "@rdf-toolkit/text";
 import * as os from "os";
 import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
 import { DiagnosticOptions, ProjectOptions } from "../options.js";
-import { Project } from "../project.js";
+import { Project } from "../workspaces/project.js";
 
 type Options =
     & DiagnosticOptions

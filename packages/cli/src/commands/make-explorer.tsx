@@ -8,8 +8,8 @@ import scriptAssetFilePath from "../assets/explorer/explorer.min.js";
 import fontAssetFilePath from "../assets/explorer/iosevka-aile-custom-light.woff2";
 import workerScriptAssetFilePath from "../assets/explorer/worker.min.js";
 import { MakeOptions, ProjectOptions } from "../options.js";
-import { Project } from "../project.js";
-import { Site } from "../site.js";
+import { Project } from "../workspaces/project.js";
+import { Site } from "../workspaces/site.js";
 
 type Options =
     & MakeOptions

@@ -1,8 +1,8 @@
 import * as readline from "node:readline";
 import * as os from "os";
 import { ProjectOptions, ServerOptions } from "../options.js";
-import { Project } from "../project.js";
-import { Site } from "../site.js";
+import { Project } from "../workspaces/project.js";
+import { Site } from "../workspaces/site.js";
 
 type Options =
     & ProjectOptions

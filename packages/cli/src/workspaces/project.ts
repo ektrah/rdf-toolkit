@@ -1,5 +1,5 @@
 import * as path from "path";
-import { ProjectConfig } from "./config.js";
+import { ProjectConfig } from "../config.js";
 import { Workspace } from "./workspace.js";
 
 export class Project extends Workspace {

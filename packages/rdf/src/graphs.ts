@@ -1,5 +1,6 @@
 import { Ix } from "@rdf-toolkit/iterable";
 import { OWLEngine } from "./engines/owl.js";
+import { RDFEngine } from "./engines/rdf.js";
 import { RDFSEngine } from "./engines/rdfs.js";
 import { SHACLEngine } from "./engines/shacl.js";
 import { XSDEngine } from "./engines/xsd.js";
@@ -65,8 +66,9 @@ interface Engine {
 }
 
 class GraphBuilder {
+    private readonly rdfEngine: RDFEngine = new RDFEngine();
     private readonly rdfsEngine: RDFSEngine = new RDFSEngine();
-    private readonly owlEngine: OWLEngine = new OWLEngine();
+    private readonly owlEngine: OWLEngine = new OWLEngine(this.rdfEngine);
     private readonly shaclEngine: SHACLEngine = new SHACLEngine();
     private readonly xsdEngine: XSDEngine = new XSDEngine();
 
@@ -79,11 +81,12 @@ class GraphBuilder {
 
     ingest(triples: Iterable<Triple>): void {
         for (const triple of triples) {
-            const a = this.rdfsEngine.ingest(triple);
-            const b = this.owlEngine.ingest(triple);
-            const c = this.shaclEngine.ingest(triple);
-            const d = this.xsdEngine.ingest(triple);
-            if (a || b || c || d) {
+            const a1 = this.rdfEngine.ingest(triple);
+            const a2 = this.rdfsEngine.ingest(triple);
+            const a3 = this.owlEngine.ingest(triple);
+            const a4 = this.shaclEngine.ingest(triple);
+            const a5 = this.xsdEngine.ingest(triple);
+            if (a1 || a2 || a3 || a4 || a5) {
                 this.triples.push(triple);
             }
         }
@@ -92,6 +95,7 @@ class GraphBuilder {
     build(): Graph {
         for (const triples of this.dataset) {
             for (const triple of triples) {
+                this.rdfEngine.ingest(triple);
                 this.rdfsEngine.ingest(triple);
                 this.owlEngine.ingest(triple);
                 this.shaclEngine.ingest(triple);
@@ -99,6 +103,7 @@ class GraphBuilder {
             }
         }
 
+        this.ingest(this.rdfEngine.beforeinterpret());
         this.ingest(this.rdfsEngine.beforeinterpret());
         this.ingest(this.owlEngine.beforeinterpret());
         this.ingest(this.shaclEngine.beforeinterpret());
@@ -110,6 +115,7 @@ class GraphBuilder {
 
             for (const triples of this.dataset) {
                 for (const triple of triples) {
+                    this.ingest(this.rdfEngine.interpret(triple));
                     this.ingest(this.rdfsEngine.interpret(triple));
                     this.ingest(this.owlEngine.interpret(triple));
                     this.ingest(this.shaclEngine.interpret(triple));
@@ -119,11 +125,12 @@ class GraphBuilder {
         }
         while (length < this.triples.length);
 
+        this.ingest(this.rdfEngine.afterinterpret());
         this.ingest(this.rdfsEngine.afterinterpret());
         this.ingest(this.owlEngine.afterinterpret());
         this.ingest(this.shaclEngine.afterinterpret());
         this.ingest(this.xsdEngine.afterinterpret());
 
-        return new RichGraph(this.dataset, this.rdfsEngine, this.owlEngine);
+        return new RichGraph(this.dataset, this.rdfEngine, this.rdfsEngine, this.owlEngine);
     }
 }

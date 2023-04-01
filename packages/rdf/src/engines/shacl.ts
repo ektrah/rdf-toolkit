@@ -1,6 +1,7 @@
 import { Triple } from "../triples.js";
 import { Rdf, Rdfs, Shacl } from "../vocab.js";
 
+// https://www.w3.org/TR/2017/REC-shacl-20170720/
 export class SHACLEngine {
 
     constructor() { }

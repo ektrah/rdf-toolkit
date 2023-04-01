@@ -3,16 +3,15 @@ import { IRI, IRIOrBlankNode, Literal } from "../terms.js";
 import { Triple } from "../triples.js";
 import { Rdf, Rdfs } from "../vocab.js";
 
+// https://www.w3.org/TR/2014/REC-rdf11-mt-20140225/#rdfs-interpretations
 export class RDFSEngine {
 
-    readonly typeMap: MultiMap<IRIOrBlankNode, IRIOrBlankNode>;       //  {Class} <-- rdf:type -- {Resource}
     readonly domainMap: MultiMap<IRI, IRIOrBlankNode>;                //  {Property} -- rdfs:domain --> {Class}
     readonly rangeMap: MultiMap<IRI, IRIOrBlankNode>;                 //  {Property} -- rdfs:range --> {Class}
     readonly subClassOfMap: MultiMap<IRIOrBlankNode, IRIOrBlankNode>; //  {Class} -- rdfs:subClassOf --> {Class}
     readonly subPropertyOfMap: MultiMap<IRI, IRI>;                    //  {Property} -- rdfs:subPropertyOf --> {Property}
 
     constructor() {
-        this.typeMap = new MultiMap();
         this.domainMap = new MultiMap();
         this.rangeMap = new MultiMap();
         this.subClassOfMap = new MultiMap();
@@ -21,8 +20,6 @@ export class RDFSEngine {
 
     ingest(triple: Triple): boolean {
         switch (triple.predicate) {
-            case Rdf.type:
-                return IRIOrBlankNode.is(triple.object) && this.typeMap.add(triple.object, triple.subject);
             case Rdfs.domain:
                 return IRI.is(triple.subject) && IRIOrBlankNode.is(triple.object) && this.domainMap.add(triple.subject, triple.object);
             case Rdfs.range:
@@ -37,15 +34,6 @@ export class RDFSEngine {
     }
 
     *beforeinterpret(): Generator<Triple> {
-        yield Triple.createAxiomatic(Rdf.type, Rdf.type, Rdf.Property);
-        yield Triple.createAxiomatic(Rdf.subject, Rdf.type, Rdf.Property);
-        yield Triple.createAxiomatic(Rdf.predicate, Rdf.type, Rdf.Property);
-        yield Triple.createAxiomatic(Rdf.object, Rdf.type, Rdf.Property);
-        yield Triple.createAxiomatic(Rdf.first, Rdf.type, Rdf.Property);
-        yield Triple.createAxiomatic(Rdf.rest, Rdf.type, Rdf.Property);
-        yield Triple.createAxiomatic(Rdf.value, Rdf.type, Rdf.Property);
-        yield Triple.createAxiomatic(Rdf.nil, Rdf.type, Rdf.List);
-
         yield Triple.createAxiomatic(Rdf.type, Rdfs.domain, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.domain, Rdfs.domain, Rdf.Property);
         yield Triple.createAxiomatic(Rdfs.range, Rdfs.domain, Rdf.Property);
@@ -91,17 +79,6 @@ export class RDFSEngine {
     }
 
     *interpret(triple: Triple): Generator<Triple> {
-        {
-            // rdfD1
-        }
-
-        {
-            const aaa = triple.predicate;
-
-            // rdfD2
-            yield Triple.createInferred(aaa, Rdf.type, Rdf.Property, triple);
-        }
-
         {
             const yyy = triple.object;
 

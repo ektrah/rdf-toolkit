@@ -11,6 +11,12 @@ import "./schema.css";
 function renderOntology(ontology: Ontology, context: RenderContext): HtmlContent {
     return <>
         {
+            ontology.title ?
+                <section>
+                    {renderMarkdown(ontology.title, context, IRI.is(ontology.id) ? ontology.id : null)}
+                </section> : null
+        }
+        {
             ontology.description ?
                 <section>
                     <h2>Overview</h2>

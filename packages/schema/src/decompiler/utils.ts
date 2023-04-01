@@ -10,6 +10,22 @@ const Dc11 = Vocabulary.create("http://purl.org/dc/elements/1.1/", ["description
 const Dcterms = Vocabulary.create("http://purl.org/dc/terms/", ["description", "title", "created", "modified"]);
 const Skos = Vocabulary.create("http://www.w3.org/2004/02/skos/core#", ["definition"]);
 
+const TitleProperties: ReadonlySet<IRI> = new Set([
+    Shacl.name,
+    Dcterms.title,
+    Dc11.title,
+]);
+
+export function getTitle(subject: IRIOrBlankNode, graph: Graph): string | undefined {
+    return Ix.from(TitleProperties)
+        .concatMap(p => graph.getSuperProperties(p))
+        .concatMap(p => graph.objects(subject, p))
+        .ofType(Literal.hasStringValue)
+        .map(x => x.valueAsString)
+        .filter(s => s.trim() !== "")
+        .firstOrDefault(undefined);
+}
+
 const DescriptionProperties: ReadonlySet<IRI> = new Set([
     Skos.definition,
     Rdfs.comment,
@@ -321,6 +337,7 @@ function getOntologies(dataset: Iterable<Iterable<Triple>>, graph: Graph): Ontol
             ontologies.push({
                 kind: EntityKind.Ontology,
                 id,
+                title: getTitle(id, graph),
                 description: getDescription(id, graph),
                 definitions: Array.from(definitions).sort((a, b) => a.compareTo(b))
             });

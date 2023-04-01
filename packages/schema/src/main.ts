@@ -42,6 +42,7 @@ export interface Property {
 export interface Ontology {
     readonly kind: EntityKind.Ontology;
     readonly id: IRIOrBlankNode;
+    readonly title?: string;
     readonly description?: string;
     readonly definitions: readonly IRIOrBlankNode[];
 }

@@ -2,6 +2,7 @@ import { Ix } from "@rdf-toolkit/iterable";
 import { OWLEngine } from "./engines/owl.js";
 import { RDFSEngine } from "./engines/rdfs.js";
 import { SHACLEngine } from "./engines/shacl.js";
+import { XSDEngine } from "./engines/xsd.js";
 import { RichGraph } from "./graphs/rich.js";
 import { IRI, IRIOrBlankNode, Literal, Term } from "./terms.js";
 import { Triple } from "./triples.js";
@@ -67,6 +68,7 @@ class GraphBuilder {
     private readonly rdfsEngine: RDFSEngine = new RDFSEngine();
     private readonly owlEngine: OWLEngine = new OWLEngine();
     private readonly shaclEngine: SHACLEngine = new SHACLEngine();
+    private readonly xsdEngine: XSDEngine = new XSDEngine();
 
     private readonly dataset: Iterable<Iterable<Triple>>;
     private readonly triples: Triple[];
@@ -80,7 +82,8 @@ class GraphBuilder {
             const a = this.rdfsEngine.ingest(triple);
             const b = this.owlEngine.ingest(triple);
             const c = this.shaclEngine.ingest(triple);
-            if (a || b || c) {
+            const d = this.xsdEngine.ingest(triple);
+            if (a || b || c || d) {
                 this.triples.push(triple);
             }
         }
@@ -92,12 +95,14 @@ class GraphBuilder {
                 this.rdfsEngine.ingest(triple);
                 this.owlEngine.ingest(triple);
                 this.shaclEngine.ingest(triple);
+                this.xsdEngine.ingest(triple);
             }
         }
 
         this.ingest(this.rdfsEngine.beforeinterpret());
         this.ingest(this.owlEngine.beforeinterpret());
         this.ingest(this.shaclEngine.beforeinterpret());
+        this.ingest(this.xsdEngine.beforeinterpret());
 
         let length;
         do {
@@ -108,6 +113,7 @@ class GraphBuilder {
                     this.ingest(this.rdfsEngine.interpret(triple));
                     this.ingest(this.owlEngine.interpret(triple));
                     this.ingest(this.shaclEngine.interpret(triple));
+                    this.ingest(this.xsdEngine.interpret(triple));
                 }
             }
         }
@@ -116,6 +122,7 @@ class GraphBuilder {
         this.ingest(this.rdfsEngine.afterinterpret());
         this.ingest(this.owlEngine.afterinterpret());
         this.ingest(this.shaclEngine.afterinterpret());
+        this.ingest(this.xsdEngine.afterinterpret());
 
         return new RichGraph(this.dataset, this.rdfsEngine, this.owlEngine);
     }

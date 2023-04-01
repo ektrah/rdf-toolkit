@@ -9,11 +9,9 @@ type Options =
 
 export default function main(options: Options): void {
     const project = Project.from(options.project);
-    const files = Object
-        .entries(project.config.files || {})
-        .sort((a, b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
-    for (const [documentURI, filePath] of files) {
-        project.access(filePath, fs.constants.R_OK);
-        process.stdout.write(`<${documentURI}> \u2192 ${filePath}${os.EOL}`);
+
+    for (const [documentURI, filePath] of project.getFiles().sort()) {
+        fs.accessSync(filePath, fs.constants.R_OK);
+        process.stdout.write(`<${documentURI}> \u2192 ${project.relative(filePath)}${os.EOL}`);
     }
 }

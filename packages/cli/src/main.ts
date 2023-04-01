@@ -122,8 +122,10 @@ yargs(yargs_helpers.hideBin(process.argv))
                 yargs => yargs
                     .option(Options.base)
                     .help()
+                    .option(Options.noWarnings)
                     .option(Options.output)
                     .option(Options.project)
+                    .option(Options.warnAsError)
                     .version(false)
                     .strict(),
                 args => makeSite(args))

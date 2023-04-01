@@ -15,12 +15,14 @@ import * as path from "path";
 import * as url from "url";
 import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
-import { MakeOptions, ProjectOptions, SiteOptions } from "../options.js";
+import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
+import { DiagnosticOptions, MakeOptions, ProjectOptions, SiteOptions } from "../options.js";
 import { PrefixTable } from "../prefixes.js";
 import { Project } from "../workspaces/project.js";
 import { Site } from "../workspaces/site.js";
 
 type Options =
+    & DiagnosticOptions
     & MakeOptions
     & ProjectOptions
     & SiteOptions
@@ -208,7 +210,7 @@ export default function main(options: Options): void {
     const modulePath = path.dirname(moduleFilePath);
 
     const project = Project.from(options.project);
-    const files = project.config.files || {};
+    const files = project.getFiles();
     const icons = project.config.siteOptions?.icons || [];
     const assets = project.config.siteOptions?.assets || {};
     const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.config.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
@@ -216,16 +218,11 @@ export default function main(options: Options): void {
 
     const diagnostics = DiagnosticBag.create();
     context.beforecompile();
-    for (const documentURI in files) {
-        context.compile(documentURI, project.resolve(files[documentURI]));
+    for (const [documentURI, filePath] of files) {
+        context.compile(documentURI, filePath);
     }
     context.aftercompile();
-    for (const [documentURI, diagnostic] of diagnostics) {
-        console.dir(diagnostic);
-    }
-    if (diagnostics.errors) {
-        throw new Error("Errors");
-    }
+    printDiagnosticsAndExitOnError(diagnostics, options);
 
     const links = <>
         {icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(path.basename(iconConfig.asset), context.baseURL)} />)}

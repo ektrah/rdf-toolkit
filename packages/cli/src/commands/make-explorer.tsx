@@ -70,14 +70,14 @@ export default function main(options: Options): void {
     const modulePath = path.dirname(moduleFilePath);
 
     const project = Project.from(options.project);
-    const files = project.config.files || {};
+    const files = project.getFiles();
     const icons = project.config.siteOptions?.icons || [];
     const assets = project.config.siteOptions?.assets || {};
     const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE);
     const site = new Site(project, options.output);
 
-    for (const documentURI in files) {
-        context.add(documentURI, project.resolve(files[documentURI]));
+    for (const [documentURI, filePath] of files) {
+        context.add(documentURI, filePath);
     }
 
     const links = <>

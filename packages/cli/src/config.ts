@@ -1,5 +1,7 @@
+import { DocumentUri } from "@rdf-toolkit/text";
+
 export interface ProjectConfig {
-    files?: Record<string, string>,
+    files?: Record<DocumentUri, string>,
     siteOptions?: SiteConfig,
 }
 

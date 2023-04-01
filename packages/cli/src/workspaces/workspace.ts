@@ -30,7 +30,8 @@ export class Workspace {
     }
 
     readText(filePath: string): string {
-        return fs.readFileSync(this.resolve(filePath), { encoding: "utf-8" });
+        const content = fs.readFileSync(this.resolve(filePath), { encoding: "utf-8" });
+        return content.startsWith("\uFEFF") ? content.slice(1) : content;
     }
 
     readTextDocument(documentURI: string, filePath: string): TextDocument {
@@ -45,7 +46,7 @@ export class Workspace {
 
     relative(filePath: string): string {
         filePath = path.relative(this.directoryPath, filePath);
-        return path.isAbsolute(filePath) ? filePath : filePath.split(path.sep).join(path.posix.sep);
+        return path.isAbsolute(filePath) ? filePath : path.posix.join(...filePath.split(path.sep));
     }
 
     resolve(filePath: string): string {

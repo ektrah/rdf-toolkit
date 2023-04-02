@@ -39,6 +39,7 @@ export default function decompile(graph: Graph, builder: SchemaBuilder): void {
                 .concat(graph.objects(propertyShape, Shacl.in).concatMap(x => splitIn(x, graph)))
                 .concat(graph.objects(propertyShape, Shacl.xone).concatMap(x => splitOr(x, graph)))
                 .concat(graph.objects(propertyShape, Shacl.hasValue))
+                .concat(graph.objects(propertyShape, Shacl.node))
                 .concat(graph.objects(propertyShape, Shacl.nodeKind))
                 .concat(graph.objects(propertyShape, Shacl.qualifiedValueShape).concatMap(x => extract(x, graph)));
 

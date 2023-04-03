@@ -9,6 +9,7 @@ import addFile from "./commands/add-file.js";
 import addSource from "./commands/add-source.js";
 import init from "./commands/init.js";
 import listFiles from "./commands/list-files.js";
+import listImports from "./commands/list-imports.js";
 import listSources from "./commands/list-sources.js";
 import makeExplorer from "./commands/make-explorer.js";
 import makeSite from "./commands/make-site.js";
@@ -129,6 +130,17 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .example("$0 list files", "")
                     .strict(),
                 args => listFiles(args))
+
+            .command("imports", "List all OWL imports in the project",
+                yargs => yargs
+                    .help()
+                    .option(Options.noWarnings)
+                    .option(Options.project)
+                    .option(Options.warnAsError)
+                    .version(false)
+                    .example("$0 list imports", "")
+                    .strict(),
+                args => listImports(args))
 
             .command("sources", "List all sources in the project",
                 yargs => yargs

@@ -17,7 +17,7 @@
     "lint": "npx eslint src/",
     "prebuild": "tsc --noEmit",
     "build": "esbuild src/main.ts --bundle --minify --platform=node --format=esm --target=es2020 --external:commonmark --external:koa --external:koa-send --external:yargs --asset-names=[name] --loader:.min.js=file --loader:.min.css=file --loader:.woff2=file --outfile=./dist/main.js",
-    "clean": "rimraf ./dist/*.{js,css,woff2}"
+    "clean": "rimraf -g \"./dist/*.{js,css,woff2}\""
   },
   "dependencies": {
     "@rdf-toolkit/iterable": "0.1.0",
@@ -40,7 +40,7 @@
     "@typescript-eslint/parser": "^5.57.0",
     "esbuild": "^0.16.17",
     "eslint": "^8.37.0",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.4.1",
     "typescript": "^5.0.3"
   }
 }

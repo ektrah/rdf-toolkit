@@ -27,7 +27,7 @@
   "scripts": {
     "lint": "npx eslint src/",
     "build": "tsc --build",
-    "clean": "rimraf dist/**/*.{js,d.ts,map}"
+    "clean": "rimraf -g \"dist/**/*.{js,d.ts,map}\""
   },
   "dependencies": {
     "@rdf-toolkit/iterable": "0.1.0",
@@ -38,7 +38,7 @@
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "eslint": "^8.37.0",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.4.1",
     "typescript": "^5.0.3"
   }
 }

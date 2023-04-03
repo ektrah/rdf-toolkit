@@ -34,48 +34,30 @@ export class RDFSEngine {
     }
 
     *beforeinterpret(): Generator<Triple> {
-        yield Triple.createAxiomatic(Rdf.type, Rdfs.domain, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.domain, Rdfs.domain, Rdf.Property);
         yield Triple.createAxiomatic(Rdfs.range, Rdfs.domain, Rdf.Property);
         yield Triple.createAxiomatic(Rdfs.subPropertyOf, Rdfs.domain, Rdf.Property);
         yield Triple.createAxiomatic(Rdfs.subClassOf, Rdfs.domain, Rdfs.Class);
-        yield Triple.createAxiomatic(Rdf.subject, Rdfs.domain, Rdf.Statement);
-        yield Triple.createAxiomatic(Rdf.predicate, Rdfs.domain, Rdf.Statement);
-        yield Triple.createAxiomatic(Rdf.object, Rdfs.domain, Rdf.Statement);
         yield Triple.createAxiomatic(Rdfs.member, Rdfs.domain, Rdfs.Resource);
-        yield Triple.createAxiomatic(Rdf.first, Rdfs.domain, Rdf.List);
-        yield Triple.createAxiomatic(Rdf.rest, Rdfs.domain, Rdf.List);
         yield Triple.createAxiomatic(Rdfs.seeAlso, Rdfs.domain, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.isDefinedBy, Rdfs.domain, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.comment, Rdfs.domain, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.label, Rdfs.domain, Rdfs.Resource);
-        yield Triple.createAxiomatic(Rdf.value, Rdfs.domain, Rdfs.Resource);
 
-        yield Triple.createAxiomatic(Rdf.type, Rdfs.range, Rdfs.Class);
         yield Triple.createAxiomatic(Rdfs.domain, Rdfs.range, Rdfs.Class);
         yield Triple.createAxiomatic(Rdfs.range, Rdfs.range, Rdfs.Class);
         yield Triple.createAxiomatic(Rdfs.subPropertyOf, Rdfs.range, Rdf.Property);
         yield Triple.createAxiomatic(Rdfs.subClassOf, Rdfs.range, Rdfs.Class);
-        yield Triple.createAxiomatic(Rdf.subject, Rdfs.range, Rdfs.Resource);
-        yield Triple.createAxiomatic(Rdf.predicate, Rdfs.range, Rdfs.Resource);
-        yield Triple.createAxiomatic(Rdf.object, Rdfs.range, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.member, Rdfs.range, Rdfs.Resource);
-        yield Triple.createAxiomatic(Rdf.first, Rdfs.range, Rdfs.Resource);
-        yield Triple.createAxiomatic(Rdf.rest, Rdfs.range, Rdf.List);
         yield Triple.createAxiomatic(Rdfs.seeAlso, Rdfs.range, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.isDefinedBy, Rdfs.range, Rdfs.Resource);
         yield Triple.createAxiomatic(Rdfs.comment, Rdfs.range, Rdfs.Literal);
         yield Triple.createAxiomatic(Rdfs.label, Rdfs.range, Rdfs.Literal);
-        yield Triple.createAxiomatic(Rdf.value, Rdfs.range, Rdfs.Resource);
 
-        yield Triple.createAxiomatic(Rdf.Alt, Rdfs.subClassOf, Rdfs.Container);
-        yield Triple.createAxiomatic(Rdf.Bag, Rdfs.subClassOf, Rdfs.Container);
-        yield Triple.createAxiomatic(Rdf.Seq, Rdfs.subClassOf, Rdfs.Container);
         yield Triple.createAxiomatic(Rdfs.ContainerMembershipProperty, Rdfs.subClassOf, Rdf.Property);
+        yield Triple.createAxiomatic(Rdfs.Datatype, Rdfs.subClassOf, Rdfs.Class);
 
         yield Triple.createAxiomatic(Rdfs.isDefinedBy, Rdfs.subPropertyOf, Rdfs.seeAlso);
-
-        yield Triple.createAxiomatic(Rdfs.Datatype, Rdfs.subClassOf, Rdfs.Class);
     }
 
     *interpret(triple: Triple): Generator<Triple> {

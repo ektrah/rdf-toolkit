@@ -1,7 +1,7 @@
 import { MultiMap } from "@rdf-toolkit/iterable";
 import { IRIOrBlankNode } from "../terms.js";
 import { Triple } from "../triples.js";
-import { Rdf } from "../vocab.js";
+import { Rdf, Rdfs } from "../vocab.js";
 
 // https://www.w3.org/TR/2014/REC-rdf11-mt-20140225/#rdf-interpretations
 export class RDFEngine {
@@ -39,6 +39,26 @@ export class RDFEngine {
         yield Triple.createAxiomatic(Rdf.rest, Rdf.type, Rdf.Property);
         yield Triple.createAxiomatic(Rdf.value, Rdf.type, Rdf.Property);
         yield Triple.createAxiomatic(Rdf.nil, Rdf.type, Rdf.List);
+
+        yield Triple.createAxiomatic(Rdf.type, Rdfs.domain, Rdfs.Resource);
+        yield Triple.createAxiomatic(Rdf.subject, Rdfs.domain, Rdf.Statement);
+        yield Triple.createAxiomatic(Rdf.predicate, Rdfs.domain, Rdf.Statement);
+        yield Triple.createAxiomatic(Rdf.object, Rdfs.domain, Rdf.Statement);
+        yield Triple.createAxiomatic(Rdf.first, Rdfs.domain, Rdf.List);
+        yield Triple.createAxiomatic(Rdf.rest, Rdfs.domain, Rdf.List);
+        yield Triple.createAxiomatic(Rdf.value, Rdfs.domain, Rdfs.Resource);
+
+        yield Triple.createAxiomatic(Rdf.type, Rdfs.range, Rdfs.Class);
+        yield Triple.createAxiomatic(Rdf.subject, Rdfs.range, Rdfs.Resource);
+        yield Triple.createAxiomatic(Rdf.predicate, Rdfs.range, Rdfs.Resource);
+        yield Triple.createAxiomatic(Rdf.object, Rdfs.range, Rdfs.Resource);
+        yield Triple.createAxiomatic(Rdf.first, Rdfs.range, Rdfs.Resource);
+        yield Triple.createAxiomatic(Rdf.rest, Rdfs.range, Rdf.List);
+        yield Triple.createAxiomatic(Rdf.value, Rdfs.range, Rdfs.Resource);
+
+        yield Triple.createAxiomatic(Rdf.Alt, Rdfs.subClassOf, Rdfs.Container);
+        yield Triple.createAxiomatic(Rdf.Bag, Rdfs.subClassOf, Rdfs.Container);
+        yield Triple.createAxiomatic(Rdf.Seq, Rdfs.subClassOf, Rdfs.Container);
     }
 
     *interpret(triple: Triple): Generator<Triple> {

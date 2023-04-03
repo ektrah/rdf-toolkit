@@ -6,11 +6,14 @@ import * as process from "process";
 import yargs from "yargs";
 import * as yargs_helpers from "yargs/helpers";
 import addFile from "./commands/add-file.js";
+import addSource from "./commands/add-source.js";
 import init from "./commands/init.js";
 import listFiles from "./commands/list-files.js";
+import listSources from "./commands/list-sources.js";
 import makeExplorer from "./commands/make-explorer.js";
 import makeSite from "./commands/make-site.js";
 import removeFile from "./commands/remove-file.js";
+import removeSource from "./commands/remove-source.js";
 import serve from "./commands/serve.js";
 import "./main.css";
 import { Options } from "./options.js";
@@ -61,6 +64,19 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .strict(),
                 args => addFile(args.URL, args.file, args))
 
+            .command("source <file>", "Add a source to the project",
+                yargs => yargs
+                    .positional("file", {
+                        type: "string",
+                        description: "The local path of the source to add",
+                    })
+                    .help()
+                    .option(Options.project)
+                    .version(false)
+                    .demandOption("file")
+                    .strict(),
+                args => addSource(args.file, args))
+
             .help()
             .version(false)
             .demandCommand(1, 1)
@@ -84,6 +100,19 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .strict(),
                 args => removeFile(args.URL, args))
 
+            .command("source <file>", "Remove a source from the project",
+                yargs => yargs
+                    .positional("file", {
+                        type: "string",
+                        description: "The local path of the source to remove",
+                    })
+                    .help()
+                    .option(Options.project)
+                    .version(false)
+                    .demandOption("file")
+                    .strict(),
+                args => removeSource(args.file, args))
+
             .help()
             .version(false)
             .demandCommand(1, 1)
@@ -100,6 +129,15 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .example("$0 list files", "")
                     .strict(),
                 args => listFiles(args))
+
+            .command("sources", "List all sources in the project",
+                yargs => yargs
+                    .help()
+                    .option(Options.project)
+                    .version(false)
+                    .example("$0 list sources", "")
+                    .strict(),
+                args => listSources(args))
 
             .help()
             .version(false)

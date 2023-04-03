@@ -2,6 +2,7 @@ import { DocumentUri } from "@rdf-toolkit/text";
 
 export interface ProjectConfig {
     files?: Record<DocumentUri, string>,
+    sources?: Array<string>,
     siteOptions?: SiteConfig,
 }
 
@@ -11,6 +12,7 @@ export namespace ProjectConfig {
         const candidate = value as ProjectConfig;
         return Is.objectLiteral(candidate)
             && (Is.undefined(candidate.files) || Is.objectLiteral(candidate.files))
+            && (Is.undefined(candidate.sources) || Is.typedArray(candidate.sources, Is.string))
             && (Is.undefined(candidate.siteOptions) || SiteConfig.is(candidate.siteOptions));
     }
 }

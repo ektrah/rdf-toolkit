@@ -16,7 +16,7 @@
   "scripts": {
     "lint": "npx eslint src/",
     "prebuild": "tsc --noEmit",
-    "build": "esbuild src/main.ts --bundle --minify --platform=node --format=esm --target=es2020 --external:commonmark --external:koa --external:koa-send --external:yargs --asset-names=[name] --loader:.min.js=file --loader:.min.css=file --loader:.woff2=file --outfile=./dist/main.js",
+    "build": "esbuild src/main.ts --bundle --minify --platform=node --format=esm --target=es2020 --external:commonmark --external:glob --external:koa --external:koa-send --external:yargs --asset-names=[name] --loader:.min.js=file --loader:.min.css=file --loader:.woff2=file --outfile=./dist/main.js",
     "clean": "rimraf -g \"./dist/*.{js,css,woff2}\""
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "@rdf-toolkit/text": "0.1.0",
     "@rdf-toolkit/turtle": "0.1.0",
     "commonmark": "^0.30.0",
+    "glob": "^9.3.4",
     "koa": "^2.14.1",
     "koa-send": "^5.0.1",
     "yargs": "^17.7.1"

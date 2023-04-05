@@ -17,8 +17,8 @@
     "clean": "rimraf -g \"../cli/src/assets/explorer/*.{js,css,woff2}\""
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
     "esbuild": "^0.16.17",
     "eslint": "^8.37.0",
     "rimraf": "^4.4.1",

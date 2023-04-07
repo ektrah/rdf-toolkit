@@ -1,103 +1,51 @@
-import { IRI, Literal } from "@rdf-toolkit/rdf/terms";
-import { Owl, Xsd } from "@rdf-toolkit/rdf/vocab";
-import { DiagnosticBag, DocumentUri } from "@rdf-toolkit/text";
-import { SyntaxTree } from "@rdf-toolkit/turtle";
-import * as os from "os";
-import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
+import { DocumentUri } from "@rdf-toolkit/text";
+import * as os from "node:os";
+import { Ontology } from "../model/ontology.js";
+import { Project } from "../model/project.js";
 import { DiagnosticOptions, ProjectOptions } from "../options.js";
-import { Project } from "../workspaces/project.js";
 
 type Options =
     & DiagnosticOptions
     & ProjectOptions
 
-interface OWLOntology {
-    readonly documentURI: string;
-    readonly filePath: string;
-    readonly ontologyIRI?: string;
-    readonly imports: ReadonlyArray<string>;
-}
+const stack: Array<string> = [];
 
-function getRetrievalURLFromIRI(ontologyIRI: string): DocumentUri {
-    const url = new URL(ontologyIRI);
-    url.hash = "";
-    return url.href;
-}
+function printOntologies(ontologies2: ReadonlyMap<DocumentUri, Ontology | null>, project: Project, indentation: string): void {
+    const ontologies = Array.from(ontologies2)
+        .filter(([x]) => !stack.includes(x))
+        .sort();
 
-function printOntology(documentURI: DocumentUri, ontologies: Record<DocumentUri, OWLOntology>, project: Project, indentation: string): void {
-    const ontology: OWLOntology | undefined = ontologies[documentURI];
+    for (let i = 0; i < ontologies.length; i++) {
+        const [documentURI, ontology] = ontologies[i];
 
-    if (ontology) {
-        process.stdout.write(`\u257C <${ontology.ontologyIRI || ontology.documentURI}> \u2192 ${project.relative(ontology.filePath)}${os.EOL}`);
+        process.stdout.write(indentation);
+        process.stdout.write(i + 1 < ontologies.length ? "  \u251C" : "  \u2570");
+        process.stdout.write("\u257C <");
+        process.stdout.write(documentURI);
+        process.stdout.write(">");
+        if (ontology) {
+            process.stdout.write(" \u2192 ");
+            process.stdout.write(project.package.relative(ontology.filePath));
+            process.stdout.write(os.EOL);
 
-        for (let i = 0; i < ontology.imports.length; i++) {
-            process.stdout.write(indentation);
-            process.stdout.write(i + 1 < ontology.imports.length ? "  \u251C" : "  \u2570");
-            printOntology(
-                getRetrievalURLFromIRI(ontology.imports[i]),
-                ontologies,
-                project,
-                indentation + (i + 1 < ontology.imports.length ? "  \u2502" : "   "))
+            stack.push(documentURI);
+            printOntologies(ontology.imports, project, indentation + (i + 1 < ontologies.length ? "  \u2502" : "   "));
+            stack.pop();
         }
-    }
-    else {
-        process.stdout.write(`\u257C <${documentURI}> \u2717${os.EOL}`);
-    }
-}
-
-function printOntologies(ontologies: Record<DocumentUri, OWLOntology>, project: Project): void {
-    const namespaceURIs = Object.keys(ontologies).sort();
-    if (namespaceURIs.length) {
-        process.stdout.write(`  \u2564${os.EOL}`);
-
-        for (let i = 0; i < namespaceURIs.length; i++) {
-            process.stdout.write(i + 1 < namespaceURIs.length ? "  \u251C" : "  \u2570");
-            printOntology(
-                namespaceURIs[i],
-                ontologies,
-                project,
-                (i + 1 < namespaceURIs.length ? "  \u2502" : "   "))
+        else {
+            process.stdout.write(" \u00D7");
+            process.stdout.write(os.EOL);
         }
     }
 }
 
 export default function main(options: Options): void {
-    const project = Project.from(options.project);
-    const diagnostics = DiagnosticBag.create();
-    const ontologies: Record<DocumentUri, OWLOntology> = {};
+    const project = new Project(options.project);
 
-    for (const [documentURI, filePath] of project.getFiles()) {
-        const syntaxTree = project.readSyntaxTree(documentURI, filePath, diagnostics);
-        if (!diagnostics.errors) {
-            const triples = SyntaxTree.compileTriples(syntaxTree, diagnostics);
-            if (!diagnostics.errors) {
-                let ontologyIRI: string | undefined;
-                const imports: string[] = [];
+    if (project.package.ontologies.size) {
+        process.stdout.write("  \u2564");
+        process.stdout.write(os.EOL);
 
-                for (const triple of triples) {
-                    if (triple.predicate === Owl.imports) {
-                        if (IRI.is(triple.subject)) {
-                            ontologyIRI = triple.subject.value;
-                        }
-                        if (IRI.is(triple.object) || (Literal.is(triple.object) && (triple.object.datatype === Xsd.string || triple.object.datatype === Xsd.anyURI))) {
-                            if (!imports.includes(triple.object.value)) {
-                                imports.push(triple.object.value);
-                            }
-                        }
-                    }
-                }
-
-                ontologies[documentURI] = {
-                    documentURI,
-                    filePath,
-                    ontologyIRI,
-                    imports: imports.sort()
-                };
-            }
-        }
+        printOntologies(project.package.ontologies, project, "");
     }
-
-    printDiagnosticsAndExitOnError(diagnostics, options);
-
-    printOntologies(ontologies, project);
 }

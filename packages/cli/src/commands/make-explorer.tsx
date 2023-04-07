@@ -1,15 +1,16 @@
 import renderHTML, { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
-import * as crypto from "crypto";
-import * as fs from "fs";
-import * as path from "path";
-import * as url from "url";
+import * as crypto from "node:crypto";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as url from "node:url";
 import cssAssetFilePath from "../assets/explorer/explorer.min.css";
 import scriptAssetFilePath from "../assets/explorer/explorer.min.js";
 import fontAssetFilePath from "../assets/explorer/iosevka-aile-custom-light.woff2";
 import workerScriptAssetFilePath from "../assets/explorer/worker.min.js";
+import { Ontology } from "../model/ontology.js";
+import { Project } from "../model/project.js";
 import { MakeOptions, ProjectOptions } from "../options.js";
-import { Project } from "../workspaces/project.js";
-import { Site } from "../workspaces/site.js";
+import { Workspace } from "../workspace.js";
 
 type Options =
     & MakeOptions
@@ -29,21 +30,11 @@ class Website {
     constructor(readonly title: string) {
     }
 
-    add(documentURI: string, filePath: string): void {
-        const buffer = fs.readFileSync(filePath);
-
-        const info = /[.](?:md|mkdn?|mdwn|mdown|markdown)$/i.test(filePath) ? {
-            contentType: "text/markdown",
-            fileExtension: "md"
-        } : {
-            contentType: "text/turtle",
-            fileExtension: "ttl"
-        };
-
-        this.files[documentURI] = {
-            fileName: `${path.parse(filePath).name}.${crypto.createHash("sha256").update(buffer).digest("hex").slice(0, 12)}.${info.fileExtension}`,
-            contentType: info.contentType,
-            buffer,
+    add(ontology: Ontology): void {
+        this.files[ontology.documentURI] = {
+            fileName: [path.parse(ontology.filePath).name, crypto.createHash("sha256").update(ontology.buffer).digest("hex").slice(0, 12), ontology.fileExtension].join("."),
+            contentType: ontology.contentType,
+            buffer: ontology.buffer,
         };
     }
 }
@@ -55,7 +46,6 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent)
             <title>{context.title}</title>
             {links}
             <link rel="preload" type="font/woff2" href={FONT_FILE_NAME} as="font" crossorigin="anonymous" />
-            <link rel="preload" type="application/javascript" href={WORKER_SCRIPT_FILE_NAME} as="worker" crossorigin="anonymous" />
             {Object.entries(context.files).map(([documentURI, item]) => <link rel="preload" type={item.contentType} href={item.fileName} as="fetch" crossorigin="anonymous" data-uri={documentURI} />)}
         </head>
         <body>
@@ -69,15 +59,16 @@ export default function main(options: Options): void {
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
 
-    const project = Project.from(options.project);
-    const files = project.getFiles();
-    const icons = project.config.siteOptions?.icons || [];
-    const assets = project.config.siteOptions?.assets || {};
-    const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE);
-    const site = new Site(project, options.output);
+    const project = new Project(options.project);
+    const icons = project.json.siteOptions?.icons || [];
+    const assets = project.json.siteOptions?.assets || {};
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE);
+    const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
-    for (const [documentURI, filePath] of files) {
-        context.add(documentURI, filePath);
+    for (const ontology of project.files.values()) {
+        if (ontology) {
+            context.add(ontology);
+        }
     }
 
     const links = <>
@@ -95,11 +86,11 @@ export default function main(options: Options): void {
     site.write(WORKER_SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, workerScriptAssetFilePath)));
 
     for (const iconConfig of icons) {
-        site.write(path.basename(iconConfig.asset), project.read(iconConfig.asset));
+        site.write(path.basename(iconConfig.asset), project.package.read(iconConfig.asset));
     }
 
-    for (const filePath in assets) {
-        site.write(assets[filePath], project.read(filePath));
+    for (const assetPath in assets) {
+        site.write(assets[assetPath], project.package.read(assetPath));
     }
 
     site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts))));

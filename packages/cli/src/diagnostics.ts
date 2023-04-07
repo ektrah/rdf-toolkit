@@ -1,5 +1,5 @@
 import { DiagnosticBag } from "@rdf-toolkit/text";
-import * as process from "process";
+import * as process from "node:process";
 import { DiagnosticOptions } from "./options.js";
 
 export function hasErrors(diagnostics: DiagnosticBag, options: DiagnosticOptions): boolean {

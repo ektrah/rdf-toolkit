@@ -1,8 +1,8 @@
 import { DiagnosticBag, TextDocument } from "@rdf-toolkit/text";
 import { SyntaxTree } from "@rdf-toolkit/turtle";
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 
 export class Workspace {
 
@@ -18,10 +18,10 @@ export class Workspace {
     }
 
     read(filePath: string): Buffer {
-        return fs.readFileSync(this.resolve(filePath));
+        return fs.readFileSync(this.resolve(filePath), { flag: "r" });
     }
 
-    readJSON(filePath: string): any {
+    readJSON(filePath: string): unknown {
         return JSON.parse(this.readText(filePath));
     }
 
@@ -30,7 +30,7 @@ export class Workspace {
     }
 
     readText(filePath: string): string {
-        const content = fs.readFileSync(this.resolve(filePath), { encoding: "utf-8" });
+        const content = fs.readFileSync(this.resolve(filePath), { encoding: "utf-8", flag: "r" });
         return content.startsWith("\uFEFF") ? content.slice(1) : content;
     }
 
@@ -53,28 +53,28 @@ export class Workspace {
         return path.resolve(this.directoryPath, filePath);
     }
 
-    write(filePath: string, data: Buffer): void {
+    write(filePath: string, data: Buffer, preventOverwrite?: boolean): void {
         filePath = this.resolve(filePath);
         fs.mkdirSync(path.dirname(filePath), { recursive: true });
-        fs.writeFileSync(filePath, data);
+        fs.writeFileSync(filePath, data, { encoding: null, flag: preventOverwrite ? "wx" : "w" });
     }
 
-    writeJSON(filePath: string, value: any): void {
+    writeJSON(filePath: string, value: any, preventOverwrite?: boolean): void {
         const data = JSON.stringify(value, undefined, 2).replace(/\n|\r\n?/g, os.EOL);
-        this.writeText(filePath, data.endsWith(os.EOL) ? data : data + os.EOL);
+        this.writeText(filePath, data.endsWith(os.EOL) ? data : data + os.EOL, preventOverwrite);
     }
 
-    writeSyntaxTree(filePath: string, syntaxTree: SyntaxTree): void {
-        this.writeTextDocument(filePath, syntaxTree.document);
+    writeSyntaxTree(filePath: string, syntaxTree: SyntaxTree, preventOverwrite?: boolean): void {
+        this.writeTextDocument(filePath, syntaxTree.document, preventOverwrite);
     }
 
-    writeText(filePath: string, text: string): void {
+    writeText(filePath: string, text: string, preventOverwrite?: boolean): void {
         filePath = this.resolve(filePath);
         fs.mkdirSync(path.dirname(filePath), { recursive: true });
-        fs.writeFileSync(filePath, text, { encoding: "utf-8" });
+        fs.writeFileSync(filePath, text, { encoding: "utf-8", flag: preventOverwrite ? "wx" : "w" });
     }
 
-    writeTextDocument(filePath: string, document: TextDocument): void {
-        this.writeText(filePath, document.getText());
+    writeTextDocument(filePath: string, document: TextDocument, preventOverwrite?: boolean): void {
+        this.writeText(filePath, document.getText(), preventOverwrite);
     }
 }

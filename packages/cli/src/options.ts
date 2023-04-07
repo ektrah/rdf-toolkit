@@ -1,9 +1,13 @@
-import * as path from "path";
+import * as path from "node:path";
 import * as yargs from "yargs";
 
 export type DiagnosticOptions = {
     readonly noWarn: boolean | undefined;
     readonly warnAsError: boolean | undefined;
+}
+
+export type ForceOptions = {
+    readonly force: boolean | undefined;
 }
 
 export type MakeOptions = {
@@ -33,6 +37,14 @@ export namespace Options {
         }
     } satisfies Record<string, yargs.Options>;
 
+    export const force = {
+        "force": {
+            description: "Force overwriting existing files",
+            nargs: 0,
+            type: "boolean"
+        }
+    } satisfies Record<string, yargs.Options>;
+
     export const noWarnings = {
         "no-warn": {
             description: "Suppress all warnings",
@@ -57,7 +69,7 @@ export namespace Options {
             description: "Specify the project file",
             nargs: 1,
             type: "string",
-            default: "./rdf.json",
+            default: ".",
             coerce: (arg: string) => path.resolve(arg),
         }
     } satisfies Record<string, yargs.Options>;

@@ -1,17 +1,21 @@
 import { DocumentUri } from "@rdf-toolkit/text";
-import * as os from "os";
-import * as process from "process";
+import * as os from "node:os";
+import * as process from "node:process";
+import { PACKAGE_JSON } from "../model/package.js";
+import { Project } from "../model/project.js";
 import { ProjectOptions } from "../options.js";
-import { Project } from "../workspaces/project.js";
+import { Is } from "../type-checks.js";
 
 type Options =
     & ProjectOptions
 
 export default function main(documentURI: DocumentUri, options: Options): void {
-    const project = Project.from(options.project);
+    const project = new Project(options.project);
+    const json = project.package.json;
 
-    if (project.removeFile(documentURI)) {
-        project.saveConfig();
-        process.stdout.write(`<${documentURI}> \u2717${os.EOL}`);
+    if (Is.record(json.ontologies, Is.string) && (documentURI in json.ontologies)) {
+        delete json.ontologies[documentURI];
+        project.package.writeJSON(PACKAGE_JSON, json, false);
+        process.stdout.write(`<${documentURI}> \u00D7${os.EOL}`);
     }
 }

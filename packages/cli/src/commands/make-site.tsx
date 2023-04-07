@@ -10,16 +10,17 @@ import { ParsedTriple } from "@rdf-toolkit/rdf/triples";
 import { Schema } from "@rdf-toolkit/schema";
 import { DiagnosticBag, TextDocument } from "@rdf-toolkit/text";
 import { SyntaxTree } from "@rdf-toolkit/turtle";
-import * as fs from "fs";
-import * as path from "path";
-import * as url from "url";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as url from "node:url";
 import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
 import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
+import { Ontology } from "../model/ontology.js";
+import { Project } from "../model/project.js";
 import { DiagnosticOptions, MakeOptions, ProjectOptions, SiteOptions } from "../options.js";
 import { PrefixTable } from "../prefixes.js";
-import { Project } from "../workspaces/project.js";
-import { Site } from "../workspaces/site.js";
+import { Workspace } from "../workspace.js";
 
 type Options =
     & DiagnosticOptions
@@ -77,9 +78,9 @@ class Website implements RenderContext {
     beforecompile(): void {
     }
 
-    compile(documentURI: string, filePath: string): void {
-        const document = this.documents[documentURI] = TextDocument.create(documentURI, "turtle", 0, fs.readFileSync(filePath, { encoding: "utf-8" }));
-        const syntaxTree = SyntaxTree.parse(document, this.diagnostics);
+    compile(ontology: Ontology): void {
+        this.documents[ontology.documentURI] = ontology.document;
+        const syntaxTree = ontology.syntaxTree;
         if (this.diagnostics.errors === 0) {
             const parserState = SyntaxTree.compileTriples(syntaxTree, this.diagnostics, { returnParserState: true });
             if (this.diagnostics.errors === 0) {
@@ -209,17 +210,16 @@ export default function main(options: Options): void {
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
 
-    const project = Project.from(options.project);
-    const files = project.getFiles();
-    const icons = project.config.siteOptions?.icons || [];
-    const assets = project.config.siteOptions?.assets || {};
-    const context = new Website(project.config.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.config.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
-    const site = new Site(project, options.output);
+    const project = new Project(options.project);
+    const icons = project.json.siteOptions?.icons || [];
+    const assets = project.json.siteOptions?.assets || {};
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
+    const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
     const diagnostics = DiagnosticBag.create();
     context.beforecompile();
-    for (const [documentURI, filePath] of files) {
-        context.compile(documentURI, filePath);
+    for (const ontology of project.files.values()) {
+        context.compile(ontology);
     }
     context.aftercompile();
     printDiagnosticsAndExitOnError(diagnostics, options);
@@ -240,11 +240,11 @@ export default function main(options: Options): void {
     site.write(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
 
     for (const iconConfig of icons) {
-        site.write(path.basename(iconConfig.asset), project.read(iconConfig.asset));
+        site.write(path.basename(iconConfig.asset), project.package.read(iconConfig.asset));
     }
 
-    for (const filePath in assets) {
-        site.write(assets[filePath], project.read(filePath));
+    for (const assetPath in assets) {
+        site.write(assets[assetPath], project.package.read(assetPath));
     }
 
     site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));

@@ -80,18 +80,29 @@ function renderClassCode(class_: Class, context: RenderContext): HtmlContent {
         {" "}
         {renderRdfTerm(class_.id, context, options)}
         {
-            class_.subClassOf.length
-                ? <>
+            class_.subClassOf.length === 0
+                ? ""
+                : <>
                     {" "}
                     <span class="schema-keyword">extends</span>
                     {" "}
                     {
-                        Ix.from(class_.subClassOf)
-                            .map(c => <><br />    {renderRdfTerm(c, context, options)}</>)
-                            .intersperse(<>,</>)
+                        class_.subClassOf.length === 1
+                            ? <>
+                                {renderRdfTerm(class_.subClassOf[0], context, options)}
+                                {class_.properties.length ? "" : " ."}
+                            </>
+                            : <span class="schema-list">
+                                {
+                                    Ix.from(class_.subClassOf)
+                                        .map((c, i) => <span>
+                                            {renderRdfTerm(c, context, options)}
+                                            {i + 1 < class_.subClassOf.length ? ", " : (class_.properties.length ? "" : " .")}
+                                        </span>)
+                                }
+                            </span>
                     }
                 </>
-                : null
         }
         {
             class_.properties.length
@@ -129,7 +140,7 @@ function renderClassCode(class_: Class, context: RenderContext): HtmlContent {
                     <br />
                     {"}"}
                 </>
-                : " ."
+                : ""
         }
     </>);
 }

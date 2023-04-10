@@ -30,43 +30,43 @@ export class Ontology {
     }
 
     get buffer(): Buffer {
-        return this._buffer ||= fs.readFileSync(this.filePath, { flag: "r" });
+        return this._buffer ??= fs.readFileSync(this.filePath, { flag: "r" });
     }
 
     get contentType(): string {
-        return (this._format ||= getFormat(this.filePath)).contentType;
+        return (this._format ??= getFormat(this.filePath)).contentType;
     }
 
     get document(): TextDocument {
-        return this._document ||= TextDocument.create(this.documentURI, this.languageId, 0, this.text);
+        return this._document ??= TextDocument.create(this.documentURI, this.languageId, 0, this.text);
     }
 
     get fileExtension(): string {
-        return (this._format ||= getFormat(this.filePath)).fileExtension;
+        return (this._format ??= getFormat(this.filePath)).fileExtension;
     }
 
     get imports(): ReadonlyMap<DocumentUri, Ontology | null> {
-        return (this._owl ||= getOWLOntology(this.triples, this.containingProject)).imports;
+        return (this._owl ??= getOWLOntology(this.triples, this.containingProject)).imports;
     }
 
     get languageId(): string {
-        return (this._format ||= getFormat(this.filePath)).languageId;
+        return (this._format ??= getFormat(this.filePath)).languageId;
     }
 
     get ontologyIRI(): string | undefined {
-        return (this._owl ||= getOWLOntology(this.triples, this.containingProject)).ontologyIRI;
+        return (this._owl ??= getOWLOntology(this.triples, this.containingProject)).ontologyIRI;
     }
 
     get syntaxTree(): SyntaxTree {
-        return this._syntaxTree ||= SyntaxTree.parse(this.document, this.diagnostics);
+        return this._syntaxTree ??= SyntaxTree.parse(this.document, this.diagnostics);
     }
 
     get text(): string {
-        return this._text ||= this.buffer.toString("utf-8");
+        return this._text ??= this.buffer.toString("utf-8");
     }
 
     get triples(): ReadonlyArray<ParsedTriple> {
-        return this._triples ||= SyntaxTree.compileTriples(this.syntaxTree, this.diagnostics);
+        return this._triples ??= SyntaxTree.compileTriples(this.syntaxTree, this.diagnostics);
     }
 }
 

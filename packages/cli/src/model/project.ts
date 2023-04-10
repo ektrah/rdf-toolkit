@@ -1,5 +1,6 @@
 import { DiagnosticBag, DocumentUri } from "@rdf-toolkit/text";
 import { Is } from "../type-checks.js";
+import { Workspace } from "../workspace.js";
 import { ModelCache } from "./cache.js";
 import { Ontology } from "./ontology.js";
 import { Package } from "./package.js";
@@ -76,23 +77,19 @@ export class Project {
     }
 
     get files(): ReadonlyMap<string, Ontology> {
-        return this._files ||= getFiles(this.packages.values());
+        return this._files ??= getFiles(this.packages.values());
     }
 
     get json(): ProjectConfig {
-        const value = this.package.exists(CONFIG_JSON) ? this.package.readJSON(CONFIG_JSON) : {};
-        if (!ProjectConfig.is(value)) {
-            throw new Error("Invalid " + CONFIG_JSON);
-        }
-        return this._json = value;
+        return this._json ??= getProjectConfig(this.package);
     }
 
     get ontologies(): ReadonlyMap<DocumentUri, Ontology | null> {
-        return this._ontologies ||= getOntologies(this.packages.values());
+        return this._ontologies ??= getOntologies(this.packages.values());
     }
 
     get packages(): ReadonlyMap<string, Package | null> {
-        return this._packages ||= getPackages(this.package);
+        return this._packages ??= getPackages(this.package);
     }
 }
 
@@ -146,4 +143,12 @@ function getPackages(root: Package): Map<string, Package | null> {
     }
 
     return packages;
+}
+
+function getProjectConfig(workspace: Workspace): ProjectConfig {
+    const value = workspace.exists(CONFIG_JSON) ? workspace.readJSON(CONFIG_JSON) : {};
+    if (!ProjectConfig.is(value)) {
+        throw new Error("Invalid " + CONFIG_JSON);
+    }
+    return value;
 }

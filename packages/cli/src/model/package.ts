@@ -83,7 +83,7 @@ export class Package extends Workspace {
     }
 
     get dependencies(): ReadonlyMap<string, Package | null> {
-        return this._dependencies ||= getDependencies(this.json, this, this.cache);
+        return this._dependencies ??= getDependencies(this.json, this, this.cache);
     }
 
     get description(): string | undefined {
@@ -91,19 +91,15 @@ export class Package extends Workspace {
     }
 
     get files(): ReadonlyMap<string, Ontology> {
-        return this._files ||= getFiles(this.json, this, this.cache);
+        return this._files ??= getFiles(this.json, this, this.cache);
     }
 
     get json(): PackageConfig {
-        const value = this.readJSON(PACKAGE_JSON);
-        if (!Is.objectLiteral(value)) {
-            throw new Error("Invalid " + PACKAGE_JSON);
-        }
-        return this._json ||= value;
+        return this._json ??= getPackageConfig(this);
     }
 
     get ontologies(): ReadonlyMap<DocumentUri, Ontology | null> {
-        return this._ontologies ||= getOntologies(this.json, this, this.cache);
+        return this._ontologies ??= getOntologies(this.json, this, this.cache);
     }
 
     get version(): string | undefined {
@@ -178,4 +174,12 @@ function getOntologies(json: PackageConfig, containingPackage: Package, cache: M
     }
 
     return ontologies;
+}
+
+function getPackageConfig(workspace: Workspace): PackageConfig {
+    const value = workspace.readJSON(PACKAGE_JSON);
+    if (!Is.objectLiteral(value)) {
+        throw new Error("Invalid " + PACKAGE_JSON);
+    }
+    return value;
 }

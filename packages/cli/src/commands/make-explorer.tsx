@@ -1,4 +1,5 @@
 import renderHTML, { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
+import { Ix } from "@rdf-toolkit/iterable";
 import * as crypto from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -7,8 +8,8 @@ import cssAssetFilePath from "../assets/explorer/explorer.min.css";
 import scriptAssetFilePath from "../assets/explorer/explorer.min.js";
 import fontAssetFilePath from "../assets/explorer/iosevka-aile-custom-light.woff2";
 import workerScriptAssetFilePath from "../assets/explorer/worker.min.js";
-import { Ontology } from "../model/ontology.js";
 import { Project } from "../model/project.js";
+import { TextFile } from "../model/textfile.js";
 import { MakeOptions, ProjectOptions } from "../options.js";
 import { Workspace } from "../workspace.js";
 
@@ -30,7 +31,7 @@ class Website {
     constructor(readonly title: string) {
     }
 
-    add(ontology: Ontology): void {
+    add(ontology: TextFile): void {
         this.files[ontology.documentURI] = {
             fileName: [path.parse(ontology.filePath).name, crypto.createHash("sha256").update(ontology.buffer).digest("hex").slice(0, 12), ontology.fileExtension].join("."),
             contentType: ontology.contentType,
@@ -65,9 +66,10 @@ export default function main(options: Options): void {
     const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
-    for (const ontology of project.files.values()) {
-        if (ontology) {
-            context.add(ontology);
+    for (const fileSet of project.files.values()) {
+        const file = Ix.from(fileSet).singleOrDefault(null);
+        if (file) {
+            context.add(file);
         }
     }
 

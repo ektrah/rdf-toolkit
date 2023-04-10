@@ -1,11 +1,15 @@
+import { Ix } from "@rdf-toolkit/iterable";
 import { DiagnosticBag, DocumentUri } from "@rdf-toolkit/text";
+import * as fs from "node:fs";
+import * as module from "node:module";
+import * as path from "node:path";
 import { Is } from "../type-checks.js";
 import { Workspace } from "../workspace.js";
-import { ModelCache } from "./cache.js";
-import { Ontology } from "./ontology.js";
 import { Package } from "./package.js";
+import { TextFile } from "./textfile.js";
 
 export const CONFIG_JSON = "rdfconfig.json";
+export const PACKAGE_JSON = "package.json";
 
 export interface ProjectConfig {
     siteOptions?: SiteConfig,
@@ -59,24 +63,23 @@ export namespace IconConfig {
 }
 
 export class Project {
-    private readonly cache: ModelCache = {
-        packages: new Map(),
-        files: new Map(),
-        diagnostics: DiagnosticBag.create(),
-    };
-
-    private _files?: ReadonlyMap<string, Ontology>;
+    private _files?: ReadonlyMap<string, ReadonlySet<TextFile>>;
     private _json?: ProjectConfig;
-    private _ontologies?: ReadonlyMap<string, Ontology | null>;
     private _packages?: ReadonlyMap<string, Package | null>;
+
+    private readonly packageCache: Map<string, Package>;
+    private readonly require: NodeRequire;
 
     readonly package: Package;
 
-    constructor(projectPath: string) {
-        this.package = new Package(projectPath, this, this.cache);
+    constructor(readonly projectPath: string, readonly diagnostics = DiagnosticBag.create()) {
+        this.packageCache = new Map();
+        this.require = module.createRequire(this.projectPath);
+
+        this.package = new Package(projectPath, this);
     }
 
-    get files(): ReadonlyMap<string, Ontology> {
+    get files(): ReadonlyMap<DocumentUri, ReadonlySet<TextFile>> {
         return this._files ??= getFiles(this.packages.values());
     }
 
@@ -84,47 +87,66 @@ export class Project {
         return this._json ??= getProjectConfig(this.package);
     }
 
-    get ontologies(): ReadonlyMap<DocumentUri, Ontology | null> {
-        return this._ontologies ??= getOntologies(this.packages.values());
-    }
-
     get packages(): ReadonlyMap<string, Package | null> {
         return this._packages ??= getPackages(this.package);
     }
+
+    resolveImport(ontologyIRI: string): [DocumentUri, TextFile | null] {
+        const url = new URL(ontologyIRI);
+        url.hash = "";
+        const documentURI: DocumentUri = url.href;
+
+        const fileSet = this.files.get(documentURI);
+        let file: TextFile | null = null;
+
+        if (fileSet && fileSet.size) {
+            file = Ix.from(fileSet).singleOrDefault(null);
+            if (!file) {
+                console.log(`Ambiguous import: <${documentURI}> is provided by multiple packages`);
+            }
+        }
+
+        return [url.href, file];
+    }
+
+    resolvePackage(packageName: string): Package | null {
+        const candidatePaths = this.require.resolve.paths(packageName);
+
+        if (candidatePaths) {
+            for (const candidatePath of candidatePaths) {
+                if (fs.existsSync(path.join(candidatePath, packageName, PACKAGE_JSON))) {
+                    const packagePath = fs.realpathSync(path.join(candidatePath, packageName));
+                    let package_ = this.packageCache.get(packagePath);
+                    if (!package_) {
+                        this.packageCache.set(packagePath, package_ = new Package(packagePath, this));
+                    }
+                    return package_;
+                }
+            }
+        }
+
+        return null;
+    }
 }
 
-function getFiles(packages: Iterable<Package | null>): Map<string, Ontology> {
-    const files = new Map<string, Ontology>();
+function getFiles(packages: Iterable<Package | null>): Map<string, ReadonlySet<TextFile>> {
+    const files = new Map<string, Set<TextFile>>();
 
     for (const package_ of packages) {
         if (package_) {
-            for (const [filePath, ontology] of package_.files) {
-                files.set(filePath, ontology);
+            for (const [documentURI, file] of package_.files) {
+                let fileSet = files.get(documentURI);
+                if (!fileSet) {
+                    files.set(documentURI, fileSet = new Set());
+                }
+                if (file) {
+                    fileSet.add(file);
+                }
             }
         }
     }
 
     return files;
-}
-
-function getOntologies(packages: Iterable<Package | null>): Map<DocumentUri, Ontology | null> {
-    const ontologies = new Map<DocumentUri, Ontology | null>();
-
-    for (const package_ of packages) {
-        if (package_) {
-            for (const [documentURI, ontology] of package_.ontologies) {
-                const ontology_ = ontologies.get(documentURI);
-                if (!ontology_ || ontology_ === ontology) {
-                    ontologies.set(documentURI, ontology);
-                }
-                else {
-                    // TODO: collision
-                }
-            }
-        }
-    }
-
-    return ontologies;
 }
 
 function getPackages(root: Package): Map<string, Package | null> {
@@ -133,11 +155,9 @@ function getPackages(root: Package): Map<string, Package | null> {
 
     for (let i = 0; i < queue.length; i++) {
         for (const [moduleName, package_] of queue[i].dependencies) {
-            if (!packages.has(moduleName)) {
+            if (package_ && !packages.has(moduleName)) {
                 packages.set(moduleName, package_);
-                if (package_) {
-                    queue.push(package_);
-                }
+                queue.push(package_);
             }
         }
     }

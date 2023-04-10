@@ -1,4 +1,4 @@
-import { DiagnosticBag, DocumentUri } from "@rdf-toolkit/text";
+import { DocumentUri } from "@rdf-toolkit/text";
 import * as os from "node:os";
 import * as process from "node:process";
 import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
@@ -17,7 +17,7 @@ export default function main(documentURI: DocumentUri, filePath: string, options
 
     filePath = project.package.relative(filePath);
 
-    const diagnostics = DiagnosticBag.create();
+    const diagnostics = project.diagnostics;
     project.package.readSyntaxTree(documentURI, filePath, diagnostics)
     printDiagnosticsAndExitOnError(diagnostics, options);
 

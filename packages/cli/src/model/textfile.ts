@@ -1,7 +1,7 @@
 import { IRI, Literal } from "@rdf-toolkit/rdf/terms";
 import { ParsedTriple } from "@rdf-toolkit/rdf/triples";
 import { Owl, Xsd } from "@rdf-toolkit/rdf/vocab";
-import { DiagnosticBag, DocumentUri, TextDocument } from "@rdf-toolkit/text";
+import { DocumentUri, TextDocument } from "@rdf-toolkit/text";
 import { SyntaxTree } from "@rdf-toolkit/turtle";
 import * as fs from "node:fs";
 import { Project } from "./project.js";
@@ -13,11 +13,11 @@ interface DataFormat {
 }
 
 interface OWLOntology {
-    readonly imports: ReadonlyMap<DocumentUri, Ontology | null>;
+    readonly imports: ReadonlySet<string>;
     readonly ontologyIRI: string | undefined;
 }
 
-export class Ontology {
+export class TextFile {
     private _buffer?: Buffer;
     private _document?: TextDocument;
     private _format?: DataFormat;
@@ -26,7 +26,7 @@ export class Ontology {
     private _text?: string;
     private _triples?: ReadonlyArray<ParsedTriple>;
 
-    constructor(readonly documentURI: DocumentUri, readonly filePath: string, readonly containingProject: Project, private readonly diagnostics: DiagnosticBag) {
+    constructor(readonly documentURI: DocumentUri, readonly filePath: string, readonly containingProject: Project) {
     }
 
     get buffer(): Buffer {
@@ -45,8 +45,8 @@ export class Ontology {
         return (this._format ??= getFormat(this.filePath)).fileExtension;
     }
 
-    get imports(): ReadonlyMap<DocumentUri, Ontology | null> {
-        return (this._owl ??= getOWLOntology(this.triples, this.containingProject)).imports;
+    get imports(): ReadonlySet<string> {
+        return (this._owl ??= getOWLOntology(this.triples)).imports;
     }
 
     get languageId(): string {
@@ -54,11 +54,11 @@ export class Ontology {
     }
 
     get ontologyIRI(): string | undefined {
-        return (this._owl ??= getOWLOntology(this.triples, this.containingProject)).ontologyIRI;
+        return (this._owl ??= getOWLOntology(this.triples)).ontologyIRI;
     }
 
     get syntaxTree(): SyntaxTree {
-        return this._syntaxTree ??= SyntaxTree.parse(this.document, this.diagnostics);
+        return this._syntaxTree ??= SyntaxTree.parse(this.document, this.containingProject.diagnostics);
     }
 
     get text(): string {
@@ -66,44 +66,28 @@ export class Ontology {
     }
 
     get triples(): ReadonlyArray<ParsedTriple> {
-        return this._triples ??= SyntaxTree.compileTriples(this.syntaxTree, this.diagnostics);
+        return this._triples ??= SyntaxTree.compileTriples(this.syntaxTree, this.containingProject.diagnostics);
     }
 }
 
 function getFormat(filePath: string): DataFormat {
     if (/[.](?:ttl)$/i.test(filePath)) {
-        return {
-            contentType: "text/turtle",
-            fileExtension: "ttl",
-            languageId: "turtle",
-        };
+        return { contentType: "text/turtle", fileExtension: "ttl", languageId: "turtle" };
     }
     else if (/[.](?:md|mkdn?|mdwn|mdown|markdown)$/i.test(filePath)) {
-        return {
-            contentType: "text/markdown",
-            fileExtension: "md",
-            languageId: "markdown",
-        };
+        return { contentType: "text/markdown", fileExtension: "md", languageId: "markdown" };
     }
     else if (/[.](?:owl|rdf|xml)$/i.test(filePath)) {
-        return {
-            contentType: "application/xml",
-            fileExtension: "xml",
-            languageId: "xml",
-        };
+        return { contentType: "application/xml", fileExtension: "xml", languageId: "xml" };
     }
     else {
-        return {
-            contentType: "text/plain",
-            fileExtension: "txt",
-            languageId: "plaintext",
-        };
+        return { contentType: "text/plain", fileExtension: "txt", languageId: "plaintext" };
     }
 }
 
-function getOWLOntology(triples: Iterable<ParsedTriple>, project: Project): Readonly<OWLOntology> {
+function getOWLOntology(triples: Iterable<ParsedTriple>): Readonly<OWLOntology> {
+    const imports = new Set<string>();
     let ontologyIRI: string | undefined;
-    const imports = new Map<DocumentUri, Ontology | null>();
 
     for (const triple of triples) {
         switch (triple.predicate) {
@@ -112,11 +96,7 @@ function getOWLOntology(triples: Iterable<ParsedTriple>, project: Project): Read
                     ontologyIRI = triple.subject.value;
                 }
                 if (IRI.is(triple.object) || (Literal.is(triple.object) && (triple.object.datatype === Xsd.string || triple.object.datatype === Xsd.anyURI))) {
-                    const importIRI = triple.object.value;
-                    const url = new URL(importIRI);
-                    url.hash = "";
-                    const documentURI = url.href;
-                    imports.set(documentURI, project.ontologies.get(documentURI) || null);
+                    imports.add(triple.object.value);
                 }
                 break;
         }

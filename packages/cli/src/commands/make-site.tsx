@@ -16,8 +16,8 @@ import * as url from "node:url";
 import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
 import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
-import { Ontology } from "../model/ontology.js";
 import { Project } from "../model/project.js";
+import { TextFile } from "../model/textfile.js";
 import { DiagnosticOptions, MakeOptions, ProjectOptions, SiteOptions } from "../options.js";
 import { PrefixTable } from "../prefixes.js";
 import { Workspace } from "../workspace.js";
@@ -78,9 +78,9 @@ class Website implements RenderContext {
     beforecompile(): void {
     }
 
-    compile(ontology: Ontology): void {
-        this.documents[ontology.documentURI] = ontology.document;
-        const syntaxTree = ontology.syntaxTree;
+    compile(file: TextFile): void {
+        this.documents[file.documentURI] = file.document;
+        const syntaxTree = file.syntaxTree;
         if (this.diagnostics.errors === 0) {
             const parserState = SyntaxTree.compileTriples(syntaxTree, this.diagnostics, { returnParserState: true });
             if (this.diagnostics.errors === 0) {
@@ -216,13 +216,16 @@ export default function main(options: Options): void {
     const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
-    const diagnostics = DiagnosticBag.create();
     context.beforecompile();
-    for (const ontology of project.files.values()) {
-        context.compile(ontology);
+    for (const fileSet of project.files.values()) {
+        const file = Ix.from(fileSet).singleOrDefault(null);
+        if (file) {
+            context.compile(file);
+        }
     }
     context.aftercompile();
-    printDiagnosticsAndExitOnError(diagnostics, options);
+
+    printDiagnosticsAndExitOnError(project.diagnostics, options);
 
     const links = <>
         {icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(path.basename(iconConfig.asset), context.baseURL)} />)}

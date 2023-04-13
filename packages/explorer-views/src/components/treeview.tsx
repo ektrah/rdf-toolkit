@@ -9,13 +9,13 @@ export interface TreeNode {
 }
 
 function renderNode(node: TreeNode, depth: number): HtmlContent {
-    return depth >= 32 ? "\u2026" : Ix.from(node.children)
+    return depth > 9 ? <li>{"\u2026"}</li> : Ix.from(node.children)
         .map(child => renderNode(child, node.open ? 1 : depth + 1))
         .wrap(children =>
             <li>
                 <details open={node.open || depth > 3}>
                     <summary>{node.label}</summary>
-                    <ul>{children}</ul>
+                    {depth >= 9 ? "\u2026" : <ul>{children}</ul>}
                 </details>
             </li>,
             <li>

@@ -8,6 +8,7 @@ import { Class, EntityKind, Ontology, Property, Schema } from "../main.js";
 
 const Dc11 = Vocabulary.create("http://purl.org/dc/elements/1.1/", ["description", "title", "date"]);
 const Dcterms = Vocabulary.create("http://purl.org/dc/terms/", ["description", "title", "created", "modified"]);
+const Qudt = Vocabulary.create("http://qudt.org/schema/qudt/", ["deprecated", "deprecatedProperty"]);
 const Skos = Vocabulary.create("http://www.w3.org/2004/02/skos/core#", ["definition"]);
 
 const TitleProperties: ReadonlySet<IRI> = new Set([
@@ -42,6 +43,14 @@ export function getDescription(subject: IRIOrBlankNode, graph: Graph): string | 
         .map(x => x.valueAsString)
         .filter(s => s.trim() !== "")
         .firstOrDefault(undefined);
+}
+
+function isDeprecated(node: IRIOrBlankNode, graph: Graph): boolean {
+    return graph.isInstanceOf(node, Owl.DeprecatedClass) ||
+        graph.isInstanceOf(node, Owl.DeprecatedProperty) ||
+        graph.isInstanceOf(node, Qudt.deprecatedProperty) ||
+        graph.triples(node, Owl.deprecated, Literal.createBoolean(true)).some() ||
+        graph.triples(node, Qudt.deprecated, Literal.createBoolean(true)).some();
 }
 
 export function flattenOwlIntersections(node: IRIOrBlankNode, graph: Graph): Ix<IRIOrBlankNode> {
@@ -258,10 +267,10 @@ export class SchemaBuilder {
 
                                 maxCount: typeof p[1].maxCount === "undefined" ? -1n : p[1].maxCount,
 
-                                deprecated: graph.isDeprecated(p[0])
+                                deprecated: isDeprecated(p[0], graph)
                             })),
 
-                        deprecated: graph.isDeprecated(c[0])
+                        deprecated: isDeprecated(c[0], graph)
                     })),
 
             properties: Ix.from(this.schema.properties)

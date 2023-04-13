@@ -26,7 +26,7 @@ function printFiles(files: ArrayLike<[DocumentUri, TextFile | null]>, project: P
             process.stdout.write(os.EOL);
 
             stack.push(documentURI);
-            printFiles(Ix.from(file.imports).map(ontologyIRI => project.resolveImport(ontologyIRI)).toArray().sort(), project, indentation + (i + 1 < files.length ? "  \u2502" : "   "));
+            printFiles(Ix.from(file.imports).map(ontologyIRI => project.resolveImport(ontologyIRI)).filter(([x]) => !stack.includes(x)).toArray().sort(), project, indentation + (i + 1 < files.length ? "  \u2502" : "   "));
             stack.pop();
         }
         else {

@@ -51,6 +51,18 @@ function renderPropertyDefinition(property: Property, context: RenderContext): H
     </section>;
 }
 
+function renderEquivalentProperties(property: Property, context: RenderContext): HtmlContent {
+    return context.graph.getEquivalentProperties(property.id)
+        .filter(x => x !== property.id)
+        .sort((a, b) => a.compareTo(b))
+        .map(property => <li>{renderRdfTerm(property, context, { rawBlankNodes: true })}</li>)
+        .wrap(properties =>
+            <section>
+                <h2>Equivalent Properties</h2>
+                <ul class="schema-columns">{properties}</ul>
+            </section>, null);
+}
+
 function renderPropertyDomain(property: Property, context: RenderContext): HtmlContent {
     return Ix.from(property.domainIncludes)
         .map(class_ => <li>{renderRdfTerm(class_, context, { rawBlankNodes: true })}</li>)
@@ -64,6 +76,7 @@ function renderPropertyDomain(property: Property, context: RenderContext): HtmlC
 function renderProperty(property: Property, context: RenderContext): HtmlContent {
     return <>
         {renderPropertyDefinition(property, context)}
+        {renderEquivalentProperties(property, context)}
         {renderPropertyDomain(property, context)}
     </>;
 }

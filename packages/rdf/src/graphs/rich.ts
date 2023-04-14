@@ -155,10 +155,20 @@ export class RichGraph extends IndexedGraph {
         return this.subClassOfMap.get(type).filter(superClass => this.subClassOfMap.has(superClass, type));
     }
 
+    getEquivalentProperties(property: IRI): Ix<IRI> {
+        return this.subPropertyOfMap.get(property).filter(superClass => this.subPropertyOfMap.has(superClass, property));
+    }
+
     isEquivalentClassOf(resource: Term, class_: IRIOrBlankNode): boolean {
         return IRIOrBlankNode.is(resource) &&
             this.subClassOfMap.has(resource, class_) &&
             this.subClassOfMap.has(class_, resource);
+    }
+
+    isEquivalentPropertyOf(resource: Term, property: IRI): boolean {
+        return IRI.is(resource) &&
+            this.subPropertyOfMap.has(resource, property) &&
+            this.subPropertyOfMap.has(property, resource);
     }
 
     isDeprecated(resource: IRIOrBlankNode): boolean {

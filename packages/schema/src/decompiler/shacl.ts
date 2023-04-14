@@ -1,7 +1,7 @@
 import { Ix } from "@rdf-toolkit/iterable";
 import { Graph } from "@rdf-toolkit/rdf/graphs";
 import { IRI, IRIOrBlankNode, Literal, Term } from "@rdf-toolkit/rdf/terms";
-import { Shacl } from "@rdf-toolkit/rdf/vocab";
+import { Rdfs, Shacl } from "@rdf-toolkit/rdf/vocab";
 import { splitRange } from "./rdfs.js";
 import { getDescription, SchemaBuilder } from "./utils.js";
 
@@ -34,7 +34,7 @@ export default function decompile(graph: Graph, builder: SchemaBuilder): void {
                 .concat(graph.objects(propertyShape, Shacl.xone).concatMap(x => splitOr(x, graph)))
                 .concat(graph.objects(propertyShape, Shacl.hasValue))
                 .concat(graph.objects(propertyShape, Shacl.node))
-                .concat(graph.objects(propertyShape, Shacl.nodeKind))
+                .concat(graph.objects(propertyShape, Shacl.nodeKind).concatMap(x => mapNodeKindToClass(x)))
                 .concat(graph.objects(propertyShape, Shacl.qualifiedValueShape).concatMap(x => extract(x, graph)));
 
             const minCount = graph.objects(propertyShape, Shacl.minCount)
@@ -96,5 +96,20 @@ function* splitOr(node: Term, graph: Graph): Generator<Term> {
                 yield* extract(item, graph);
             }
         }
+    }
+}
+
+function* mapNodeKindToClass(node: Term): Generator<Term> {
+    switch (node) {
+        case Shacl.BlankNode:
+        case Shacl.IRI:
+        case Shacl.BlankNodeOrIRI:
+        case Shacl.BlankNodeOrLiteral:
+        case Shacl.IRIOrLiteral:
+            yield Rdfs.Resource;
+            break;
+        case Shacl.Literal:
+            yield Rdfs.Literal;
+            break;
     }
 }

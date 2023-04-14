@@ -76,35 +76,6 @@ function getDirectSuperClasses(node: IRIOrBlankNode, graph: Graph): Ix<IRIOrBlan
             .wrap(() => Ix.of(Owl.Thing), Ix.empty));
 }
 
-function isNodeKind(node: Term): boolean {
-    switch (node) {
-        case Shacl.BlankNode:
-        case Shacl.IRI:
-        case Shacl.BlankNodeOrIRI:
-        case Shacl.BlankNodeOrLiteral:
-        case Shacl.IRIOrLiteral:
-        case Shacl.Literal:
-            return true;
-        default:
-            return false;
-    }
-}
-
-function* mapNodeKind(node: Term): Generator<Term> {
-    switch (node) {
-        case Shacl.BlankNode:
-        case Shacl.IRI:
-        case Shacl.BlankNodeOrIRI:
-        case Shacl.BlankNodeOrLiteral:
-        case Shacl.IRIOrLiteral:
-            yield Rdfs.Resource;
-            break;
-        case Shacl.Literal:
-            yield Rdfs.Literal;
-            break;
-    }
-}
-
 export class SchemaBuilder {
     private readonly schema: {
         readonly classes: Map<IRIOrBlankNode, {
@@ -252,11 +223,6 @@ export class SchemaBuilder {
                                 description: p[1].description,
 
                                 value: Ix.from(p[1].values)
-                                    .filter(x => !isNodeKind(x))
-                                    .concatIfEmpty(Ix
-                                        .from(p[1].values)
-                                        .filter(x => isNodeKind(x))
-                                        .concatMap(x => mapNodeKind(x)))
                                     .concatIfEmpty((graph.isInstanceOf(p[0], Owl.ObjectProperty) ? Ix.of(Owl.Thing) : Ix.empty)
                                         .concat(graph.isInstanceOf(p[0], Owl.DatatypeProperty) ? Ix.of(Rdfs.Literal) : Ix.empty))
                                     .toArray()

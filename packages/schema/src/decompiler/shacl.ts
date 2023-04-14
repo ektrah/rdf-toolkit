@@ -10,16 +10,10 @@ import { getDescription, SchemaBuilder } from "./utils.js";
 //
 //  [ a sh:NodeShape; sh:targetClass ?class; sh:property [ a sh:PropertyShape; sh:path ?property ] ]
 //
-//  [ a sh:NodeShape; sh:targetSubjectsOf ?property; sh:class ?class; sh:property [ a sh:PropertyShape; sh:path ?property ] ]
-//
 export default function decompile(graph: Graph, builder: SchemaBuilder): void {
     for (const nodeShape of graph.getInstances(Shacl.NodeShape)) {
         const classes = (graph.isClass(nodeShape) ? Ix.of(nodeShape) : Ix.empty)
-            .concat(graph.objects(nodeShape, Shacl.targetClass).ofType(IRIOrBlankNode.is))
-            .concat(graph.objects(nodeShape, Shacl.targetSubjectsOf).wrap(_ => graph.objects(nodeShape, Shacl.class)
-                .concat(graph.objects(nodeShape, Shacl.datatype))
-                .concat(graph.objects(nodeShape, Shacl.or).concatMap(x => splitOr(x, graph)))
-                .ofType(IRIOrBlankNode.is), Ix.empty));
+            .concat(graph.objects(nodeShape, Shacl.targetClass).ofType(IRIOrBlankNode.is));
 
         for (const class_ of classes) {
             builder.addClass(class_, getDescription(class_, graph));

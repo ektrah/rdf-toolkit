@@ -45,6 +45,10 @@ export class SHACLEngine {
             case Shacl.xone:
                 yield Triple.createAxiomatic(triple.predicate, Rdfs.range, Rdf.List);
                 break;
+
+            case Shacl.node:
+                yield Triple.createAxiomatic(triple.predicate, Rdfs.range, Shacl.NodeShape);
+                break;
         }
     }
 

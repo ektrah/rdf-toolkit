@@ -63,8 +63,7 @@ export function flattenOwlIntersections(node: IRIOrBlankNode, graph: Graph): Ix<
 }
 
 function getDirectSuperClasses(node: IRIOrBlankNode, graph: Graph): Ix<IRIOrBlankNode> {
-    const superClasses = Ix.of(node)
-        .concat(graph.objects(node, Owl.equivalentClass).ofType(IRIOrBlankNode.is))
+    const superClasses = graph.getEquivalentClasses(node)
         .concatMap(x => graph.getDirectSuperClasses(x))
         .concatMap(x => flattenOwlIntersections(x, graph))
         .distinct()

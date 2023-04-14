@@ -34,10 +34,15 @@ export class OWLEngine {
 
     *interpret(triple: Triple): Generator<Triple> {
 
-        // every OWL class is a subclass of owl:Thing and equivalent to itself
+        // every OWL class is a subclass of owl:Thing
         if (triple.subject !== Rdfs.Resource && triple.predicate === Rdf.type && triple.object === Owl.Class) {
             const class_ = triple.subject;
             yield Triple.createInferred(class_, Rdfs.subClassOf, Owl.Thing, triple);
+        }
+
+        // every class is equivalent to itself
+        if (triple.predicate === Rdf.type && triple.object === Rdfs.Class) {
+            const class_ = triple.subject;
             yield Triple.createInferred(class_, Owl.equivalentClass, class_, triple);
         }
 
@@ -50,6 +55,13 @@ export class OWLEngine {
             for (const transitiveEquivalentClass of this.equivalentClassMap.get(equivalentClass)) {
                 yield Triple.createInferred(class_, Owl.equivalentClass, transitiveEquivalentClass, triple);
             }
+        }
+
+        // every class is a subclass of its equivalent classes
+        if (triple.predicate === Owl.equivalentClass && IRIOrBlankNode.is(triple.object)) {
+            const class_ = triple.subject;
+            const equivalentClass = triple.object;
+            yield Triple.createInferred(class_, Rdfs.subClassOf, equivalentClass, triple);
         }
 
         // every class in a union is a subclass of the union

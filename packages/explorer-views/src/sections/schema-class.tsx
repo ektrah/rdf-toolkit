@@ -163,6 +163,18 @@ function renderClassDefinition(class_: Class, context: RenderContext): HtmlConte
     </section>;
 }
 
+function renderEquivalentClasses(class_: Class, context: RenderContext): HtmlContent {
+    return context.graph.getEquivalentClasses(class_.id)
+        .filter(x => IRI.is(x) && (x !== class_.id))
+        .sort((a, b) => a.compareTo(b))
+        .map(instance => <li>{renderRdfTerm(instance, context, { rawBlankNodes: true })}</li>)
+        .wrap(instances =>
+            <section>
+                <h2>Equivalent Classes</h2>
+                <ul class="schema-columns">{instances}</ul>
+            </section>, null);
+}
+
 function renderClassInstances(class_: Class, context: RenderContext): HtmlContent {
     return context.graph.getDirectInstances(class_.id)
         .sort((a, b) => a.compareTo(b))
@@ -177,6 +189,7 @@ function renderClassInstances(class_: Class, context: RenderContext): HtmlConten
 function renderClass(class_: Class, context: RenderContext): HtmlContent {
     return <>
         {renderClassDefinition(class_, context)}
+        {renderEquivalentClasses(class_, context)}
         {renderClassInstances(class_, context)}
         {renderClassProperties(class_, context)}
     </>;

@@ -26,8 +26,6 @@ export class RichGraph extends IndexedGraph {
     private readonly directSuperProperties: ReadonlyMultiMap<IRI, IRI>;
     private readonly directSubProperties: ReadonlyMultiMap<IRI, IRI>;
 
-    readonly equivalentClassMap: MultiMap<IRIOrBlankNode, IRIOrBlankNode>;              //  {Class} -- owl:equivalentClass --> {Class}
-
     constructor(dataset: Iterable<Iterable<Triple>>, rdfEngine: RDFEngine, rdfsEngine: RDFSEngine, owlEngine: OWLEngine) {
         super(dataset);
 
@@ -47,8 +45,6 @@ export class RichGraph extends IndexedGraph {
         this.directSubClasses = direct(this.subClasses);
         this.directSuperProperties = direct(this.subPropertyOfMap);
         this.directSubProperties = direct(this.subProperties);
-
-        this.equivalentClassMap = owlEngine.equivalentClassMap;
     }
 
     // ---
@@ -156,7 +152,13 @@ export class RichGraph extends IndexedGraph {
     // ---
 
     getEquivalentClasses(type: IRIOrBlankNode): Ix<IRIOrBlankNode> {
-        return this.equivalentClassMap.get(type);
+        return this.subClassOfMap.get(type).filter(superClass => this.subClassOfMap.has(superClass, type));
+    }
+
+    isEquivalentClassOf(resource: Term, class_: IRIOrBlankNode): boolean {
+        return IRIOrBlankNode.is(resource) &&
+            this.subClassOfMap.has(resource, class_) &&
+            this.subClassOfMap.has(class_, resource);
     }
 
     isDeprecated(resource: IRIOrBlankNode): boolean {
@@ -175,14 +177,15 @@ function invert<T>(map: ReadonlyMultiMap<T, T>): MultiMap<T, T> {
 }
 
 function direct<T>(map: ReadonlyMultiMap<T, T>): MultiMap<T, T> {
+    const areEquivalent = (a: T, b: T): boolean => map.has(a, b) && map.has(b, a);
     const result = new MultiMap<T, T>(map);
     for (const [x, y] of map) {
-        if (x === y) {
+        if (areEquivalent(x, y)) {
             result.delete(x, y);
         }
         else {
             for (const z of map.get(y)) {
-                if (z !== y) {
+                if (!areEquivalent(z, y)) {
                     result.delete(x, z);
                 }
             }

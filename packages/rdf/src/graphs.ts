@@ -47,6 +47,7 @@ export interface Graph {
     getDirectSubProperties(property: IRI): Ix<IRI>;
 
     getEquivalentClasses(type: IRIOrBlankNode): Ix<IRIOrBlankNode>;
+    isEquivalentClassOf(resource: Term, class_: IRIOrBlankNode): boolean;
     isDeprecated(resource: IRIOrBlankNode): boolean;
 }
 

@@ -17,18 +17,10 @@ export default function decompile(graph: Graph, builder: SchemaBuilder): void {
             decompileOWLRestriction(class_, graph, class_, builder);
         }
         else {
-            const queue: IRIOrBlankNode[] = [class_];
-            for (let i = 0; i < queue.length; i++) {
-                for (const superClass of graph.getDirectSuperClasses(queue[i])) {
-                    for (const intersected of flattenOwlIntersections(superClass, graph)) {
-                        if (graph.isInstanceOf(intersected, Owl.Restriction)) {
-                            decompileOWLRestriction(intersected, graph, class_, builder);
-                        }
-                    }
-                }
-                for (const equivalentClass of graph.getEquivalentClasses(queue[i])) {
-                    if (queue.indexOf(equivalentClass) < 0) {
-                        queue.push(equivalentClass);
+            for (const superClass of graph.getDirectSuperClasses(class_)) {
+                for (const intersected of flattenOwlIntersections(superClass, graph)) {
+                    if (graph.isInstanceOf(intersected, Owl.Restriction)) {
+                        decompileOWLRestriction(intersected, graph, class_, builder);
                     }
                 }
             }

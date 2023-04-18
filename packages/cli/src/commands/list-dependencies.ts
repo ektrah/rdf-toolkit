@@ -2,24 +2,21 @@ import * as os from "node:os";
 import * as process from "node:process";
 import { Package } from "../model/package.js";
 import { Project } from "../model/project.js";
-import { ProjectOptions, RecursiveOptions } from "../options.js";
+import { AllOption, ProjectOptions, RecursiveOptions } from "../options.js";
 
 type Options =
+    & AllOption
     & ProjectOptions
     & RecursiveOptions
 
 const stack: Array<string> = [];
 
-function printDependencies(package_: Package, indentation: string, recursive: boolean): void {
-    const dependencies = Array.from(package_.dependencies)
-        .filter(([x]) => !stack.includes(x))
-        .sort();
-
-    for (let i = 0; i < dependencies.length; i++) {
-        const [moduleName, package_] = dependencies[i];
+function printPackages(packages: Array<readonly [string, Package | null]>, indentation: string, recursive: boolean): void {
+    for (let i = 0; i < packages.length; i++) {
+        const [moduleName, package_] = packages[i];
 
         process.stdout.write(indentation);
-        process.stdout.write(i + 1 < dependencies.length ? "  \u251C" : "  \u2570");
+        process.stdout.write(i + 1 < packages.length ? "  \u251C" : "  \u2570");
         process.stdout.write("\u257C ");
         process.stdout.write(moduleName);
 
@@ -31,8 +28,12 @@ function printDependencies(package_: Package, indentation: string, recursive: bo
             process.stdout.write(os.EOL);
 
             if (recursive) {
+                const dependencies = Array.from(package_.dependencies)
+                    .filter(([x]) => !stack.includes(x))
+                    .sort();
+
                 stack.push(moduleName);
-                printDependencies(package_, indentation + (i + 1 < dependencies.length ? "  \u2502" : "   "), recursive);
+                printPackages(dependencies, indentation + (i + 1 < packages.length ? "  \u2502" : "   "), recursive);
                 stack.pop();
             }
         }
@@ -46,10 +47,14 @@ function printDependencies(package_: Package, indentation: string, recursive: bo
 export default function main(options: Options): void {
     const project = new Project(options.project);
 
-    if (project.package.dependencies.size) {
+    const packages = !!options.all
+        ? Array.from(project.packages).filter(([, p]) => p !== project.package).sort()
+        : Array.from(project.package.dependencies).sort();
+
+    if (packages.length) {
         process.stdout.write("  \u2564");
         process.stdout.write(os.EOL);
 
-        printDependencies(project.package, "", !!options.recursive);
+        printPackages(packages, "", !!options.recursive);
     }
 }

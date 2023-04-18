@@ -1,6 +1,10 @@
 import * as path from "node:path";
 import * as yargs from "yargs";
 
+export type AllOption = {
+    readonly all: boolean | undefined;
+}
+
 export type DiagnosticOptions = {
     readonly noWarn: boolean | undefined;
     readonly warnAsError: boolean | undefined;
@@ -31,6 +35,15 @@ export type SiteOptions = {
 }
 
 export namespace Options {
+
+    export const all = {
+        "all": {
+            alias: "a",
+            description: "List all items",
+            nargs: 0,
+            type: "boolean"
+        }
+    } satisfies Record<string, yargs.Options>;
 
     export const base = {
         "base": {

@@ -97,6 +97,7 @@ yargs(yargs_helpers.hideBin(process.argv))
 
             .command("dependencies", "List all dependencies of the project",
                 yargs => yargs
+                    .option(Options.all)
                     .help()
                     .option(Options.project)
                     .option(Options.recursive)

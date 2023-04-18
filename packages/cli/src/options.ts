@@ -18,6 +18,10 @@ export type ProjectOptions = {
     readonly project: string;
 }
 
+export type RecursiveOptions = {
+    readonly recursive: boolean | undefined;
+}
+
 export type ServerOptions = {
     readonly root: string | undefined;
 }
@@ -71,6 +75,15 @@ export namespace Options {
             type: "string",
             default: ".",
             coerce: (arg: string) => path.resolve(arg),
+        }
+    } satisfies Record<string, yargs.Options>;
+
+    export const recursive = {
+        "recursive": {
+            alias: "r",
+            description: "List items recursively",
+            nargs: 0,
+            type: "boolean"
         }
     } satisfies Record<string, yargs.Options>;
 

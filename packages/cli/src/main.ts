@@ -99,6 +99,7 @@ yargs(yargs_helpers.hideBin(process.argv))
                 yargs => yargs
                     .help()
                     .option(Options.project)
+                    .option(Options.recursive)
                     .version(false)
                     .example("$0 list dependencies", "")
                     .strict(),

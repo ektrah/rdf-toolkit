@@ -2,14 +2,15 @@ import * as os from "node:os";
 import * as process from "node:process";
 import { Package } from "../model/package.js";
 import { Project } from "../model/project.js";
-import { ProjectOptions } from "../options.js";
+import { ProjectOptions, RecursiveOptions } from "../options.js";
 
 type Options =
     & ProjectOptions
+    & RecursiveOptions
 
 const stack: Array<string> = [];
 
-function printDependencies(package_: Package, indentation: string): void {
+function printDependencies(package_: Package, indentation: string, recursive: boolean): void {
     const dependencies = Array.from(package_.dependencies)
         .filter(([x]) => !stack.includes(x))
         .sort();
@@ -29,9 +30,11 @@ function printDependencies(package_: Package, indentation: string): void {
             }
             process.stdout.write(os.EOL);
 
-            stack.push(moduleName);
-            printDependencies(package_, indentation + (i + 1 < dependencies.length ? "  \u2502" : "   "));
-            stack.pop();
+            if (recursive) {
+                stack.push(moduleName);
+                printDependencies(package_, indentation + (i + 1 < dependencies.length ? "  \u2502" : "   "), recursive);
+                stack.pop();
+            }
         }
         else {
             process.stdout.write(" \u00D7");
@@ -47,6 +50,6 @@ export default function main(options: Options): void {
         process.stdout.write("  \u2564");
         process.stdout.write(os.EOL);
 
-        printDependencies(project.package, "");
+        printDependencies(project.package, "", !!options.recursive);
     }
 }

@@ -187,7 +187,7 @@ function invert<T>(map: ReadonlyMultiMap<T, T>): MultiMap<T, T> {
 }
 
 function direct<T>(map: ReadonlyMultiMap<T, T>): MultiMap<T, T> {
-    const areEquivalent = (a: T, b: T): boolean => map.has(a, b) && map.has(b, a);
+    const areEquivalent = (a: T, b: T): boolean => (a === b) || (map.has(a, b) && map.has(b, a));
     const result = new MultiMap<T, T>(map);
     for (const [x, y] of map) {
         if (areEquivalent(x, y)) {

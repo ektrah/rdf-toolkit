@@ -83,7 +83,7 @@ export namespace Options {
     export const project = {
         "project": {
             alias: "p",
-            description: "Specify the project file",
+            description: "Specify the project directory",
             nargs: 1,
             type: "string",
             default: ".",

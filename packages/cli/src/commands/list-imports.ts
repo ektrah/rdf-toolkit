@@ -25,9 +25,11 @@ function printFiles(files: ArrayLike<[DocumentUri, TextFile | null]>, project: P
             process.stdout.write(project.package.relative(file.filePath));
             process.stdout.write(os.EOL);
 
-            stack.push(documentURI);
-            printFiles(Ix.from(file.imports).map(ontologyIRI => project.resolveImport(ontologyIRI)).filter(([x]) => !stack.includes(x)).toArray().sort(), project, indentation + (i + 1 < files.length ? "  \u2502" : "   "));
-            stack.pop();
+            if (file.ontology) {
+                stack.push(documentURI);
+                printFiles(Ix.from(file.ontology.imports).map(ontologyIRI => project.resolveImport(ontologyIRI)).filter(([x]) => !stack.includes(x)).toArray().sort(), project, indentation + (i + 1 < files.length ? "  \u2502" : "   "));
+                stack.pop();
+            }
         }
         else {
             process.stdout.write(" \u00D7");

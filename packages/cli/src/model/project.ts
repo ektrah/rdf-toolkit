@@ -76,7 +76,8 @@ export class Project {
         this.packageCache = new Map();
         this.require = module.createRequire(this.projectPath);
 
-        this.package = new Package(projectPath, this);
+        const packagePath = fs.realpathSync(projectPath);
+        this.packageCache.set(packagePath, this.package = new Package(packagePath, this));
     }
 
     get files(): ReadonlyMap<DocumentUri, ReadonlySet<TextFile>> {

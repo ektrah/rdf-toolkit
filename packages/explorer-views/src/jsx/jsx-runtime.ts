@@ -48,18 +48,18 @@ declare global {
 
             link: GlobalAttributes & {
                 href?: string;
-                crossorigin?: "" | "anonymous" | "use-credentials";
+                crossorigin?: CORSSettings;
                 rel?: string;
                 media?: string;
                 integrity?: string;
                 hreflang?: string;
                 type?: string;
-                referrerpolicy?: "" | "no-referrer" | "no-referrer-when-downgrade" | "same-origin" | "origin" | "strict-origin" | "origin-when-cross-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
+                referrerpolicy?: ReferrerPolicy;
                 sizes?: string;
                 imagesrcset?: string;
                 imagesizes?: string;
-                "as"?: "fetch" | "audio" | "audioworklet" | "document" | "embed" | "font" | "frame" | "iframe" | "image" | "manifest" | "object" | "paintworklet" | "report" | "script" | "serviceworker" | "sharedworker" | "style" | "track" | "video" | "webidentity" | "worker" | "xslt";
-                blocking?: "render";
+                "as"?: PotentialDestination;
+                blocking?: Array<BlockingToken>;
                 color?: string;
                 disabled?: boolean;
             };
@@ -74,7 +74,7 @@ declare global {
 
             style: GlobalAttributes & {
                 media?: string;
-                blocking?: "render";
+                blocking?: Array<BlockingToken>;
             };
 
             //
@@ -123,7 +123,7 @@ declare global {
             ol: GlobalAttributes & {
                 reversed?: boolean;
                 start?: number;
-                type?: "1" | "a" | "A" | "i" | "I";
+                type?: MarkerKind;
             };
 
             ul: GlobalAttributes;
@@ -160,7 +160,7 @@ declare global {
                 rel?: string;
                 hreflang?: string;
                 type?: string;
-                referrerpolicy?: "" | "no-referrer" | "no-referrer-when-downgrade" | "same-origin" | "origin" | "strict-origin" | "origin-when-cross-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
+                referrerpolicy?: ReferrerPolicy;
             }
 
             em: GlobalAttributes;
@@ -235,14 +235,14 @@ declare global {
                 src: string;
                 srcset?: string;
                 sizes?: string;
-                crossorigin?: "anonymous" | "use-credentials";
+                crossorigin?: CORSSettings;
                 usemap?: string;
                 ismap?: boolean;
                 width?: number;
                 height?: number;
-                referrerpolicy?: "" | "no-referrer" | "no-referrer-when-downgrade" | "same-origin" | "origin" | "strict-origin" | "origin-when-cross-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
-                decoding?: string;
-                loading?: string;
+                referrerpolicy?: ReferrerPolicy;
+                decoding?: ImageDecodingHint;
+                loading?: LazyLoading;
             };
 
             //iframe
@@ -323,7 +323,7 @@ declare global {
                 //size
                 //src
                 //step
-                type?: "hidden" | "text" | "search" | "tel" | "url" | "email" | "password" | "date" | "month" | "week" | "time" | "datetime-local" | "number" | "range" | "color" | "checkbox" | "radio" | "file" | "submit" | "image" | "reset" | "button";
+                type?: InputType;
                 //value
                 //width
             };
@@ -362,10 +362,10 @@ declare global {
                 nomodule?: boolean;
                 async?: boolean;
                 defer?: boolean;
-                crossorigin?: "anonymous" | "use-credentials";
+                crossorigin?: CORSSettings;
                 integrity?: string;
-                referrerpolicy?: "" | "no-referrer" | "no-referrer-when-downgrade" | "same-origin" | "origin" | "strict-origin" | "origin-when-cross-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
-                blocking?: "render";
+                referrerpolicy?: ReferrerPolicy;
+                blocking?: Array<BlockingToken>;
             };
 
             noscript: GlobalAttributes;
@@ -386,7 +386,7 @@ declare global {
             //autocapitalize
             //autofocus
             //contenteditable
-            dir?: "ltr" | "rtl" | "auto";
+            dir?: TextDirectionality;
             //draggable
             //enterkeyhint
             //hidden
@@ -406,10 +406,141 @@ declare global {
             title?: string;
             //translate
 
-            class?: string | null | (string | null)[];
+            class?: string | null | Array<string | null>;
             id?: string;
             //slot
         }
+
+        //
+        // 2.2.5. Requests
+        //
+
+        type Destination =
+            | "audio"
+            | "audioworklet"
+            | "document"
+            | "embed"
+            | "font"
+            | "frame"
+            | "iframe"
+            | "image"
+            | "manifest"
+            | "object"
+            | "paintworklet"
+            | "report"
+            | "script"
+            | "serviceworker"
+            | "sharedworker"
+            | "style"
+            | "track"
+            | "video"
+            | "webidentity"
+            | "worker"
+            | "xslt"
+
+        //
+        // 2.2.7. Miscellaneous
+        //
+
+        type PotentialDestination =
+            | "fetch"
+            | Destination
+
+        //
+        // 2.5.4 CORS settings attributes
+        //
+
+        type CORSSettings =
+            | ""
+            | "anonymous"
+            | "use-credentials"
+
+        //
+        // 2.5.5 Referrer policy attributes
+        //
+
+        type ReferrerPolicy =
+            | ""
+            | "no-referrer"
+            | "no-referrer-when-downgrade"
+            | "same-origin"
+            | "origin"
+            | "strict-origin"
+            | "origin-when-cross-origin"
+            | "strict-origin-when-cross-origin"
+            | "unsafe-url"
+
+        //
+        // 2.5.7 Lazy loading attributes
+        //
+
+        type LazyLoading =
+            | "lazy"
+            | "eager"
+
+        //
+        // 2.5.8 Blocking attributes
+        //
+
+        type BlockingToken =
+            | "render"
+
+        //
+        // 3.2.6.4 The dir attribute
+        //
+
+        type TextDirectionality =
+            | "ltr"
+            | "rtl"
+            | "auto"
+
+        //
+        // 4.4.5 The ol element
+        //
+
+        type MarkerKind =
+            | "1"
+            | "a"
+            | "A"
+            | "i"
+            | "I"
+
+        //
+        // 4.8.4.3.4 Decoding images
+        //
+
+        type ImageDecodingHint =
+            | "sync"
+            | "async"
+            | "auto"
+
+        //
+        // 4.10.5 The input element
+        //
+
+        type InputType =
+            | "hidden"
+            | "text"
+            | "search"
+            | "tel"
+            | "url"
+            | "email"
+            | "password"
+            | "date"
+            | "month"
+            | "week"
+            | "time"
+            | "datetime-local"
+            | "number"
+            | "range"
+            | "color"
+            | "checkbox"
+            | "radio"
+            | "file"
+            | "submit"
+            | "image"
+            | "reset"
+            | "button"
     }
 }
 

@@ -187,6 +187,12 @@ declare global {
             //data
             //time
 
+            iframe: GlobalAttributes & {
+                alt?: string;
+                src: string;
+                seamless: boolean;
+            };
+
             code: GlobalAttributes;
 
             var: GlobalAttributes;

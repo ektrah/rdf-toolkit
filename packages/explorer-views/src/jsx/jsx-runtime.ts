@@ -184,8 +184,14 @@ declare global {
             //ruby
             //rt
             //rp
-            //data
-            //time
+
+            data: GlobalAttributes & {
+                value: string;
+            };
+
+            time: GlobalAttributes & {
+                datetime?: string;
+            };
 
             code: GlobalAttributes;
 
@@ -220,8 +226,15 @@ declare global {
             // 4.7 Edits
             //
 
-            //ins
-            //del
+            ins: GlobalAttributes & {
+                cite?: string;
+                datetime?: string;
+            };
+
+            del: GlobalAttributes & {
+                cite?: string;
+                datetime?: string;
+            };
 
             //
             // 4.8 Embedded content
@@ -245,7 +258,19 @@ declare global {
                 loading?: LazyLoading;
             };
 
-            //iframe
+            iframe: GlobalAttributes & {
+                src?: string;
+                srcdoc?: string;
+                name?: string;
+                sandbox?: Array<SandboxKeyword>;
+                allow?: string;
+                allowfullscreen?: boolean;
+                width?: string;
+                height?: string;
+                referrerpolicy?: ReferrerPolicy;
+                loading?: LazyLoading;
+            };
+
             //embed
             //object
             //video
@@ -513,6 +538,25 @@ declare global {
             | "sync"
             | "async"
             | "auto"
+
+        //
+        // 4.8.5 The iframe element
+        //
+
+        type SandboxKeyword =
+            | "allow-downloads"
+            | "allow-forms"
+            | "allow-modals"
+            | "allow-orientation-lock"
+            | "allow-pointer-lock"
+            | "allow-popups"
+            | "allow-popups-to-escape-sandbox"
+            | "allow-presentation"
+            | "allow-same-origin"
+            | "allow-scripts"
+            | "allow-top-navigation"
+            | "allow-top-navigation-by-user-activation"
+            | "allow-top-navigation-to-custom-protocols"
 
         //
         // 4.10.5 The input element

@@ -66,6 +66,7 @@ export class Project {
     private _files?: ReadonlyMap<string, ReadonlySet<TextFile>>;
     private _json?: ProjectConfig;
     private _packages?: ReadonlyMap<string, Package | null>;
+    private _terms?: ReadonlyMap<string, ReadonlySet<TextFile>>;
 
     private readonly packageCache: Map<string, Package>;
     private readonly require: NodeRequire;
@@ -90,6 +91,10 @@ export class Project {
 
     get packages(): ReadonlyMap<string, Package | null> {
         return this._packages ??= getPackages(this.package);
+    }
+
+    get terms(): ReadonlyMap<string, ReadonlySet<TextFile>> {
+        return this._terms ??= getTerms(this.files);
     }
 
     resolveImport(ontologyIRI: string): [DocumentUri, TextFile | null] {
@@ -172,4 +177,22 @@ function getProjectConfig(workspace: Workspace): ProjectConfig {
         throw new Error("Invalid " + CONFIG_JSON);
     }
     return value;
+}
+
+function getTerms(files: ReadonlyMap<string, ReadonlySet<TextFile>>): Map<string, Set<TextFile>> {
+    const terms = new Map<string, Set<TextFile>>();
+
+    for (const fileSet of files.values()) {
+        for (const file of fileSet) {
+            for (const term of file.terms) {
+                let termSet = terms.get(term.value);
+                if (!termSet) {
+                    terms.set(term.value, termSet = new Set());
+                }
+                termSet.add(file);
+            }
+        }
+    }
+
+    return terms;
 }

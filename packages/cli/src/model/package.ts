@@ -72,7 +72,7 @@ function getFiles(json: PackageConfig, containingPackage: Package): Map<Document
 
             let file: TextFile | null = null;
             if (fs.existsSync(filePath)) {
-                file = new TextFile(documentURI, fs.realpathSync(filePath), containingPackage.containingProject);
+                file = new TextFile(documentURI, fs.realpathSync(filePath), containingPackage);
             }
             files.set(documentURI, file);
         }

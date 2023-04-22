@@ -1,11 +1,13 @@
+import { IRI } from "@rdf-toolkit/rdf/terms";
 import { ParsedTriple } from "@rdf-toolkit/rdf/triples";
 import { DocumentUri, TextDocument } from "@rdf-toolkit/text";
-import { SymbolTable, SyntaxTree } from "@rdf-toolkit/turtle";
+import { SymbolTable, SyntaxKind, SyntaxTree } from "@rdf-toolkit/turtle";
 import * as fs from "node:fs";
 import { Ontology } from "./ontology.js";
+import { Package } from "./package.js";
 import { Project } from "./project.js";
 
-interface DataFormat {
+interface FileFormat {
     readonly contentType: string;
     readonly fileExtension: string;
     readonly languageId: string;
@@ -14,18 +16,23 @@ interface DataFormat {
 export class TextFile {
     private _buffer?: Buffer;
     private _document?: TextDocument;
-    private _format?: DataFormat;
+    private _format?: FileFormat;
     private _ontology?: Ontology;
     private _symbolTable?: SymbolTable;
     private _syntaxTree?: SyntaxTree;
+    private _terms?: ReadonlyArray<IRI>;
     private _text?: string;
     private _triples?: ReadonlyArray<ParsedTriple>;
 
-    constructor(readonly documentURI: DocumentUri, readonly filePath: string, readonly containingProject: Project) {
+    constructor(readonly documentURI: DocumentUri, readonly filePath: string, readonly containingPackage: Package) {
     }
 
     get buffer(): Buffer {
         return this._buffer ??= fs.readFileSync(this.filePath, { flag: "r" });
+    }
+
+    get containingProject(): Project {
+        return this.containingPackage.containingProject;
     }
 
     get contentType(): string {
@@ -45,7 +52,7 @@ export class TextFile {
     }
 
     get ontology(): Ontology | undefined {
-        return (this._ontology ??= Ontology.from(this.syntaxTree, this.symbolTable));
+        return this._ontology ??= Ontology.from(this.syntaxTree, this.symbolTable);
     }
 
     get symbolTable(): SymbolTable {
@@ -54,6 +61,10 @@ export class TextFile {
 
     get syntaxTree(): SyntaxTree {
         return this._syntaxTree ??= SyntaxTree.parse(this.document, this.containingProject.diagnostics);
+    }
+
+    get terms(): ReadonlyArray<IRI> {
+        return this._terms ??= getTerms(this.syntaxTree, this.symbolTable);
     }
 
     get text(): string {
@@ -65,7 +76,7 @@ export class TextFile {
     }
 }
 
-function getFormat(filePath: string): DataFormat {
+function getFormat(filePath: string): FileFormat {
     if (/[.](?:ttl)$/i.test(filePath)) {
         return { contentType: "text/turtle", fileExtension: "ttl", languageId: "turtle" };
     }
@@ -78,4 +89,19 @@ function getFormat(filePath: string): DataFormat {
     else {
         return { contentType: "text/plain", fileExtension: "txt", languageId: "plaintext" };
     }
+}
+
+function getTerms(syntaxTree: SyntaxTree, symbolTable: SymbolTable): Array<IRI> {
+    const terms = new Set<IRI>();
+
+    for (const statement of syntaxTree.root.statements) {
+        if (statement.kind === SyntaxKind.SubjectPredicateObjectList) {
+            const subject = symbolTable.get(statement.subject);
+            if (subject) {
+                terms.add(subject);
+            }
+        }
+    }
+
+    return Array.from(terms);
 }

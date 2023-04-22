@@ -10,6 +10,7 @@ import init from "./commands/init.js";
 import listDependencies from "./commands/list-dependencies.js";
 import listFiles from "./commands/list-files.js";
 import listImports from "./commands/list-imports.js";
+import listTerms from "./commands/list-terms.js";
 import makeExplorer from "./commands/make-explorer.js";
 import makeSite from "./commands/make-site.js";
 import removeFile from "./commands/remove-file.js";
@@ -125,6 +126,15 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .example("$0 list imports", "")
                     .strict(),
                 args => listImports(args))
+
+            .command("terms", "List all terms defined in the project",
+                yargs => yargs
+                    .help()
+                    .option(Options.project)
+                    .version(false)
+                    .example("$0 list terms", "")
+                    .strict(),
+                args => listTerms(args))
 
             .help()
             .version(false)

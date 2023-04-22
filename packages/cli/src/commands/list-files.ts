@@ -7,7 +7,7 @@ import { ProjectOptions } from "../options.js";
 type Options =
     & ProjectOptions
 
-function printOntologies(project: Project): void {
+function printFiles(project: Project): void {
     const files = Array.from(project.files).sort();
 
     for (let i = 0; i < files.length; i++) {
@@ -37,6 +37,6 @@ export default function main(options: Options): void {
         process.stdout.write("  \u2564");
         process.stdout.write(os.EOL);
 
-        printOntologies(project);
+        printFiles(project);
     }
 }

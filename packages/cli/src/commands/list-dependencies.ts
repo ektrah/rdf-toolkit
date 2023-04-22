@@ -47,7 +47,7 @@ function printPackages(packages: Array<readonly [string, Package | null]>, inden
 export default function main(options: Options): void {
     const project = new Project(options.project);
 
-    const packages = !!options.all
+    const packages = options.all
         ? Array.from(project.packages).filter(([, p]) => p !== project.package).sort()
         : Array.from(project.package.dependencies).sort();
 

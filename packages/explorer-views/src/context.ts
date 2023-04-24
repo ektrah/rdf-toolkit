@@ -6,6 +6,7 @@ export interface RenderContext {
     readonly documents: Record<string, TextDocument>;
     readonly graph: Graph;
     readonly schema: Schema;
+    readonly roots: ReadonlySet<string>;
 
     lookupPrefixedName(iri: string): { readonly prefixLabel: string, readonly localName: string } | null;
 

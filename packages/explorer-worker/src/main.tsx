@@ -62,11 +62,13 @@ class BackendImpl implements Backend, RenderContext {
     graph: Graph;
     schema: Schema;
     prefixes: PrefixTable;
+    roots: ReadonlySet<string>;
 
     constructor(private readonly frontend: Frontend) {
         this.graph = Graph.from(this.dataset);
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.prefixes = new PrefixTable(this.namespaces);
+        this.roots = new Set();
     }
 
     lookupPrefixedName(iri: string): { readonly prefixLabel: string; readonly localName: string; } | null {

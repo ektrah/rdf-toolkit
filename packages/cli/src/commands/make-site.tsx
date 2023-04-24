@@ -57,13 +57,15 @@ class Website implements RenderContext {
     graph: Graph;
     schema: Schema;
     prefixes: PrefixTable;
+    roots: ReadonlySet<string>;
 
     readonly outputs: Record<string, string> = {};
 
-    constructor(readonly title: string, readonly baseURL: string) {
+    constructor(readonly title: string, readonly baseURL: string, readonly rootIRIs: ReadonlySet<string>) {
         this.graph = Graph.from(this.dataset);
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.prefixes = new PrefixTable(this.namespaces);
+        this.roots = rootIRIs; 
     }
 
     lookupPrefixedName(iri: string): { readonly prefixLabel: string; readonly localName: string; } | null {
@@ -213,7 +215,7 @@ export default function main(options: Options): void {
     const project = new Project(options.project);
     const icons = project.json.siteOptions?.icons || [];
     const assets = project.json.siteOptions?.assets || {};
-    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href);
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, project.package.roots);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
     context.beforecompile();

@@ -20,8 +20,15 @@ function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, p
                 (tree[parent.value] || (tree[parent.value] = { label: renderRdfTerm(parent, context, options), children: [], open: parent === Rdfs.Resource || parent === Owl.Thing })).children.push(node);
                 hasParents = true;
             }
-            if (!hasParents) {
-                roots.push(node);
+
+            if(context.roots.size > 0) {
+                if(context.roots.has(item.id.value)) {
+                  roots.push(node);
+                 }
+            } else {
+                if (!hasParents) {
+                 roots.push(node);
+                }
             }
         }
     }

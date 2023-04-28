@@ -23,14 +23,12 @@ export interface PackageConfig {
     devDependencies?: unknown; // Record<string, string>
 
     ontologies?: unknown, // Record<DocumentUri, string>
-    roots?: unknown, //Array<string>
 }
 
 export class Package extends Workspace {
     private _dependencies?: ReadonlyMap<string, Package | null>;
     private _files?: ReadonlyMap<DocumentUri, TextFile | null>;
     private _json?: PackageConfig;
-    private _roots?: ReadonlySet<string>;
 
     constructor(packagePath: string, readonly containingProject: Project) {
         super(packagePath);
@@ -51,21 +49,8 @@ export class Package extends Workspace {
     get version(): string | undefined {
         return Is.string(this.json.version) ? this.json.version : undefined;
     }
-
-    get roots(): ReadonlySet<string> {
-        return this._roots ??= getRoots(this.json);
-    }
 }
 
-function getRoots(json: PackageConfig): ReadonlySet<string> {
-    const rootIRIs = new Set<string>();
-    if(Array.isArray(json.roots)) {
-        json.roots.forEach( (r) => {
-            rootIRIs.add(r);
-        } );
-    }
-    return rootIRIs;
-}
 function getDependencies(json: PackageConfig, containingProject: Project): Map<string, Package | null> {
     const dependencies = new Map<string, Package | null>();
 

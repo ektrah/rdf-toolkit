@@ -9,9 +9,10 @@ import { RenderContext } from "../context.js";
 import { HtmlContent } from "../jsx/html.js";
 import "./navigation.css";
 
-function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, parents: (item: T) => Iterable<IRIOrBlankNode>, context: RenderContext, options?: RenderOptions): TreeNode[] {
+function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, parents: (item: T) => Iterable<IRIOrBlankNode>, context: RenderContext, rootIRIs: Iterable<string> | null, options?: RenderOptions): TreeNode[] {
     const roots: TreeNode[] = [];
     const tree: { [P in string]: { readonly label: HtmlContent; readonly children: TreeNode[], readonly open: boolean } } = {};
+
     for (const item of items) {
         if (IRI.is(item.id)) {
             const node = tree[item.id.value] || (tree[item.id.value] = { label: renderRdfTerm(item.id, context, options), children: [], open: item.id === Rdfs.Resource || item.id === Owl.Thing });
@@ -20,18 +21,22 @@ function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, p
                 (tree[parent.value] || (tree[parent.value] = { label: renderRdfTerm(parent, context, options), children: [], open: parent === Rdfs.Resource || parent === Owl.Thing })).children.push(node);
                 hasParents = true;
             }
-
-            if(context.roots.size > 0) {
-                if(context.roots.has(item.id.value)) {
-                  roots.push(node);
-                 }
-            } else {
-                if (!hasParents) {
-                 roots.push(node);
-                }
+            if (!hasParents) {
+                roots.push(node);
             }
         }
     }
+
+    if (rootIRIs) {
+        roots.length = 0;
+        for (const rootIRI of rootIRIs) {
+            const node = tree[rootIRI];
+            if (node) {
+                roots.push(node);
+            }
+        }
+    }
+
     return roots;
 }
 
@@ -43,17 +48,17 @@ export default function render(title: string | undefined, context: RenderContext
                 {
                     id: "navigation-classes",
                     label: "Classes",
-                    content: renderTreeView(createTree(context.schema.classes.values(), x => x.subClassOf, context, { rawBlankNodes: true }))
+                    content: renderTreeView(createTree(context.schema.classes.values(), x => x.subClassOf, context, context.rootClasses, { rawBlankNodes: true }))
                 },
                 {
                     id: "navigation-properties",
                     label: "Properties",
-                    content: renderTreeView(createTree(context.schema.properties.values(), x => x.subPropertyOf, context, { rawBlankNodes: true }))
+                    content: renderTreeView(createTree(context.schema.properties.values(), x => x.subPropertyOf, context, null, { rawBlankNodes: true }))
                 },
                 {
                     id: "navigation-ontologies",
                     label: "Ontologies",
-                    content: renderTreeView(createTree(context.schema.ontologies.values(), () => Ix.empty, context, { rawIRIs: true, rawBlankNodes: true }))
+                    content: renderTreeView(createTree(context.schema.ontologies.values(), () => Ix.empty, context, null, { rawIRIs: true, rawBlankNodes: true }))
                 },
                 {
                     id: "navigation-files",

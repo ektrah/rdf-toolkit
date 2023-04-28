@@ -17,10 +17,6 @@ export default function decompile(graph: Graph, builder: SchemaBuilder): void {
 
         for (const class_ of classes) {
             builder.addClass(class_, getDescription(class_, graph));
-            for (const property of graph.objects(nodeShape, Shacl.targetSubjectsOf).ofType(IRI.is)) {
-                builder.addClassProperty(class_, property, getDescription(property, graph), undefined, undefined);
-                builder.addPropertyClass(property, class_);
-            }
         }
 
         for (const propertyShape of graph.objects(nodeShape, Shacl.property).ofType(IRIOrBlankNode.is)) {

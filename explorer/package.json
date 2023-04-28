@@ -13,6 +13,6 @@
   },
   "devDependencies": {
     "@rdf-toolkit/cli": "0.1.0",
-    "rimraf": "^4.4.1"
+    "rimraf": "^5.0.0"
   }
 }

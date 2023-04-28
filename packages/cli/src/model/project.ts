@@ -30,6 +30,7 @@ export interface SiteConfig {
     assets?: Record<string, string>;
     baseURL?: string;
     outDir?: string;
+    roots?: Array<string>;
 }
 
 export namespace SiteConfig {
@@ -41,7 +42,8 @@ export namespace SiteConfig {
             && (Is.undefined(candidate.icons) || Is.typedArray(candidate.icons, IconConfig.is))
             && (Is.undefined(candidate.assets) || Is.objectLiteral(candidate.assets))
             && (Is.undefined(candidate.baseURL) || Is.string(candidate.baseURL))
-            && (Is.undefined(candidate.outDir) || Is.string(candidate.outDir));
+            && (Is.undefined(candidate.outDir) || Is.string(candidate.outDir))
+            && (Is.undefined(candidate.roots) || Is.typedArray(candidate.roots, Is.string));
     }
 }
 

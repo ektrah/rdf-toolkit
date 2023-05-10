@@ -198,8 +198,7 @@ function renderPage(
     iri: string,
     context: Website,
     links: HtmlContent,
-    scripts: HtmlContent,
-    navigation: HtmlContent
+    scripts: HtmlContent
 ): HtmlContent {
     const subject: IRIOrBlankNode = iri.startsWith(
         "http://example.com/.well-known/genid/"
@@ -353,9 +352,7 @@ export default function main(options: Options): void {
             context.outputs[iri] + ".html",
             Buffer.from(
                 "<!DOCTYPE html>\n" +
-                    renderHTML(
-                        renderPage(iri, context, links, scripts, navigation)
-                    )
+                    renderHTML(renderPage(iri, context, links, scripts))
             )
         );
     }

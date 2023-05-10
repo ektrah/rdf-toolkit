@@ -19,5 +19,8 @@
     "build": "npm run build -ws",
     "clean": "npm run clean -ws",
     "test": "npm test -ws --if-present"
+  },
+  "dependencies": {
+    "@rdf-toolkit/cli": "^0.1.0"
   }
 }

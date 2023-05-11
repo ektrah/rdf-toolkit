@@ -221,3 +221,12 @@ nav a[href='http://www.w3.org/2000/01/rdf-schema#Resource'] .rdf-iri-localname {
     border-radius: 4px;
     padding: 3px 5px 2px;
 }
+
+.nav-divider {
+    position: fixed;
+    left: calc(25vw - 1px);
+    width: 1px;
+    height: 100%;
+    cursor: ew-resize;
+    background: var(--base02);
+}

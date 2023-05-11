@@ -46,9 +46,11 @@ else if (typeof fetch !== "function") {
     document.write("Your browser doesn't support the Fetch API.");
 }
 else {
+    const navWidthStorageKey = 'navWidth';
     const documentTitle = document.title;
     const worker = new Worker(workerScriptURL);
     const navigationPane = document.createElement("nav");
+    const navigationDivider = document.createElement("div");
     const mainContent = document.createElement("main");
     const dialog = document.createElement("dialog");
     const dialogContent = document.createElement("div");
@@ -56,12 +58,13 @@ else {
     const loader = document.createElement("div");
     const progress = document.createElement("div");
 
+    navigationDivider.className = "nav-divider";
     progress.className = "progress-bar";
     loader.className = "loader-box";
     loader.innerHTML = "<div class='loader'></div>";
     closeButton.innerHTML = "<svg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg' version='1.0'><line x1='2' y1='2' x2='8' y2='8' /><line x1='2' y1='8' x2='8' y2='2' /></svg>";
     dialog.replaceChildren(closeButton, loader, dialogContent);
-    document.body.replaceChildren(navigationPane, mainContent, dialog, progress);
+    document.body.replaceChildren(navigationPane, navigationDivider, mainContent, dialog, progress);
     dialog.showModal();
 
     const frontend: Frontend = {
@@ -115,6 +118,40 @@ else {
     closeButton.onclick = function () {
         frontend.hideProgress();
     }
+
+    const setLayoutsSize = (width: string) => {
+        navigationPane.style.width = width;
+        mainContent.style.marginLeft = width;
+        navigationDivider.style.left = `${parseInt(width) - 1}px` ;
+    }
+
+    const handleLayoutResize = (event: MouseEvent | TouchEvent) => {
+        const width = event instanceof MouseEvent ? `${event.clientX}px` : `${event.touches[0].clientX}`;
+        const currentWidth = parseInt(width);
+
+        if (currentWidth <= window.innerWidth * 0.25 || currentWidth >= window.innerWidth * 0.75) {
+            return;
+        }
+
+        setLayoutsSize(width);
+        localStorage.setItem(navWidthStorageKey, width)
+    };
+
+    navigationDivider.addEventListener("mousedown", () => {
+        document.addEventListener("mousemove", handleLayoutResize);
+    });
+
+    navigationDivider.addEventListener("touchstart", () => {
+        document.addEventListener("touchmove", handleLayoutResize);
+    });
+
+    document.addEventListener("mouseup", () => {
+        document.removeEventListener("mousemove", handleLayoutResize);
+    });
+
+    document.addEventListener("touchend", () => {
+        document.removeEventListener("touchmove", handleLayoutResize);
+    });
 
     window.onclick = function (ev) {
         let target = ev.target;
@@ -204,12 +241,18 @@ else {
     }
 
     window.onload = async function () {
+        const navWidth = localStorage.getItem(navWidthStorageKey);
+
         if (history.scrollRestoration) {
             history.scrollRestoration = "manual";
         }
 
         if (document.fonts) {
             await document.fonts.load("300 17px \"Iosevka Aile Custom\"", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        }
+
+        if (navWidth) {
+            setLayoutsSize(navWidth);
         }
 
         progress.className = "progress-bar loading";
@@ -235,7 +278,7 @@ else {
             const sourceText = await response.arrayBuffer();
             const sourceTextHash = await crypto.subtle.digest("SHA-256", sourceText);
             backend.compile(document.uri, sourceText, sourceTextHash, document.language);
-        }
+        } 
 
         backend.aftercompile();
         backend.navigateTo(location.hash.startsWith("#") ? location.hash.slice("#".length) : "");

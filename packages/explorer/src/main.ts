@@ -126,7 +126,7 @@ else {
     }
 
     const handleLayoutResize = (event: MouseEvent | TouchEvent) => {
-        const width = event instanceof MouseEvent ? `${event.clientX}px` : `${event.touches[0].clientX}`;
+        const width = event instanceof MouseEvent ? `${event.clientX}px` : `${event.touches[0].clientX}px`;
         const currentWidth = parseInt(width);
 
         if (currentWidth <= window.innerWidth * 0.25 || currentWidth >= window.innerWidth * 0.75) {

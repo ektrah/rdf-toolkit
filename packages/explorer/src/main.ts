@@ -75,7 +75,7 @@ else {
         mainContent.style.marginLeft = width;
 
         if (window.localStorage) {
-            localStorage.setItem(navWidthStorageKey, width);
+            window.localStorage.setItem(navWidthStorageKey, width);
         }
     }
 

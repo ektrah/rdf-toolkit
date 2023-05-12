@@ -12,6 +12,7 @@ import listFiles from "./commands/list-files.js";
 import listImports from "./commands/list-imports.js";
 import listTerms from "./commands/list-terms.js";
 import makeExplorer from "./commands/make-explorer.js";
+import makeSchema from "./commands/make-schema.js";
 import makeSite from "./commands/make-site.js";
 import removeFile from "./commands/remove-file.js";
 import serve from "./commands/serve.js";
@@ -164,6 +165,19 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .version(false)
                     .strict(),
                 args => makeSite(args))
+
+            .command("schema", "Generate a schema",
+                yargs => yargs
+                    .option(Options.force)
+                    .option("format", { choices: ["text", "jsonld"] as const, default: "text" as const, description: "Specify the output format", nargs: 1 })
+                    .help()
+                    .option(Options.noWarnings)
+                    .option(Options.output)
+                    .option(Options.project)
+                    .option(Options.warnAsError)
+                    .version(false)
+                    .strict(),
+                args => makeSchema(args.format, args))
 
             .help()
             .version(false)

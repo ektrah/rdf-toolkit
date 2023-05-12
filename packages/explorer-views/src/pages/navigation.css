@@ -5,7 +5,7 @@ nav {
     grid-template-rows: min-content minmax(0, 1fr);
     height: 100vh;
     left: 0;
-    padding: 1.5em 0 1em 1em;
+    padding: 1.5em 2px 1em 1em;
     position: fixed;
     top: 0;
     width: 25vw;

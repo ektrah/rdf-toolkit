@@ -46,9 +46,11 @@ else if (typeof fetch !== "function") {
     document.write("Your browser doesn't support the Fetch API.");
 }
 else {
+    const navWidthStorageKey = "navWidth";
     const documentTitle = document.title;
     const worker = new Worker(workerScriptURL);
     const navigationPane = document.createElement("nav");
+    const navigationDivider = document.createElement("div");
     const mainContent = document.createElement("main");
     const dialog = document.createElement("dialog");
     const dialogContent = document.createElement("div");
@@ -56,13 +58,26 @@ else {
     const loader = document.createElement("div");
     const progress = document.createElement("div");
 
+    navigationDivider.className = "nav-divider";
     progress.className = "progress-bar";
     loader.className = "loader-box";
     loader.innerHTML = "<div class='loader'></div>";
     closeButton.innerHTML = "<svg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg' version='1.0'><line x1='2' y1='2' x2='8' y2='8' /><line x1='2' y1='8' x2='8' y2='2' /></svg>";
     dialog.replaceChildren(closeButton, loader, dialogContent);
-    document.body.replaceChildren(navigationPane, mainContent, dialog, progress);
+    document.body.replaceChildren(navigationPane, navigationDivider, mainContent, dialog, progress);
     dialog.showModal();
+
+    function setLayoutsSize(clientX: number) {
+        const width = Math.min(Math.max(clientX - 4, window.innerWidth * 0.15), window.innerWidth * 0.85) + "px";
+
+        navigationDivider.style.left = width;
+        navigationPane.style.width = width;
+        mainContent.style.marginLeft = width;
+
+        if (window.localStorage) {
+            window.localStorage.setItem(navWidthStorageKey, width);
+        }
+    }
 
     const frontend: Frontend = {
 
@@ -115,6 +130,46 @@ else {
     closeButton.onclick = function () {
         frontend.hideProgress();
     }
+
+    navigationDivider.onmousedown = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+
+        document.onmousemove = function (ev) {
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            setLayoutsSize(ev.clientX);
+        };
+    };
+
+    navigationDivider.ontouchstart = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+
+        document.ontouchmove = function (ev) {
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            if (ev.touches.length) {
+                setLayoutsSize(ev.touches[0].clientX);
+            }
+        };
+    };
+
+    document.onmouseup = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+
+        document.onmousemove = null;
+    };
+
+    document.ontouchend = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+
+        document.ontouchmove = null;
+    };
 
     window.onclick = function (ev) {
         let target = ev.target;
@@ -210,6 +265,13 @@ else {
 
         if (document.fonts) {
             await document.fonts.load("300 17px \"Iosevka Aile Custom\"", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        }
+
+        if (window.localStorage) {
+            const navWidth = Number.parseInt(window.localStorage.getItem(navWidthStorageKey) || "");
+            if (!Number.isNaN(navWidth)) {
+                setLayoutsSize(navWidth);
+            }
         }
 
         progress.className = "progress-bar loading";

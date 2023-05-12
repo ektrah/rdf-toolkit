@@ -1,6 +1,7 @@
 import { RenderContext } from "@rdf-toolkit/explorer-views/context";
 import { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
 import renderFooter from "@rdf-toolkit/explorer-views/sections/footer";
+import renderRDFPrefixes from "@rdf-toolkit/explorer-views/sections/rdf-prefixes";
 
 export default function render(context: RenderContext): HtmlContent {
     return <>
@@ -19,6 +20,7 @@ export default function render(context: RenderContext): HtmlContent {
             <p>Have fun!</p>
         </section>
         <footer>
+            {renderRDFPrefixes(context)}
             {renderFooter(context)}
         </footer>
     </>;

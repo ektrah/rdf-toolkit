@@ -27,6 +27,10 @@ export class PrefixTable {
         this.table = Array.from(namespacesToPrefixLabels).sort((a, b) => b[0].length - a[0].length);
     }
 
+    all(): readonly [string, string][] {
+        return this.table;
+    }
+
     lookup(iri: string): { readonly localName: string; readonly prefixLabel: string; } | null {
         for (const [namespace, prefixLabel] of this.table) {
             if (iri.startsWith(namespace)) {

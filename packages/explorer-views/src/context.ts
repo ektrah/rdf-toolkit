@@ -8,6 +8,7 @@ export interface RenderContext {
     readonly schema: Schema;
     readonly rootClasses: ReadonlySet<string> | null;
 
+    getPrefixes(): ReadonlyArray<[string, string]>;
     lookupPrefixedName(iri: string): { readonly prefixLabel: string, readonly localName: string } | null;
 
     rewriteHref?(iri: string): string;

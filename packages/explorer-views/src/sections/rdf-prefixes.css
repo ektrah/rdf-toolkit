@@ -1,0 +1,26 @@
+table.rdf-prefixes {
+    margin: 1em 0;
+    width: 100%;
+}
+
+    table.rdf-prefixes th,
+    table.rdf-prefixes td {
+        border-bottom: 1px solid var(--base01);
+        padding: 5px 2ex 5px 0;
+    }
+
+        table.rdf-prefixes th:last-child,
+        table.rdf-prefixes td:last-child {
+            padding-right: 0;
+            width: 100%;
+        }
+
+.rdf-prefixes-prefixlabel {
+    background: var(--base02);
+    border-radius: 4px;
+    color: var(--base05);
+    font-size: small;
+    letter-spacing: initial;
+    padding: 3px 4px 2px;
+    vertical-align: text-top;
+}

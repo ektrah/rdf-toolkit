@@ -72,6 +72,10 @@ class BackendImpl implements Backend, RenderContext {
         this.rootClasses = null;
     }
 
+    getPrefixes(): ReadonlyArray<[string, string]> {
+        return this.prefixes.all();
+    }
+
     lookupPrefixedName(iri: string): { readonly prefixLabel: string; readonly localName: string; } | null {
         return this.prefixes.lookup(iri);
     }

@@ -3,6 +3,7 @@ import renderHTML, { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
 import renderMain from "@rdf-toolkit/explorer-views/pages/main";
 import renderNavigation from "@rdf-toolkit/explorer-views/pages/navigation";
 import renderFooter from "@rdf-toolkit/explorer-views/sections/footer";
+import renderRDFPrefixes from "@rdf-toolkit/explorer-views/sections/rdf-prefixes";
 import { Ix } from "@rdf-toolkit/iterable";
 import { Graph } from "@rdf-toolkit/rdf/graphs";
 import { BlankNode, IRI, IRIOrBlankNode } from "@rdf-toolkit/rdf/terms";
@@ -66,6 +67,10 @@ class Website implements RenderContext {
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.prefixes = new PrefixTable(this.namespaces);
         this.rootClasses = rootClasses ? new Set(rootClasses) : null;
+    }
+
+    getPrefixes(): ReadonlyArray<[string, string]> {
+        return this.prefixes.all();
     }
 
     lookupPrefixedName(iri: string): { readonly prefixLabel: string; readonly localName: string; } | null {
@@ -141,6 +146,7 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent,
                     <h1>{context.title}</h1>
                 </section>
                 <footer>
+                    {renderRDFPrefixes(context)}
                     {renderFooter(context)}
                 </footer>
             </main>

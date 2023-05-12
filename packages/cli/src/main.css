@@ -21,6 +21,19 @@ body {
     padding: 0;
 }
 
+html, 
+body,
+iframe,
+body > main  {
+    height: 100%;
+}
+
+iframe {
+    width: 100%;
+    max-width: 100%;
+    border: none;
+}
+
 a {
     color: var(--base0A);
     text-decoration: none;

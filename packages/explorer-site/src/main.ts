@@ -7,11 +7,33 @@ window.onclick = function (ev) {
             if (!rel) {
                 ev.preventDefault();
                 if (href) {
-                    window.location.href = href;
+                    window.location.hash = href;
                 }
             }
             break;
         }
         target = target.parentElement;
     }
-}
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+    const iframeElement = document.getElementById("pageIframe");
+
+    if (iframeElement) {
+        window.onload = function () {
+            iframeElement.setAttribute(
+                "src",
+                window.location.hash.substring(1)
+            );
+        };
+
+        window.addEventListener("hashchange", function () {
+            iframeElement.setAttribute(
+                "src",
+                window.location.hash.substring(1)
+            );
+        });
+
+        window.dispatchEvent(new Event("hashchange"));
+    }
+});

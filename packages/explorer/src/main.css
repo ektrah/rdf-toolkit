@@ -223,10 +223,13 @@ nav a[href='http://www.w3.org/2000/01/rdf-schema#Resource'] .rdf-iri-localname {
 }
 
 .nav-divider {
-    position: fixed;
-    left: calc(25vw - 1px);
-    width: 1px;
-    height: 100%;
     cursor: ew-resize;
-    background: var(--base02);
+    height: 100vh;
+    left: 25vw;
+    position: fixed;
+    width: 8px;
 }
+
+    .nav-divider:hover {
+        background: var(--base02);
+    }

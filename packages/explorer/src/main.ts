@@ -46,7 +46,7 @@ else if (typeof fetch !== "function") {
     document.write("Your browser doesn't support the Fetch API.");
 }
 else {
-    const navWidthStorageKey = 'navWidth';
+    const navWidthStorageKey = "navWidth";
     const documentTitle = document.title;
     const worker = new Worker(workerScriptURL);
     const navigationPane = document.createElement("nav");
@@ -66,6 +66,18 @@ else {
     dialog.replaceChildren(closeButton, loader, dialogContent);
     document.body.replaceChildren(navigationPane, navigationDivider, mainContent, dialog, progress);
     dialog.showModal();
+
+    function setLayoutsSize(clientX: number) {
+        const width = Math.min(Math.max(clientX - 4, window.innerWidth * 0.15), window.innerWidth * 0.85) + "px";
+
+        navigationDivider.style.left = width;
+        navigationPane.style.width = width;
+        mainContent.style.marginLeft = width;
+
+        if (window.localStorage) {
+            localStorage.setItem(navWidthStorageKey, width);
+        }
+    }
 
     const frontend: Frontend = {
 
@@ -119,39 +131,45 @@ else {
         frontend.hideProgress();
     }
 
-    const setLayoutsSize = (width: string) => {
-        navigationPane.style.width = width;
-        mainContent.style.marginLeft = width;
-        navigationDivider.style.left = `${parseInt(width) - 1}px` ;
-    }
+    navigationDivider.onmousedown = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
 
-    const handleLayoutResize = (event: MouseEvent | TouchEvent) => {
-        const width = event instanceof MouseEvent ? `${event.clientX}px` : `${event.touches[0].clientX}px`;
-        const currentWidth = parseInt(width);
+        document.onmousemove = function (ev) {
+            ev.stopPropagation();
+            ev.preventDefault();
 
-        if (currentWidth <= window.innerWidth * 0.25 || currentWidth >= window.innerWidth * 0.75) {
-            return;
-        }
-
-        setLayoutsSize(width);
-        localStorage.setItem(navWidthStorageKey, width)
+            setLayoutsSize(ev.clientX);
+        };
     };
 
-    navigationDivider.addEventListener("mousedown", () => {
-        document.addEventListener("mousemove", handleLayoutResize);
-    });
+    navigationDivider.ontouchstart = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
 
-    navigationDivider.addEventListener("touchstart", () => {
-        document.addEventListener("touchmove", handleLayoutResize);
-    });
+        document.ontouchmove = function (ev) {
+            ev.stopPropagation();
+            ev.preventDefault();
 
-    document.addEventListener("mouseup", () => {
-        document.removeEventListener("mousemove", handleLayoutResize);
-    });
+            if (ev.touches.length) {
+                setLayoutsSize(ev.touches[0].clientX);
+            }
+        };
+    };
 
-    document.addEventListener("touchend", () => {
-        document.removeEventListener("touchmove", handleLayoutResize);
-    });
+    document.onmouseup = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+
+        document.onmousemove = null;
+    };
+
+    document.ontouchend = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+
+        document.ontouchmove = null;
+    };
 
     window.onclick = function (ev) {
         let target = ev.target;
@@ -241,8 +259,6 @@ else {
     }
 
     window.onload = async function () {
-        const navWidth = localStorage.getItem(navWidthStorageKey);
-
         if (history.scrollRestoration) {
             history.scrollRestoration = "manual";
         }
@@ -251,8 +267,11 @@ else {
             await document.fonts.load("300 17px \"Iosevka Aile Custom\"", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         }
 
-        if (navWidth) {
-            setLayoutsSize(navWidth);
+        if (window.localStorage) {
+            const navWidth = Number.parseInt(window.localStorage.getItem(navWidthStorageKey) || "");
+            if (!Number.isNaN(navWidth)) {
+                setLayoutsSize(navWidth);
+            }
         }
 
         progress.className = "progress-bar loading";
@@ -278,7 +297,7 @@ else {
             const sourceText = await response.arrayBuffer();
             const sourceTextHash = await crypto.subtle.digest("SHA-256", sourceText);
             backend.compile(document.uri, sourceText, sourceTextHash, document.language);
-        } 
+        }
 
         backend.aftercompile();
         backend.navigateTo(location.hash.startsWith("#") ? location.hash.slice("#".length) : "");

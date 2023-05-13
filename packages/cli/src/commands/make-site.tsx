@@ -138,7 +138,7 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent,
             {scripts}
         </head>
         <body>
-            <nav>
+            <nav id="nav">
                 {navigation}
             </nav>
             <main>
@@ -152,6 +152,11 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent,
             </main>
         </body>
     </html>;
+}
+
+function renderFiller(): HtmlContent {
+   // return <iframe src="/navfragment.html" seamless></iframe>
+   return <div></div>
 }
 
 function render404(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
@@ -198,7 +203,7 @@ function renderPage(iri: string, context: Website, links: HtmlContent, scripts: 
             {scripts}
         </head>
         <body>
-            <nav>
+            <nav id="nav">
                 {navigation}
             </nav>
             <main>
@@ -241,6 +246,7 @@ export default function main(options: Options): void {
     </>;
 
     const scripts = <>
+        <script src="https://code.jquery.com/jquery-3.6.4.js"></script>    
         <script src={resolveHref(SCRIPT_FILE_NAME, context.baseURL)}></script>
     </>;
 
@@ -260,8 +266,10 @@ export default function main(options: Options): void {
 
     site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
     site.write(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
+    site.write("navfragment.html", Buffer.from(renderHTML(navigation)));
+    let filler = renderFiller();
 
     for (const iri in context.outputs) {
-        site.write(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
+        site.write(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, filler))));
     }
 }

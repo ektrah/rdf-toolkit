@@ -193,6 +193,12 @@ declare global {
                 datetime?: string;
             };
 
+            iframe: GlobalAttributes & {
+                alt?: string;
+                src: string;
+                seamless: boolean;
+            };
+
             code: GlobalAttributes;
 
             var: GlobalAttributes;

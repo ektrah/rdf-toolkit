@@ -16,6 +16,7 @@ import * as path from "node:path";
 import * as url from "node:url";
 import fontAssetFilePath from "../assets/fonts/iosevka-aile-custom-light.woff2";
 import scriptAssetFilePath from "../assets/scripts/site.min.js";
+import iframehelperAssetFilePath from "../assets/scripts/iframehelper.min.js";
 import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
 import { Project } from "../model/project.js";
 import { TextFile } from "../model/textfile.js";
@@ -37,6 +38,7 @@ const ERROR_FILE_NAME = "404.html";
 const CSS_FILE_NAME = "style.css";
 const FONT_FILE_NAME = path.basename(fontAssetFilePath);
 const SCRIPT_FILE_NAME = path.basename(scriptAssetFilePath);
+const IFRAMEHELPER_FILE_NAME = path.basename(iframehelperAssetFilePath);
 
 class Website implements RenderContext {
     readonly dataset: ParsedTriple[][] = [];
@@ -129,7 +131,7 @@ class Website implements RenderContext {
     }
 }
 
-function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
+function renderWrapper(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
     return <html lang="en-US">
         <head>
             <meta charset="utf-8" />
@@ -141,6 +143,21 @@ function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent,
             <nav>
                 {navigation}
             </nav>
+            <main>
+            <iframe id="myInner" name="inner"></iframe>
+            </main>
+        </body>
+    </html>;
+}
+function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
+    return <html lang="en-US">
+        <head>
+            <meta charset="utf-8" />
+            <title>{context.title}</title>
+            {links}
+            {scripts}
+        </head>
+        <body>
             <main>
                 <section>
                     <h1>{context.title}</h1>
@@ -208,6 +225,31 @@ function renderPage(iri: string, context: Website, links: HtmlContent, scripts: 
     </html>;
 }
 
+function renderNavlessPage(iri: string, context: Website, links: HtmlContent, scripts: HtmlContent): HtmlContent {
+    const subject: IRIOrBlankNode = iri.startsWith("http://example.com/.well-known/genid/")
+        ? BlankNode.create(iri.slice("http://example.com/.well-known/genid/".length))
+        : IRI.create(iri);
+
+    const prefixedName = context.lookupPrefixedName(subject.value);
+    const title = prefixedName ? prefixedName.prefixLabel + ":" + prefixedName.localName : "<" + subject.value + ">";
+
+    const main = renderMain(subject, iri in context.documents ? context.documents[iri] : null, context);
+
+    return <html lang="en-US">
+        <head>
+            <meta charset="utf-8" />
+            <title>{title} &ndash; {context.title}</title>
+            {links}
+            {scripts}
+        </head>
+        <body>
+            <main>
+                {main}
+            </main>
+        </body>
+    </html>;
+}
+
 function resolveHref(url: string, base: string): string {
     const root = new URL("/", base).href;
     const result = new URL(url, base).href;
@@ -242,6 +284,7 @@ export default function main(options: Options): void {
 
     const scripts = <>
         <script src={resolveHref(SCRIPT_FILE_NAME, context.baseURL)}></script>
+        <script src={resolveHref(IFRAMEHELPER_FILE_NAME, context.baseURL)}></script>
     </>;
 
     const navigation = renderNavigation(context.title, context);
@@ -249,6 +292,8 @@ export default function main(options: Options): void {
     site.write(CSS_FILE_NAME, fs.readFileSync(path.format({ ...path.parse(moduleFilePath), base: "", ext: ".css" })));
     site.write(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
     site.write(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
+    site.write(IFRAMEHELPER_FILE_NAME, fs.readFileSync(path.resolve(modulePath, iframehelperAssetFilePath)));
+
 
     for (const iconConfig of icons) {
         site.write(path.basename(iconConfig.asset), project.package.read(iconConfig.asset));
@@ -258,10 +303,11 @@ export default function main(options: Options): void {
         site.write(assets[assetPath], project.package.read(assetPath));
     }
 
-    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
+    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderWrapper(context, links, scripts, navigation))));
+    site.write("indexcontent.html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
     site.write(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
 
     for (const iri in context.outputs) {
-        site.write(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
+        site.write(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderNavlessPage(iri, context, links, scripts))));
     }
 }

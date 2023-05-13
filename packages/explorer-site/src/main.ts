@@ -7,7 +7,15 @@ window.onclick = function (ev) {
             if (!rel) {
                 ev.preventDefault();
                 if (href) {
-                    window.location.href = href;
+                    /*
+                    const myTitle = window.document.title;
+                    window.document.title = this.contentWindow.document.title + " - " + myTitle;
+                    window.history.replaceState(null, "", "#" + this.contentWindow.location);
+                    */
+                   if (window.location.hash.startsWith("#") ) {
+                    var base = window.location.href.split('#')[0];
+                    window.location.href = base + "#" + href;
+                   }
                 }
             }
             break;

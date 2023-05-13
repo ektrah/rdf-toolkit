@@ -63,3 +63,10 @@ strong {
     font-weight: 600;
     color: var(--base07);
 }
+
+iframe {
+    border: none;
+    display: block;
+    height: 100%;
+    width: 100%;
+  }

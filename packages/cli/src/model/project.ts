@@ -31,6 +31,7 @@ export interface SiteConfig {
     baseURL?: string;
     outDir?: string;
     roots?: Array<string>;
+    cleanUrls?: boolean;
 }
 
 export namespace SiteConfig {
@@ -43,7 +44,8 @@ export namespace SiteConfig {
             && (Is.undefined(candidate.assets) || Is.objectLiteral(candidate.assets))
             && (Is.undefined(candidate.baseURL) || Is.string(candidate.baseURL))
             && (Is.undefined(candidate.outDir) || Is.string(candidate.outDir))
-            && (Is.undefined(candidate.roots) || Is.typedArray(candidate.roots, Is.string));
+            && (Is.undefined(candidate.roots) || Is.typedArray(candidate.roots, Is.string))
+            && (Is.undefined(candidate.cleanUrls) || Is.boolean(candidate.cleanUrls));
     }
 }
 

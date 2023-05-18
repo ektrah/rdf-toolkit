@@ -17,6 +17,7 @@
       "favicon.ico": "favicon.ico",
       "robots.txt": "robots.txt"
     },
-    "outDir": "public"
+    "outDir": "public",
+    "cleanUrls": true
   }
 }

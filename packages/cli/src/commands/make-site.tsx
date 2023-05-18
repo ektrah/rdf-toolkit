@@ -62,7 +62,7 @@ class Website implements RenderContext {
     readonly outputs: Record<string, string> = {};
     readonly rootClasses: ReadonlySet<string> | null;
 
-    constructor(readonly title: string, readonly baseURL: string, rootClasses?: Iterable<string>) {
+    constructor(readonly title: string, readonly baseURL: string, readonly cleanUrls: boolean, rootClasses?: Iterable<string>) {
         this.graph = Graph.from(this.dataset);
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.prefixes = new PrefixTable(this.namespaces);
@@ -112,7 +112,7 @@ class Website implements RenderContext {
             for (const term of terms) {
                 const prefixedName = this.prefixes.lookup(term.value);
                 if (prefixedName) {
-                    this.outputs[term.value] = path.join(prefixedName.prefixLabel, prefixedName.localName);
+                    this.outputs[term.value] = path.join(prefixedName.prefixLabel, prefixedName.localName) + (this.cleanUrls ? "" : ".html");
                 }
                 else {
                     const string = term.value;
@@ -122,7 +122,7 @@ class Website implements RenderContext {
                         hash = ((hash << 5) - hash) + char;
                         hash = hash & hash;
                     }
-                    this.outputs[term.value] = (hash & ((1 << 31) - 1)).toString().padStart(10, "0");
+                    this.outputs[term.value] = (hash & ((1 << 31) - 1)).toString().padStart(10, "0") + (this.cleanUrls ? "" : ".html");
                 }
             }
         }
@@ -221,7 +221,8 @@ export default function main(options: Options): void {
     const project = new Project(options.project);
     const icons = project.json.siteOptions?.icons || [];
     const assets = project.json.siteOptions?.assets || {};
-    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, project.json.siteOptions?.roots);
+
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, !!project.json.siteOptions?.cleanUrls, project.json.siteOptions?.roots);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
     context.beforecompile();
@@ -262,6 +263,6 @@ export default function main(options: Options): void {
     site.write(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
 
     for (const iri in context.outputs) {
-        site.write(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
+        site.write(context.outputs[iri] + (context.cleanUrls ? ".html" : ""), Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
     }
 }

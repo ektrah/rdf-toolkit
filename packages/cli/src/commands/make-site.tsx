@@ -62,11 +62,12 @@ class Website implements RenderContext {
     readonly outputs: Record<string, string> = {};
     readonly rootClasses: ReadonlySet<string> | null;
 
-    constructor(readonly title: string, readonly baseURL: string, rootClasses?: Iterable<string>) {
+    constructor(readonly title: string, readonly baseURL: string, readonly appendHtmlSuffix: boolean, rootClasses?: Iterable<string>) {
         this.graph = Graph.from(this.dataset);
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.prefixes = new PrefixTable(this.namespaces);
         this.rootClasses = rootClasses ? new Set(rootClasses) : null;
+        this.appendHtmlSuffix = appendHtmlSuffix;
     }
 
     getPrefixes(): ReadonlyArray<[string, string]> {
@@ -79,7 +80,13 @@ class Website implements RenderContext {
 
     rewriteHrefAsData(iri: string): string | undefined {
         const result: string | undefined = this.outputs[iri];
-        return result ? resolveHref(result, this.baseURL) : undefined;
+        if(result) {
+            let resolved = resolveHref(result, this.baseURL)
+            if(this.appendHtmlSuffix) {
+                resolved = resolved + ".html"
+            }
+            return resolved
+        } else return undefined
     }
 
     beforecompile(): void {
@@ -221,7 +228,8 @@ export default function main(options: Options): void {
     const project = new Project(options.project);
     const icons = project.json.siteOptions?.icons || [];
     const assets = project.json.siteOptions?.assets || {};
-    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, project.json.siteOptions?.roots);
+
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, (project.json.siteOptions?.appendHtmlSuffix || false), project.json.siteOptions?.roots);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
     context.beforecompile();

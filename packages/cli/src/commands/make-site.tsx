@@ -67,7 +67,6 @@ class Website implements RenderContext {
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.prefixes = new PrefixTable(this.namespaces);
         this.rootClasses = rootClasses ? new Set(rootClasses) : null;
-        this.appendHtmlSuffix = appendHtmlSuffix;
     }
 
     getPrefixes(): ReadonlyArray<[string, string]> {
@@ -80,13 +79,7 @@ class Website implements RenderContext {
 
     rewriteHrefAsData(iri: string): string | undefined {
         const result: string | undefined = this.outputs[iri];
-        if(result) {
-            let resolved = resolveHref(result, this.baseURL)
-            if(this.appendHtmlSuffix) {
-                resolved = resolved + ".html"
-            }
-            return resolved
-        } else return undefined
+        return result ? resolveHref(result, this.baseURL) : undefined;
     }
 
     beforecompile(): void {
@@ -119,7 +112,7 @@ class Website implements RenderContext {
             for (const term of terms) {
                 const prefixedName = this.prefixes.lookup(term.value);
                 if (prefixedName) {
-                    this.outputs[term.value] = path.join(prefixedName.prefixLabel, prefixedName.localName);
+                    this.outputs[term.value] = path.join(prefixedName.prefixLabel, prefixedName.localName) + (this.appendHtmlSuffix ? ".html" : "");
                 }
                 else {
                     const string = term.value;
@@ -129,7 +122,7 @@ class Website implements RenderContext {
                         hash = ((hash << 5) - hash) + char;
                         hash = hash & hash;
                     }
-                    this.outputs[term.value] = (hash & ((1 << 31) - 1)).toString().padStart(10, "0");
+                    this.outputs[term.value] = (hash & ((1 << 31) - 1)).toString().padStart(10, "0") + (this.appendHtmlSuffix ? ".html" : "");
                 }
             }
         }
@@ -229,7 +222,7 @@ export default function main(options: Options): void {
     const icons = project.json.siteOptions?.icons || [];
     const assets = project.json.siteOptions?.assets || {};
 
-    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, (project.json.siteOptions?.appendHtmlSuffix || false), project.json.siteOptions?.roots);
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, !!project.json.siteOptions?.appendHtmlSuffix, project.json.siteOptions?.roots);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
     context.beforecompile();
@@ -270,6 +263,6 @@ export default function main(options: Options): void {
     site.write(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
 
     for (const iri in context.outputs) {
-        site.write(context.outputs[iri] + ".html", Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
+        site.write(context.outputs[iri] + (context.appendHtmlSuffix ? "" : ".html"), Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderPage(iri, context, links, scripts, navigation))));
     }
 }

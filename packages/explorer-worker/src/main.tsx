@@ -64,14 +64,12 @@ class BackendImpl implements Backend, RenderContext {
     prefixes: PrefixTable;
 
     readonly rootClasses: ReadonlySet<string> | null;
-    readonly appendHtmlSuffix = false;
 
     constructor(private readonly frontend: Frontend) {
         this.graph = Graph.from(this.dataset);
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.prefixes = new PrefixTable(this.namespaces);
         this.rootClasses = null;
-        this.appendHtmlSuffix = false;
     }
 
     getPrefixes(): ReadonlyArray<[string, string]> {

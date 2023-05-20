@@ -10,7 +10,7 @@ type Options =
     & ProjectOptions
     & ServerOptions
 
-function serve(opts: SendOptions): Middleware<{}> {
+function serve(opts: SendOptions): Middleware {
     return async function serve(ctx, next) {
         if (ctx.method === "HEAD" || ctx.method === "GET") {
             try {

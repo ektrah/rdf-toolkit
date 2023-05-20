@@ -67,7 +67,7 @@ else {
     document.body.replaceChildren(navigationPane, navigationDivider, mainContent, dialog, progress);
     dialog.showModal();
 
-    function setLayoutsSize(clientX: number) {
+    function setLayoutsSize(clientX: number) { // eslint-disable-line no-inner-declarations
         const width = Math.min(Math.max(clientX - 4, window.innerWidth * 0.15), window.innerWidth * 0.85) + "px";
 
         navigationDivider.style.left = width;

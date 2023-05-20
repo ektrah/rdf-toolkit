@@ -33,7 +33,7 @@ export function* tokenizeLiterateTurtle(document: TextDocument, diagnostics: Dia
         }
 
         if (/^\s*turtle\b/ui.test(m[2])) {
-            const subDocument = TextDocument.create(document.uri, "turtle", document.version, text.substring(0, end));
+            const subDocument = TextDocument.create(document.uri, "turtle", document.version, text.slice(0, end));
             const tokens = [...new TurtleScanner(subDocument, start, diagnostics)];
             const endOfFileToken = tokens.pop();
 
@@ -41,7 +41,7 @@ export function* tokenizeLiterateTurtle(document: TextDocument, diagnostics: Dia
                 const firstToken: Mutable<SyntaxToken> = tokens[0];
                 const lastToken: Mutable<SyntaxToken> = tokens[tokens.length - 1];
 
-                firstToken.leadingTrivia = textToTrivia(text.substring(offset, start)).concat(firstToken.leadingTrivia);
+                firstToken.leadingTrivia = textToTrivia(text.slice(offset, start)).concat(firstToken.leadingTrivia);
                 lastToken.trailingTrivia = (lastToken.trailingTrivia).concat(endOfFileToken.leadingTrivia, endOfFileToken.trailingTrivia);
 
                 offset = end;
@@ -52,7 +52,7 @@ export function* tokenizeLiterateTurtle(document: TextDocument, diagnostics: Dia
 
     yield <SyntaxToken>{
         kind: TokenKind.EndOfFile,
-        leadingTrivia: textToTrivia(text.substring(offset)),
+        leadingTrivia: textToTrivia(text.slice(offset)),
         offset: text.length,
         text: "",
         trailingTrivia: [],

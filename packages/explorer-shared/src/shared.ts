@@ -21,7 +21,7 @@ export namespace WorkerChannel {
         const local: Local = fn(remote);
         channel.onmessage = function (e: MessageEvent): void {
             const message: WorkerMessage = e.data;
-            (local as { [k in string]: Function })[message.command].apply(local, message.arguments);
+            (local as Record<string, Function>)[message.command].apply(local, message.arguments); // eslint-disable-line @typescript-eslint/ban-types
         };
         return remote;
     }

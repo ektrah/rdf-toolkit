@@ -12,7 +12,7 @@ declare global {
         }
 
         interface ElementAttributesProperty {
-            props: {};
+            props: any;
         }
 
         interface ElementChildrenAttribute {

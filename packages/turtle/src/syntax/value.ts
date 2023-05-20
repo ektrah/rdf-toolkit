@@ -226,7 +226,7 @@ function unescapeUCHAR(text: string): string {
         switch (esc[1]) {
             case "u":
             case "U":
-                return String.fromCodePoint(Number.parseInt(esc.substr(2), 16));
+                return String.fromCodePoint(Number.parseInt(esc.slice(2), 16));
             default:
                 throw new Error(); // should never happen
         }
@@ -254,7 +254,7 @@ function unescapeUECHAR(text: string): string {
                 return "\\";
             case "u":
             case "U":
-                return String.fromCodePoint(Number.parseInt(esc.substr(2), 16));
+                return String.fromCodePoint(Number.parseInt(esc.slice(2), 16));
             default:
                 throw new Error(); // should never happen
         }

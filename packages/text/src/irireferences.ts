@@ -103,12 +103,12 @@ function removeDotSegments(input: string): string {
         else if (input.startsWith("/../")) {
             input = input.slice(3);
             const pos = output.lastIndexOf("/");
-            output = (pos >= 0) ? output.substring(0, pos) : "";
+            output = (pos >= 0) ? output.slice(0, pos) : "";
         }
         else if (input === "/..") {
             input = "/";
             const pos = output.lastIndexOf("/");
-            output = (pos >= 0) ? output.substring(0, pos) : "";
+            output = (pos >= 0) ? output.slice(0, pos) : "";
         }
         else if (input === "." || input === "..") {
             input = "";

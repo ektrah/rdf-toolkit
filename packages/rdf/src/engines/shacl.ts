@@ -4,9 +4,7 @@ import { Rdf, Rdfs, Shacl } from "../vocab.js";
 // https://www.w3.org/TR/2017/REC-shacl-20170720/
 export class SHACLEngine {
 
-    constructor() { }
-
-    ingest(_triple: Triple): boolean {
+    ingest(triple: Triple): boolean {
         return false;
     }
 

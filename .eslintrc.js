@@ -4,7 +4,6 @@ module.exports = {
     plugins: ["@typescript-eslint"],
     root: true,
     rules: {
-        "@typescript-eslint/ban-types": ["error", { "types": { "Function": false, "{}": false }, "extendDefaults": true }],
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-explicit-any": "off",

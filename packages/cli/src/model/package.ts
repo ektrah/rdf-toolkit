@@ -22,7 +22,7 @@ export interface PackageConfig {
     dependencies?: unknown; // Record<string, string>
     devDependencies?: unknown; // Record<string, string>
 
-    ontologies?: unknown, // Record<DocumentUri, string>
+    "rdf:files"?: unknown, // Record<DocumentUri, string>
 }
 
 export class Package extends Workspace {
@@ -66,9 +66,9 @@ function getDependencies(json: PackageConfig, containingProject: Project): Map<s
 function getFiles(json: PackageConfig, containingPackage: Package): Map<DocumentUri, TextFile | null> {
     const files = new Map<DocumentUri, TextFile | null>();
 
-    if (Is.record(json.ontologies, Is.string)) {
-        for (const documentURI in json.ontologies) {
-            const filePath = containingPackage.resolve(json.ontologies[documentURI]);
+    if (Is.record(json["rdf:files"], Is.string)) {
+        for (const documentURI in json["rdf:files"]) {
+            const filePath = containingPackage.resolve(json["rdf:files"][documentURI]);
 
             let file: TextFile | null = null;
             if (fs.existsSync(filePath)) {

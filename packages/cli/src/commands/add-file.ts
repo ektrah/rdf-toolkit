@@ -21,10 +21,10 @@ export default function main(documentURI: DocumentUri, filePath: string, options
     project.package.readSyntaxTree(documentURI, filePath, diagnostics)
     printDiagnosticsAndExitOnError(diagnostics, options);
 
-    const files = Is.record(json.ontologies, Is.string) ? json.ontologies : {};
+    const files = Is.record(json["rdf:files"], Is.string) ? json["rdf:files"] : {};
     if (files[documentURI] !== filePath) {
         files[documentURI] = filePath;
-        json.ontologies = files;
+        json["rdf:files"] = files;
         project.package.writeJSON(PACKAGE_JSON, json, false);
 
         process.stdout.write("<");

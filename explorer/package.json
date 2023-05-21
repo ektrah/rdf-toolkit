@@ -1,10 +1,5 @@
 {
   "private": true,
-  "ontologies": {
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns": "vocab/rdf.ttl",
-    "http://www.w3.org/2000/01/rdf-schema": "vocab/rdfs.ttl",
-    "http://www.w3.org/2002/07/owl": "vocab/owl.ttl"
-  },
   "scripts": {
     "prebuild": "rimraf -g \"./public/**/*\"",
     "build": "npx rdf make explorer",
@@ -14,5 +9,10 @@
   "devDependencies": {
     "@rdf-toolkit/cli": "0.1.0",
     "rimraf": "^5.0.0"
+  },
+  "rdf:files": {
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns": "vocab/rdf.ttl",
+    "http://www.w3.org/2000/01/rdf-schema": "vocab/rdfs.ttl",
+    "http://www.w3.org/2002/07/owl": "vocab/owl.ttl"
   }
 }

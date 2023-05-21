@@ -13,9 +13,12 @@ export default function main(documentURI: DocumentUri, options: Options): void {
     const project = new Project(options.project);
     const json = project.package.json;
 
-    if (Is.record(json.ontologies, Is.string) && (documentURI in json.ontologies)) {
-        delete json.ontologies[documentURI];
+    if (Is.record(json["rdf:files"], Is.string) && (documentURI in json["rdf:files"])) {
+        delete json["rdf:files"][documentURI];
         project.package.writeJSON(PACKAGE_JSON, json, false);
-        process.stdout.write(`<${documentURI}> \u00D7${os.EOL}`);
+        process.stdout.write("<");
+        process.stdout.write(documentURI);
+        process.stdout.write("> \u00D7");
+        process.stdout.write(os.EOL);
     }
 }

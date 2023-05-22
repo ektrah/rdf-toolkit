@@ -3,9 +3,20 @@ import { Rdf } from "@rdf-toolkit/rdf/vocab";
 import { Diagnostic, DiagnosticBag, DiagnosticSeverity, IRIReference } from "@rdf-toolkit/text";
 import { SyntaxTree } from "./syntax-tree.js";
 import { SyntaxVisitor } from "./syntax-visitor.js";
-import { ASyntax, BooleanLiteralSyntax, DecimalLiteralSyntax, DirectiveSyntax, DoubleLiteralSyntax, IntegerLiteralSyntax, IRIReferenceSyntax, IRISyntax, ObjectSyntax, PredicateSyntax, PrefixedNameSyntax, RDFLiteralSyntax, SubjectSyntax, SyntaxKind, SyntaxNode, TokenKind } from "./syntax.js";
+import { ASyntax, BaseDirectiveSyntax, BooleanLiteralSyntax, DecimalLiteralSyntax, DirectiveSyntax, DoubleLiteralSyntax, IntegerLiteralSyntax, IRIReferenceSyntax, IRISyntax, ObjectSyntax, PredicateSyntax, PrefixDirectiveSyntax, PrefixedNameSyntax, RDFLiteralSyntax, SparqlBaseDirectiveSyntax, SparqlPrefixDirectiveSyntax, SubjectSyntax, SyntaxKind, SyntaxNode, TokenKind } from "./syntax.js";
+
+export interface BaseDirective {
+    readonly baseIRI: string;
+}
+
+export interface PrefixDirective {
+    readonly prefixLabel: string;
+    readonly namespaceIRI: string;
+}
 
 export interface SymbolTable {
+    get(node: BaseDirectiveSyntax | SparqlBaseDirectiveSyntax): BaseDirective | undefined;
+    get(node: PrefixDirectiveSyntax | SparqlPrefixDirectiveSyntax): PrefixDirective | undefined;
     get(node: SubjectSyntax): IRI | undefined;
     get(node: PredicateSyntax): IRI | undefined;
     get(node: ObjectSyntax): IRI | Literal | undefined;
@@ -20,19 +31,21 @@ export namespace SymbolTable {
 
 class FullSymbolTable {
 
-    constructor(private readonly table: WeakMap<SyntaxNode, IRI | Literal>) {
+    constructor(private readonly table: WeakMap<SyntaxNode, IRI | Literal | BaseDirective | PrefixDirective>) {
     }
 
+    get(node: BaseDirectiveSyntax | SparqlBaseDirectiveSyntax): BaseDirective | undefined;
+    get(node: PrefixDirectiveSyntax | SparqlPrefixDirectiveSyntax): PrefixDirective | undefined;
     get(node: SubjectSyntax): IRI | undefined;
     get(node: PredicateSyntax): IRI | undefined;
     get(node: ObjectSyntax): IRI | Literal | undefined;
-    get(node: SyntaxNode): IRI | Literal | undefined {
+    get(node: SyntaxNode): IRI | Literal | BaseDirective | PrefixDirective | undefined {
         return this.table.get(node);
     }
 }
 
 class SymbolsVisitor extends SyntaxVisitor {
-    private readonly table: WeakMap<SyntaxNode, IRI | Literal>;
+    private readonly table: WeakMap<SyntaxNode, IRI | Literal | BaseDirective | PrefixDirective>;
     private readonly namespaces: Map<string, string>;
 
     private baseIRI: IRIReference;
@@ -50,7 +63,7 @@ class SymbolsVisitor extends SyntaxVisitor {
         this.baseIRI = baseIRI;
     }
 
-    build(): WeakMap<SyntaxNode, IRI | Literal> {
+    build(): WeakMap<SyntaxNode, IRI | Literal | BaseDirective | PrefixDirective> {
         this.visit(this.syntaxTree);
         return this.table;
     }
@@ -62,12 +75,14 @@ class SymbolsVisitor extends SyntaxVisitor {
                 const prefixLabel = node.prefixLabel.value.prefixLabel;
                 const namespaceIRI = IRIReference.recompose(IRIReference.resolve(node.iriReference.value, this.baseIRI));
                 this.namespaces.set(prefixLabel, namespaceIRI);
+                this.table.set(node, { prefixLabel, namespaceIRI });
                 break;
 
             case SyntaxKind.BaseDirective:
             case SyntaxKind.SparqlBaseDirective:
-                const baseIRI = IRIReference.resolve(node.iriReference.value, this.baseIRI);
-                this.baseIRI = baseIRI;
+                this.baseIRI = IRIReference.resolve(node.iriReference.value, this.baseIRI);
+                const baseIRI = IRIReference.recompose(this.baseIRI);
+                this.table.set(node, { baseIRI });
                 break;
         }
     }

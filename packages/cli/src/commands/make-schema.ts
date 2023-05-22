@@ -1,3 +1,4 @@
+import { Ix } from "@rdf-toolkit/iterable";
 import { Graph } from "@rdf-toolkit/rdf/graphs";
 import { IRIOrBlankNode, Literal, Term } from "@rdf-toolkit/rdf/terms";
 import { ParsedTriple } from "@rdf-toolkit/rdf/triples";
@@ -18,6 +19,17 @@ type Options =
     & MakeOptions
     & ProjectOptions
 
+function getPrefixes(project: Project): Record<string, string> {
+    const prefixes: Record<string, string> = {};
+    for (const [prefixLabel, iriSet] of project.prefixes) {
+        const namespaceIRI = Ix.from(iriSet).singleOrDefault(null);
+        if (namespaceIRI) {
+            prefixes[prefixLabel] = namespaceIRI;
+        }
+    }
+    return prefixes;
+}
+
 export default function main(format: "text" | "jsonld", options: Options): void {
     const project = new Project(options.project);
     const output = new Workspace(project.package.resolve(options.output || "."));
@@ -25,15 +37,11 @@ export default function main(format: "text" | "jsonld", options: Options): void 
     const dataset: ParsedTriple[][] = [];
     const namespaces: Record<string, string>[] = [{
         "_": "http://example.com/.well-known/genid/",
-        "dc11": "http://purl.org/dc/elements/1.1/",
-        "dcmitype": "http://purl.org/dc/dcmitype/",
-        "dcterms": "http://purl.org/dc/terms/",
-        "owl": "http://www.w3.org/2002/07/owl#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "sh": "http://www.w3.org/ns/shacl#",
         "xsd": "http://www.w3.org/2001/XMLSchema#",
     }];
+    namespaces.push(getPrefixes(project));
 
     //for (const file of project.package.files.values()) {
     //    if (file) {

@@ -70,6 +70,7 @@ export class Project {
     private _files?: ReadonlyMap<string, ReadonlySet<TextFile>>;
     private _json?: ProjectConfig;
     private _packages?: ReadonlyMap<string, Package | null>;
+    private _prefixes?: ReadonlyMap<string, ReadonlySet<string>>;
     private _terms?: ReadonlyMap<string, ReadonlySet<TextFile>>;
 
     private readonly packageCache: Map<string, Package>;
@@ -95,6 +96,10 @@ export class Project {
 
     get packages(): ReadonlyMap<string, Package | null> {
         return this._packages ??= getPackages(this.package);
+    }
+
+    get prefixes(): ReadonlyMap<string, ReadonlySet<string>> {
+        return this._prefixes ??= getPrefixes(this.packages.values());
     }
 
     get terms(): ReadonlyMap<string, ReadonlySet<TextFile>> {
@@ -173,6 +178,24 @@ function getPackages(root: Package): Map<string, Package | null> {
     }
 
     return packages;
+}
+
+function getPrefixes(packages: Iterable<Package | null>): Map<string, Set<string>> {
+    const prefixes = new Map<string, Set<string>>();
+
+    for (const package_ of packages) {
+        if (package_) {
+            for (const [prefixLabel, namespaceIRI] of package_.prefixes) {
+                let iriSet = prefixes.get(prefixLabel);
+                if (!iriSet) {
+                    prefixes.set(prefixLabel, iriSet = new Set());
+                }
+                iriSet.add(namespaceIRI);
+            }
+        }
+    }
+
+    return prefixes;
 }
 
 function getProjectConfig(workspace: Workspace): ProjectConfig {

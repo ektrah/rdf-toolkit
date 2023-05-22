@@ -6,15 +6,18 @@ import * as process from "node:process";
 import yargs from "yargs";
 import * as yargs_helpers from "yargs/helpers";
 import addFile from "./commands/add-file.js";
+import addPrefix from "./commands/add-prefix.js";
 import init from "./commands/init.js";
 import listDependencies from "./commands/list-dependencies.js";
 import listFiles from "./commands/list-files.js";
 import listImports from "./commands/list-imports.js";
+import listPrefixes from "./commands/list-prefixes.js";
 import listTerms from "./commands/list-terms.js";
 import makeExplorer from "./commands/make-explorer.js";
 import makeSchema from "./commands/make-schema.js";
 import makeSite from "./commands/make-site.js";
 import removeFile from "./commands/remove-file.js";
+import removePrefix from "./commands/remove-prefix.js";
 import serve from "./commands/serve.js";
 import "./main.css";
 import { Options } from "./options.js";
@@ -66,6 +69,29 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .strict(),
                 args => addFile(args.URL, args.file, args))
 
+            .command("prefix <label> <IRI>", "Add a prefix to the project",
+                yargs => yargs
+                    .positional("label", {
+                        type: "string",
+                        coerce: (arg: string): string => arg.endsWith(":") ? arg.slice(0, arg.length - 1) : arg,
+                        description: "The label for the prefix to add",
+                    })
+                    .positional("IRI", {
+                        type: "string",
+                        description: "The namespace IRI for the prefix to add",
+                    })
+                    .help()
+                    .option(Options.project)
+                    .version(false)
+                    .example("$0 add prefix rdf: \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"", "")
+                    .example("$0 add prefix rdfs: \"http://www.w3.org/2000/01/rdf-schema#\"", "")
+                    .example("$0 add prefix owl: \"http://www.w3.org/2002/07/owl#\"", "")
+                    .example("$0 add prefix sh: \"http://www.w3.org/ns/shacl#\"", "")
+                    .demandOption("label")
+                    .demandOption("IRI")
+                    .strict(),
+                args => addPrefix(args.label, args.IRI, args))
+
             .help()
             .version(false)
             .demandCommand(1, 1)
@@ -88,6 +114,21 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .demandOption("URL")
                     .strict(),
                 args => removeFile(args.URL, args))
+
+            .command("prefix <label>", "Remove a prefix from the project",
+                yargs => yargs
+                    .positional("label", {
+                        type: "string",
+                        coerce: (arg: string): string => arg.endsWith(":") ? arg.slice(0, arg.length - 1) : arg,
+                        description: "The label of the prefix to remove",
+                    })
+                    .help()
+                    .option(Options.project)
+                    .version(false)
+                    .example("$0 remove prefix owl:", "")
+                    .demandOption("label")
+                    .strict(),
+                args => removePrefix(args.label, args))
 
             .help()
             .version(false)
@@ -127,6 +168,15 @@ yargs(yargs_helpers.hideBin(process.argv))
                     .example("$0 list imports", "")
                     .strict(),
                 args => listImports(args))
+
+            .command("prefixes", "List all prefixes defined in the project",
+                yargs => yargs
+                    .help()
+                    .option(Options.project)
+                    .version(false)
+                    .example("$0 list prefixes", "")
+                    .strict(),
+                args => listPrefixes(args))
 
             .command("terms", "List all terms defined in the project",
                 yargs => yargs

@@ -1,5 +1,5 @@
-import { DocumentUri, IRIReference } from "@rdf-toolkit/text";
-import { SyntaxKind } from "@rdf-toolkit/turtle";
+import { DocumentUri } from "@rdf-toolkit/text";
+import { PrefixDirective, SymbolTable, SyntaxKind } from "@rdf-toolkit/turtle";
 import * as os from "node:os";
 import * as process from "node:process";
 import { printDiagnosticsAndExitOnError } from "../diagnostics.js";
@@ -19,7 +19,8 @@ export default function main(documentURI: DocumentUri, filePath: string, options
     filePath = project.package.relative(filePath);
 
     const diagnostics = project.diagnostics;
-    const syntaxTree = project.package.readSyntaxTree(documentURI, filePath, diagnostics)
+    const syntaxTree = project.package.readSyntaxTree(documentURI, filePath, diagnostics);
+    const symbolTable = SymbolTable.from(syntaxTree, project.diagnostics);
     printDiagnosticsAndExitOnError(diagnostics, options);
 
     const files = Is.record(json["rdf:files"], Is.string) ? json["rdf:files"] : {};
@@ -28,39 +29,29 @@ export default function main(documentURI: DocumentUri, filePath: string, options
         files[documentURI] = filePath;
         json["rdf:files"] = files;
 
-        {
-            let baseIRI = IRIReference.parse(syntaxTree.document.uri);
-            if (!baseIRI || !baseIRI.scheme) {
-                throw new Error();
-            }
-
-            const namespaces = new Map<string, string>;
-            let preferredPrefixLabel: string | undefined;
-            let preferredNamespaceIRI: string | undefined;
-            for (const node of syntaxTree.root.statements) {
-                switch (node.kind) {
-                    case SyntaxKind.PrefixDirective:
-                    case SyntaxKind.SparqlPrefixDirective:
-                        const prefixLabel = node.prefixLabel.value.prefixLabel;
-                        const namespaceIRI = IRIReference.recompose(IRIReference.resolve(node.iriReference.value, baseIRI));
-                        namespaces.set(prefixLabel, namespaceIRI);
-                        if (namespaceIRI === documentURI || namespaceIRI === documentURI + "/" || namespaceIRI === documentURI + "#") {
-                            preferredPrefixLabel = prefixLabel;
-                            preferredNamespaceIRI = namespaceIRI;
+        let preferredPrefix: PrefixDirective | undefined;
+        for (const statement of syntaxTree.root.statements) {
+            if (statement.kind === SyntaxKind.PrefixDirective || statement.kind === SyntaxKind.SparqlPrefixDirective) {
+                const prefix = symbolTable.get(statement);
+                if (prefix && prefix.prefixLabel) {
+                    try {
+                        const url = new URL(prefix.namespaceIRI);
+                        url.hash = "";
+                        if (url.href === documentURI) {
+                            preferredPrefix = prefix;
+                            break;
                         }
-                        break;
-
-                    case SyntaxKind.BaseDirective:
-                    case SyntaxKind.SparqlBaseDirective:
-                        baseIRI = IRIReference.resolve(node.iriReference.value, baseIRI);
-                        break;
+                    }
+                    catch {
+                        // continue regardless of error
+                    }
                 }
             }
+        }
 
-            if (preferredPrefixLabel && preferredNamespaceIRI) {
-                prefixes[preferredPrefixLabel] = preferredNamespaceIRI;
-                json["rdf:prefixes"] = prefixes;
-            }
+        if (preferredPrefix && !Object.values(prefixes).includes(preferredPrefix.namespaceIRI)) {
+            prefixes[preferredPrefix.prefixLabel] = preferredPrefix.namespaceIRI;
+            json["rdf:prefixes"] = prefixes;
         }
 
         project.package.writeJSON(PACKAGE_JSON, json, false);

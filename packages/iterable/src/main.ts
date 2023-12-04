@@ -97,7 +97,7 @@ export class Ix<T> implements Iterable<T> {
         if (Array.isArray(this.source)) {
             return this.source.length;
         }
-        else if (this.source instanceof Set<T>) {
+        else if (this.source instanceof Set) {
             return this.source.size;
         }
         else {

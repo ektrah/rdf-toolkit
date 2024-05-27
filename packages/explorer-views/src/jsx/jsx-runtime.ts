@@ -326,7 +326,7 @@ declare global {
                 //autocomplete
                 checked?: boolean;
                 //dirname
-                //disabled
+                disabled?: boolean;
                 //form
                 //formaction
                 //formenctype
@@ -336,16 +336,16 @@ declare global {
                 //height
                 //list
                 //max
-                //maxlength
+                maxlength?: number;
                 //min
-                //minlength
-                //multiple
+                minlength?: number;
+                multiple?: boolean;
                 name?: string;
-                //pattern
-                //placeholder
-                //readonly
-                //required
-                //size
+                pattern?: string;
+                placeholder?: string;
+                readonly?: boolean;
+                required?: boolean;
+                size?: number;
                 //src
                 //step
                 type?: InputType;

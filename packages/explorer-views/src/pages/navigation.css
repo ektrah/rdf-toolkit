@@ -1,41 +1,54 @@
 nav {
     cursor: default;
-    display: grid;
-    grid-gap: 1em;
-    grid-template-rows: min-content minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
     height: 100vh;
     left: 0;
     padding: 1.5em 2px 1em 1em;
     position: fixed;
     top: 0;
     width: 25vw;
+    box-sizing: border-box;
 }
 
-    nav p {
-        font-size: larger;
-        margin: 0;
-    }
+nav p {
+    font-size: larger;
+    margin: 0;
+}
 
-    nav .tabview {
-        display: grid;
-        grid-template-rows: min-content minmax(0, 1fr);
-        margin: 0;
-    }
+nav .tabview {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin: 0;
+}
 
-    nav .tabview-pages {
-        background: var(--base01);
-        border: 1px solid var(--base02);
-        padding: 1.5rem .5rem 5rem;
-        overflow: clip auto;
-        overscroll-behavior: none;
-    }
+nav .tabview-pages {
+    background: var(--base01);
+    border: 1px solid var(--base02);
+    padding: 1.5rem .5rem 5rem;
+    overflow: auto;
+    flex-grow: 1;
+}
 
-    nav ul {
-        margin: 0;
-        padding: 0;
-    }
+nav ul {
+    margin: 0;
+    padding: 0;
+}
 
-    nav .logo a {
-        color: var(--base07);
-        text-decoration: none;
-    }
+nav .logo a {
+    color: var(--base07);
+    text-decoration: none;
+}
+
+#search {
+    width: 100%;
+    height: 2.5em; /* Adjust height as needed */
+    padding: 0.5em;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: inherit;
+    box-sizing: border-box;
+}

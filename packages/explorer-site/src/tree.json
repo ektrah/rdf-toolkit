@@ -1,0 +1,252 @@
+[
+  {
+    "id": "rdfs:Resource",
+    "label": "rdfs:Resource",
+    "children": [
+      {
+        "id": "rdfs:Container",
+        "label": "rdfs:Container",
+        "children": [
+          {
+            "id": "rdf:Alt",
+            "label": "rdf:Alt",
+            "children": []
+          },
+          {
+            "id": "rdf:Bag",
+            "label": "rdf:Bag",
+            "children": []
+          },
+          {
+            "id": "rdf:Seq",
+            "label": "rdf:Seq",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "rdfs:Literal",
+        "label": "rdfs:Literal",
+        "children": [
+          {
+            "id": "xsd:anyURI",
+            "label": "xsd:anyURI",
+            "children": []
+          },
+          {
+            "id": "xsd:base64Binary",
+            "label": "xsd:base64Binary",
+            "children": []
+          },
+          {
+            "id": "xsd:boolean",
+            "label": "xsd:boolean",
+            "children": []
+          },
+          {
+            "id": "xsd:byte",
+            "label": "xsd:byte",
+            "children": []
+          },
+          {
+            "id": "xsd:date",
+            "label": "xsd:date",
+            "children": []
+          },
+          {
+            "id": "xsd:dateTime",
+            "label": "xsd:dateTime",
+            "children": []
+          },
+          {
+            "id": "xsd:dateTimeStamp",
+            "label": "xsd:dateTimeStamp",
+            "children": []
+          },
+          {
+            "id": "xsd:dayTimeDuration",
+            "label": "xsd:dayTimeDuration",
+            "children": []
+          },
+          {
+            "id": "xsd:decimal",
+            "label": "xsd:decimal",
+            "children": []
+          },
+          {
+            "id": "xsd:double",
+            "label": "xsd:double",
+            "children": []
+          },
+          {
+            "id": "xsd:duration",
+            "label": "xsd:duration",
+            "children": []
+          },
+          {
+            "id": "xsd:float",
+            "label": "xsd:float",
+            "children": []
+          },
+          {
+            "id": "xsd:gDay",
+            "label": "xsd:gDay",
+            "children": []
+          },
+          {
+            "id": "xsd:gMonth",
+            "label": "xsd:gMonth",
+            "children": []
+          },
+          {
+            "id": "xsd:gMonthDay",
+            "label": "xsd:gMonthDay",
+            "children": []
+          },
+          {
+            "id": "xsd:gYear",
+            "label": "xsd:gYear",
+            "children": []
+          },
+          {
+            "id": "xsd:gYearMonth",
+            "label": "xsd:gYearMonth",
+            "children": []
+          },
+          {
+            "id": "xsd:hexBinary",
+            "label": "xsd:hexBinary",
+            "children": []
+          },
+          {
+            "id": "xsd:int",
+            "label": "xsd:int",
+            "children": []
+          },
+          {
+            "id": "xsd:integer",
+            "label": "xsd:integer",
+            "children": []
+          },
+          {
+            "id": "xsd:language",
+            "label": "xsd:language",
+            "children": []
+          },
+          {
+            "id": "xsd:long",
+            "label": "xsd:long",
+            "children": []
+          },
+          {
+            "id": "xsd:Name",
+            "label": "xsd:Name",
+            "children": []
+          },
+          {
+            "id": "xsd:NCName",
+            "label": "xsd:NCName",
+            "children": []
+          },
+          {
+            "id": "xsd:negativeInteger",
+            "label": "xsd:negativeInteger",
+            "children": []
+          },
+          {
+            "id": "xsd:NMTOKEN",
+            "label": "xsd:NMTOKEN",
+            "children": []
+          },
+          {
+            "id": "xsd:nonNegativeInteger",
+            "label": "xsd:nonNegativeInteger",
+            "children": []
+          },
+          {
+            "id": "xsd:nonPositiveInteger",
+            "label": "xsd:nonPositiveInteger",
+            "children": []
+          },
+          {
+            "id": "xsd:normalizedString",
+            "label": "xsd:normalizedString",
+            "children": []
+          },
+          {
+            "id": "xsd:positiveInteger",
+            "label": "xsd:positiveInteger",
+            "children": []
+          },
+          {
+            "id": "xsd:short",
+            "label": "xsd:short",
+            "children": []
+          },
+          {
+            "id": "xsd:string",
+            "label": "xsd:string",
+            "children": []
+          },
+          {
+            "id": "xsd:time",
+            "label": "xsd:time",
+            "children": []
+          },
+          {
+            "id": "xsd:token",
+            "label": "xsd:token",
+            "children": []
+          },
+          {
+            "id": "xsd:unsignedByte",
+            "label": "xsd:unsignedByte",
+            "children": []
+          },
+          {
+            "id": "xsd:unsignedInt",
+            "label": "xsd:unsignedInt",
+            "children": []
+          },
+          {
+            "id": "xsd:unsignedLong",
+            "label": "xsd:unsignedLong",
+            "children": []
+          },
+          {
+            "id": "xsd:unsignedShort",
+            "label": "xsd:unsignedShort",
+            "children": []
+          },
+          {
+            "id": "xsd:yearMonthDuration",
+            "label": "xsd:yearMonthDuration",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rdf:Property",
+    "label": "rdf:Property",
+    "children": [
+      {
+        "id": "rdfs:ContainerMembershipProperty",
+        "label": "rdfs:ContainerMembershipProperty",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "rdfs:Class",
+    "label": "rdfs:Class",
+    "children": [
+      {
+        "id": "rdfs:Datatype",
+        "label": "rdfs:Datatype",
+        "children": []
+      }
+    ]
+  }
+]

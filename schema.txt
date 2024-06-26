@@ -1,0 +1,131 @@
+class rdf:Alt extends rdfs:Container .
+
+class rdf:Bag extends rdfs:Container .
+
+class rdf:List extends rdfs:Resource
+{
+    *rdf:first rdfs:Resource;
+    *rdf:rest rdf:List;
+}
+
+class rdf:Property extends rdfs:Resource
+{
+    *rdfs:domain rdfs:Class;
+    *rdfs:range rdfs:Class;
+    *rdfs:subPropertyOf rdf:Property;
+    *<http://www.w3.org/2002/07/owl#equivalentProperty> rdf:Property;
+}
+
+class rdf:Seq extends rdfs:Container .
+
+class rdf:Statement extends rdfs:Resource
+{
+    *rdf:object rdfs:Resource;
+    *rdf:predicate rdfs:Resource;
+    *rdf:subject rdfs:Resource;
+}
+
+class rdfs:Class extends rdfs:Resource
+{
+    *rdfs:subClassOf rdfs:Class;
+    *<http://www.w3.org/2002/07/owl#equivalentClass> rdfs:Class;
+    *<http://www.w3.org/2002/07/owl#intersectionOf> rdf:List;
+    *<http://www.w3.org/2002/07/owl#unionOf> rdf:List;
+}
+
+class rdfs:Container extends rdfs:Resource .
+
+class rdfs:ContainerMembershipProperty extends rdf:Property .
+
+class rdfs:Datatype extends rdfs:Class .
+
+class rdfs:Literal extends rdfs:Resource .
+
+class rdfs:Resource
+{
+    *a rdfs:Class;
+    *rdf:value rdfs:Resource;
+    *rdfs:comment rdfs:Literal;
+    *rdfs:isDefinedBy rdfs:Resource;
+    *rdfs:label rdfs:Literal;
+    *rdfs:member rdfs:Resource;
+    *rdfs:seeAlso rdfs:Resource;
+}
+
+class xsd:anyURI extends rdfs:Literal .
+
+class xsd:base64Binary extends rdfs:Literal .
+
+class xsd:boolean extends rdfs:Literal .
+
+class xsd:byte extends rdfs:Literal .
+
+class xsd:date extends rdfs:Literal .
+
+class xsd:dateTime extends rdfs:Literal .
+
+class xsd:dateTimeStamp extends rdfs:Literal .
+
+class xsd:dayTimeDuration extends rdfs:Literal .
+
+class xsd:decimal extends rdfs:Literal .
+
+class xsd:double extends rdfs:Literal .
+
+class xsd:duration extends rdfs:Literal .
+
+class xsd:float extends rdfs:Literal .
+
+class xsd:gDay extends rdfs:Literal .
+
+class xsd:gMonth extends rdfs:Literal .
+
+class xsd:gMonthDay extends rdfs:Literal .
+
+class xsd:gYear extends rdfs:Literal .
+
+class xsd:gYearMonth extends rdfs:Literal .
+
+class xsd:hexBinary extends rdfs:Literal .
+
+class xsd:int extends rdfs:Literal .
+
+class xsd:integer extends rdfs:Literal .
+
+class xsd:language extends rdfs:Literal .
+
+class xsd:long extends rdfs:Literal .
+
+class xsd:Name extends rdfs:Literal .
+
+class xsd:NCName extends rdfs:Literal .
+
+class xsd:negativeInteger extends rdfs:Literal .
+
+class xsd:NMTOKEN extends rdfs:Literal .
+
+class xsd:nonNegativeInteger extends rdfs:Literal .
+
+class xsd:nonPositiveInteger extends rdfs:Literal .
+
+class xsd:normalizedString extends rdfs:Literal .
+
+class xsd:positiveInteger extends rdfs:Literal .
+
+class xsd:short extends rdfs:Literal .
+
+class xsd:string extends rdfs:Literal .
+
+class xsd:time extends rdfs:Literal .
+
+class xsd:token extends rdfs:Literal .
+
+class xsd:unsignedByte extends rdfs:Literal .
+
+class xsd:unsignedInt extends rdfs:Literal .
+
+class xsd:unsignedLong extends rdfs:Literal .
+
+class xsd:unsignedShort extends rdfs:Literal .
+
+class xsd:yearMonthDuration extends rdfs:Literal .

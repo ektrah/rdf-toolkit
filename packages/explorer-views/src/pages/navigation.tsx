@@ -48,8 +48,12 @@ function createTree<T extends Class | Property | Ontology>(
 
 export default function render(title: string | undefined, context: RenderContext): HtmlContent {
     return <>
+    <div class="search-container">
       <p class="logo">{title || "\u{1F141}\u{1F133}\u{1F135} Explorer"}</p>
-      <input type="text" id="search" name="search" placeholder="Search..." /> 
+      <input id="search"  name="search" placeholder="Search..." /> 
+      <div id="results"></div>
+    </div>
+
       {
         renderTabView("navigation", [
           {

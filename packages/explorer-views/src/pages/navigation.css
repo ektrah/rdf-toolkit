@@ -10,39 +10,39 @@ nav {
     top: 0;
     width: 25vw;
     box-sizing: border-box;
-}
-
-nav p {
+  }
+  
+  nav p {
     font-size: larger;
     margin: 0;
-}
-
-nav .tabview {
+  }
+  
+  nav .tabview {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     margin: 0;
-}
-
-nav .tabview-pages {
+  }
+  
+  nav .tabview-pages {
     background: var(--base01);
     border: 1px solid var(--base02);
-    padding: 1.5rem .5rem 5rem;
+    padding: 1.5rem 0.5rem 5rem;
     overflow: auto;
     flex-grow: 1;
-}
-
-nav ul {
+  }
+  
+  nav ul {
     margin: 0;
     padding: 0;
-}
-
-nav .logo a {
+  }
+  
+  nav .logo a {
     color: var(--base07);
     text-decoration: none;
-}
-
-#search {
+  }
+  
+  #search {
     width: 100%;
     height: 2.5em; /* Adjust height as needed */
     padding: 0.5em;
@@ -51,4 +51,27 @@ nav .logo a {
     border-radius: 4px;
     background-color: inherit;
     box-sizing: border-box;
-}
+  }
+  
+  #results {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #2d2d2d;
+    position: absolute;
+    z-index: 1000;
+    display: none;
+  }
+  .result-item {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  .result-item:hover,
+  .result-item.active {
+    background-color: #474747;
+  }
+  
+  .search-container {
+    position: relative;
+  }

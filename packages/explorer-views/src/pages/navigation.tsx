@@ -9,16 +9,10 @@ import { RenderContext } from "../context.js";
 import { HtmlContent } from "../jsx/html.js";
 import "./navigation.css";
 
-function createTree<T extends Class | Property | Ontology>(
-    items: Iterable<T>,
-    parents: (item: T) => Iterable<IRIOrBlankNode>,
-    context: RenderContext,
-    rootIRIs: Iterable<string> | null,
-    options?: RenderOptions
-): TreeNode[] {
+function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, parents: (item: T) => Iterable<IRIOrBlankNode>, context: RenderContext, rootIRIs: Iterable<string> | null, options?: RenderOptions): TreeNode[] {
     const roots: TreeNode[] = [];
     const tree: { [P in string]: { readonly label: HtmlContent; readonly children: TreeNode[], readonly open: boolean } } = {};
-  
+
     for (const item of items) {
         if (IRI.is(item.id)) {
             const node = tree[item.id.value] || (tree[item.id.value] = { label: renderRdfTerm(item.id, context, options), children: [], open: item.id === Rdfs.Resource || item.id === Owl.Thing });
@@ -32,7 +26,7 @@ function createTree<T extends Class | Property | Ontology>(
             }
         }
     }
-  
+
     if (rootIRIs) {
         roots.length = 0;
         for (const rootIRI of rootIRIs) {
@@ -42,41 +36,41 @@ function createTree<T extends Class | Property | Ontology>(
             }
         }
     }
-  
+
     return roots;
 }
 
 export default function render(title: string | undefined, context: RenderContext): HtmlContent {
     return <>
-    <div class="search-container">
-      <p class="logo">{title || "\u{1F141}\u{1F133}\u{1F135} Explorer"}</p>
-      <input id="search"  name="search" placeholder="Search..." /> 
-      <div id="results"></div>
-    </div>
+        <div class="search-container">
+            <p class="logo">{title || "\u{1F141}\u{1F133}\u{1F135} Explorer"}</p>
+            <input id="search" name="search" placeholder="Search..." autocomplete="off" />
+            <div id="results"></div>
+        </div>
 
-      {
-        renderTabView("navigation", [
-          {
-            id: "navigation-classes",
-            label: "Classes",
-            content: renderTreeView(createTree(context.schema.classes.values(), x => x.subClassOf, context, context.rootClasses, { rawBlankNodes: true }))
-          },
-          {
-            id: "navigation-properties",
-            label: "Properties",
-            content: renderTreeView(createTree(context.schema.properties.values(), x => x.subPropertyOf, context, null, { rawBlankNodes: true }))
-          },
-          {
-            id: "navigation-ontologies",
-            label: "Ontologies",
-            content: renderTreeView(createTree(context.schema.ontologies.values(), () => Ix.empty, context, null, { rawIRIs: true, rawBlankNodes: true }))
-          },
-          {
-            id: "navigation-files",
-            label: "Files",
-            content: renderTreeView(Object.keys(context.documents).sort().map<TreeNode>(x => ({ label: renderRdfTerm(IRI.create(x), context, { rawIRIs: true, hideError: true }) })))
-          },
-        ])
-      }
+        {
+            renderTabView("navigation", [
+                {
+                    id: "navigation-classes",
+                    label: "Classes",
+                    content: renderTreeView(createTree(context.schema.classes.values(), x => x.subClassOf, context, context.rootClasses, { rawBlankNodes: true }))
+                },
+                {
+                    id: "navigation-properties",
+                    label: "Properties",
+                    content: renderTreeView(createTree(context.schema.properties.values(), x => x.subPropertyOf, context, null, { rawBlankNodes: true }))
+                },
+                {
+                    id: "navigation-ontologies",
+                    label: "Ontologies",
+                    content: renderTreeView(createTree(context.schema.ontologies.values(), () => Ix.empty, context, null, { rawIRIs: true, rawBlankNodes: true }))
+                },
+                {
+                    id: "navigation-files",
+                    label: "Files",
+                    content: renderTreeView(Object.keys(context.documents).sort().map<TreeNode>(x => ({ label: renderRdfTerm(IRI.create(x), context, { rawIRIs: true, hideError: true }) })))
+                },
+            ])
+        }
     </>;
-  }
+}

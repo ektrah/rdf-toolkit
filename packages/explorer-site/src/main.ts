@@ -17,33 +17,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const resultsDiv = document.getElementById("results") as HTMLDivElement;
 
     if (searchInput && resultsDiv) {
-        searchInput.addEventListener("input", (ev) => {
+        searchInput.addEventListener("input", function () {
             const searchResults = fuse.search(searchInput.value);
             if (searchResults.length) {
                 const ul = document.createElement("ul");
-                ul.className = "search-results";
-
-                ul.style.listStyleType = "none";
-                ul.style.padding = "0";
-                ul.style.margin = "0";
-
                 for (const result of searchResults) {
                     const li = document.createElement("li");
-                    li.classList.add("result-item");
-
                     const a = document.createElement("a");
                     a.href = result.item.id;
                     a.dataset.href = "/" + result.item.name.replace(/:/g, "/");
                     a.textContent = result.item.name;
-
                     li.append(a);
-
                     ul.appendChild(li);
                 };
 
-                // Display the results dropdown
-                resultsDiv.style.display = "block";
                 resultsDiv.replaceChildren(ul);
+                resultsDiv.style.display = "block";
             } else {
                 resultsDiv.textContent = "No results found";
                 resultsDiv.style.display = "none";

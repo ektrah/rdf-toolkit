@@ -39,3 +39,44 @@ nav {
         color: var(--base07);
         text-decoration: none;
     }
+
+.search-container {
+    position: relative;
+}
+
+#search {
+    width: 100%;
+    height: 2.5em;
+    padding: 0.5em;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: inherit;
+    box-sizing: border-box;
+}
+
+#results {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #2d2d2d;
+    position: absolute;
+    z-index: 1000;
+    display: none;
+}
+
+    #results ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #results li {
+        cursor: pointer;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+        #results li:hover {
+            background-color: #474747;
+        }

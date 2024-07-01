@@ -323,7 +323,7 @@ declare global {
             input: GlobalAttributes & {
                 //accept
                 //alt
-                //autocomplete
+                autocomplete?: "off" | Array<string>;
                 checked?: boolean;
                 //dirname
                 disabled?: boolean;

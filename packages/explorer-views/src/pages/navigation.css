@@ -1,15 +1,14 @@
 nav {
     cursor: default;
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
+    display: grid;
+    grid-gap: 1em;
+    grid-template-rows: min-content minmax(0, 1fr);
     height: 100vh;
     left: 0;
     padding: 1.5em 2px 1em 1em;
     position: fixed;
     top: 0;
     width: 25vw;
-    box-sizing: border-box;
 }
 
     nav p {
@@ -18,18 +17,17 @@ nav {
     }
 
     nav .tabview {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
+        display: grid;
+        grid-template-rows: min-content minmax(0, 1fr);
         margin: 0;
     }
 
     nav .tabview-pages {
         background: var(--base01);
         border: 1px solid var(--base02);
-        padding: 1.5rem 0.5rem 5rem;
-        overflow: auto;
-        flex-grow: 1;
+        padding: 1.5rem .5rem 5rem;
+        overflow: clip auto;
+        overscroll-behavior: none;
     }
 
     nav ul {

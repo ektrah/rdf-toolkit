@@ -1,43 +1,47 @@
 import Fuse from "fuse.js";
-import searchData from "./search.json";
 
 interface SearchEntry {
-    "id": string,
-    "name": string,
-    "description": string,
-    "type": string
+    readonly "href"?: string;
+    readonly "id": string;
+    readonly "name": string;
+    readonly "description"?: string;
 }
 
-const fuse = new Fuse<SearchEntry>(searchData, {
-    keys: ["name", "description"],
-});
-
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    const links = document.getElementsByTagName("link");
     const searchInput = document.getElementById("search") as HTMLInputElement;
     const resultsDiv = document.getElementById("results") as HTMLDivElement;
 
     if (searchInput && resultsDiv) {
-        searchInput.addEventListener("input", function () {
-            const searchResults = fuse.search(searchInput.value);
-            if (searchResults.length) {
-                const ul = document.createElement("ul");
-                for (const result of searchResults) {
-                    const li = document.createElement("li");
-                    const a = document.createElement("a");
-                    a.href = result.item.id;
-                    a.dataset.href = "/" + result.item.name.replace(/:/g, "/");
-                    a.textContent = result.item.name;
-                    li.append(a);
-                    ul.appendChild(li);
-                };
+        for (let i = 0; i < links.length; i++) {
+            const link = links.item(i);
+            if (link && link.rel === "preload" && link.type === "application/json" && link.as === "fetch") {
+                const response = await fetch(new URL(link.href, document.location.href).href);
+                const searchData = await response.json() as ReadonlyArray<SearchEntry>;
+                const fuse = new Fuse<SearchEntry>(searchData, { keys: ["name", "description"] });
 
-                resultsDiv.replaceChildren(ul);
-                resultsDiv.style.display = "block";
-            } else {
-                resultsDiv.textContent = "No results found";
-                resultsDiv.style.display = "none";
+                searchInput.addEventListener("input", function () {
+                    const searchResults = fuse.search(searchInput.value);
+                    const ul = document.createElement("ul");
+                    if (searchResults.length) {
+                        for (const result of searchResults) {
+                            const li = document.createElement("li");
+                            const a = document.createElement("a");
+                            a.href = result.item.id;
+                            a.dataset.href = result.item.href;
+                            a.textContent = result.item.name;
+                            li.append(a);
+                            ul.appendChild(li);
+                        }
+                    } else {
+                        const li = document.createElement("li");
+                        li.textContent = "No results found";
+                        ul.appendChild(li);
+                    }
+                    resultsDiv.replaceChildren(ul);
+                });
             }
-        });
+        }
     }
 });
 

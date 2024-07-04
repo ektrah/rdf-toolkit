@@ -42,12 +42,17 @@ function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, p
 
 export default function render(title: string | undefined, context: RenderContext): HtmlContent {
     return <>
-        <div class="search-container">
-            <p class="logo">{title || "\u{1F141}\u{1F133}\u{1F135} Explorer"}</p>
-            <input id="search" name="search" placeholder="Search..." autocomplete="off" />
-            <div id="results"></div>
-        </div>
-
+        {
+            context.searchEnabled ? <>
+                <div class="search-container">
+                    <p class="logo">{title || "\u{1F141}\u{1F133}\u{1F135} Explorer"}</p>
+                    <input id="search" name="search" placeholder="Search..." autocomplete="off" />
+                    <div id="results"></div>
+                </div>
+            </> : <>
+                <p class="logo">{title || "\u{1F141}\u{1F133}\u{1F135} Explorer"}</p>
+            </>
+        }
         {
             renderTabView("navigation", [
                 {

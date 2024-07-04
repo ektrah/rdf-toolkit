@@ -45,38 +45,65 @@ nav {
 }
 
 #search {
-    width: 100%;
-    height: 2.5em;
+    background: inherit;
+    border: 1px solid var(--base04);
+    border-radius: .5em;
+    font-size: smaller;
+    margin: 1em 0 0 0;
     padding: 0.5em;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: inherit;
-    box-sizing: border-box;
+    width: 100%;
+    outline: none;
 }
+
+    #search:placeholder-shown {
+        border-color: var(--base02);
+    }
+
+        #search:placeholder-shown ~ #results {
+            display: none;
+        }
+
+    #search:focus {
+        border-color: var(--base04);
+    }
 
 #results {
+    background-color: var(--base00);
+    border: 1px solid var(--base03);
+    left: 0;
+    margin: 3px .5em 0;
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #ccc;
-    background-color: #2d2d2d;
+    overscroll-behavior: none;
     position: absolute;
+    right: 0;
     z-index: 1000;
-    display: none;
 }
 
-    #results ul {
+    #results ul,
+    #results li {
         list-style: none;
-        padding: 0;
         margin: 0;
+        padding: 0;
     }
 
     #results li {
-        cursor: pointer;
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
+        border-top: 1px solid var(--base03);
     }
 
-        #results li:hover {
-            background-color: #474747;
+        #results li:first-child {
+            border-top: none;
+        }
+
+    #results a {
+        display: block;
+        overflow: hidden;
+        padding: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        #results a:hover {
+            text-decoration: none;
+            background: var(--base01);
         }

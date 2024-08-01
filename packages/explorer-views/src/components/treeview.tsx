@@ -1,8 +1,10 @@
 import { Ix } from "@rdf-toolkit/iterable";
+import { IRI, IRIOrBlankNode } from "@rdf-toolkit/rdf/terms";
 import { HtmlContent } from "../jsx/html.js";
 import "./treeview.css";
 
 export interface TreeNode {
+    readonly id: IRIOrBlankNode;
     readonly label: HtmlContent;
     readonly children?: Iterable<TreeNode>;
     readonly open?: boolean;

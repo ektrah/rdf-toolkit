@@ -150,6 +150,10 @@ export default function render(content: HtmlContent): string {
         }
         return result;
     }
+    // if content is a script tag, and no 'src' attribute is provided, render the content as a script tag
+    else if (content && content.type === "script" && !content.props.src) {
+        return "<script>" + content.props.children + "</script>";
+    }
     else if (content) {
         let result = "<" + content.type + renderAttributes(content.props) + ">";
         if (!(content.type in noEndTag)) {

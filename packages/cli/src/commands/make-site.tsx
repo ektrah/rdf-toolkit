@@ -1,5 +1,5 @@
 import { RenderContext } from "@rdf-toolkit/explorer-views/context";
-import renderHTML, { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
+import renderHTML, { HtmlContent, HtmlElement } from "@rdf-toolkit/explorer-views/jsx/html";
 import renderMain from "@rdf-toolkit/explorer-views/pages/main";
 import renderNavigation from "@rdf-toolkit/explorer-views/pages/navigation";
 import renderFooter from "@rdf-toolkit/explorer-views/sections/footer";
@@ -188,22 +188,64 @@ function renderPage(iri: string, context: Website, links: HtmlContent, scripts: 
 
     const main = renderMain(subject, iri in context.documents ? context.documents[iri] : null, context);
 
-    return <html lang="en-US">
-        <head>
-            <meta charset="utf-8" />
-            <title>{title} &ndash; {context.title}</title>
-            {links}
-            {scripts}
-        </head>
-        <body>
-            <nav>
-                {navigation}
-            </nav>
-            <main>
-                {main}
-            </main>
-        </body>
-    </html>;
+    // from the context, get the IRI
+    const iri_class: Class | undefined = context.schema.classes.get(subject);
+    // get all of the parent classes of 'iri_class' by iterating over the 'subClassOf' property.
+    // Do this recursively until there are no more parent classes.
+    const reachable_classes: Class[] = [];
+    function get_reachable_classes(class_: Class) {
+        reachable_classes.push(class_);
+        for (const parent_class of class_.subClassOf as IRIOrBlankNode[]) {
+            // get the class object from the IRI
+            const defn = context.schema.classes.get(parent_class);
+            // if it's not null, then call the function recursively
+            if (defn) {
+                get_reachable_classes(defn);
+            }
+        }
+    }
+    if (iri_class) {
+        get_reachable_classes(iri_class);
+    }
+
+
+    // generate the source for a javascript function which sets the open attribute
+    // on all <details> elements in the document if the class is in the 'reachable_classes' array
+    const script = `
+        function set_open() {
+            const details = document.querySelectorAll("details");
+            const reachable_classes = [${reachable_classes.map(c => `"${c.id.value}"`).join(", ")}];
+            for (const detail of details) {
+                const iri = detail.getAttribute("iri");
+                console.log(iri);
+                if (reachable_classes.includes(iri)) {
+                    detail.open = true;
+                }
+            }
+        }
+        document.addEventListener("DOMContentLoaded", set_open);
+    `;
+
+    // Render the HTML
+    return (
+        <html lang="en-US">
+            <head>
+                <meta charset="utf-8" />
+                <title>{title} &ndash; {context.title}</title>
+                {links}
+                {scripts}
+                <script>{script}</script>
+            </head>
+            <body>
+                <nav>
+                    {navigation}
+                </nav>
+                <main>
+                    {main}
+                </main>
+            </body>
+        </html>
+    );
 }
 
 function resolveHref(url: string, base: string): string {

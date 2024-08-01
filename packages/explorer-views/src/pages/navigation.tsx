@@ -11,14 +11,14 @@ import "./navigation.css";
 
 function createTree<T extends Class | Property | Ontology>(items: Iterable<T>, parents: (item: T) => Iterable<IRIOrBlankNode>, context: RenderContext, rootIRIs: Iterable<string> | null, options?: RenderOptions): TreeNode[] {
     const roots: TreeNode[] = [];
-    const tree: { [P in string]: { readonly label: HtmlContent; readonly children: TreeNode[], readonly open: boolean } } = {};
+    const tree: { [P in string]: { readonly id: IRIOrBlankNode, readonly label: HtmlContent; readonly children: TreeNode[], readonly open: boolean } } = {};
 
     for (const item of items) {
         if (IRI.is(item.id)) {
-            const node = tree[item.id.value] || (tree[item.id.value] = { label: renderRdfTerm(item.id, context, options), children: [], open: item.id === Rdfs.Resource || item.id === Owl.Thing });
+            const node = tree[item.id.value] || (tree[item.id.value] = { id: item.id, label: renderRdfTerm(item.id, context, options), children: [], open: item.id === Rdfs.Resource || item.id === Owl.Thing });
             let hasParents = false;
             for (const parent of parents(item)) {
-                (tree[parent.value] || (tree[parent.value] = { label: renderRdfTerm(parent, context, options), children: [], open: parent === Rdfs.Resource || parent === Owl.Thing })).children.push(node);
+                (tree[parent.value] || (tree[parent.value] = { id: parent, label: renderRdfTerm(parent, context, options), children: [], open: parent === Rdfs.Resource || parent === Owl.Thing })).children.push(node);
                 hasParents = true;
             }
             if (!hasParents) {
@@ -73,7 +73,7 @@ export default function render(title: string | undefined, context: RenderContext
                 {
                     id: "navigation-files",
                     label: "Files",
-                    content: renderTreeView(Object.keys(context.documents).sort().map<TreeNode>(x => ({ label: renderRdfTerm(IRI.create(x), context, { rawIRIs: true, hideError: true }) })))
+                    content: renderTreeView(Object.keys(context.documents).sort().map<TreeNode>(x => ({ id: IRI.create(x), label: renderRdfTerm(IRI.create(x), context, { rawIRIs: true, hideError: true }) })))
                 },
             ])
         }

@@ -5,6 +5,7 @@ interface SearchEntry {
     readonly "id": string;
     readonly "name": string;
     readonly "description"?: string;
+    readonly "deprecated"?: boolean;
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -30,6 +31,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                             a.href = result.item.id;
                             a.dataset.href = result.item.href;
                             a.textContent = result.item.name;
+                            if (result.item.deprecated) {
+                                a.classList.add("rdf-deprecated");
+                            }
                             li.append(a);
                             ul.appendChild(li);
                         }

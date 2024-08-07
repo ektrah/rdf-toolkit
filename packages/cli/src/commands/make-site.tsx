@@ -1,5 +1,5 @@
 import { RenderContext } from "@rdf-toolkit/explorer-views/context";
-import renderHTML, { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
+import renderHTML, { HtmlContent, HtmlElement } from "@rdf-toolkit/explorer-views/jsx/html";
 import renderMain from "@rdf-toolkit/explorer-views/pages/main";
 import renderNavigation from "@rdf-toolkit/explorer-views/pages/navigation";
 import renderFooter from "@rdf-toolkit/explorer-views/sections/footer";
@@ -8,7 +8,7 @@ import { Ix } from "@rdf-toolkit/iterable";
 import { Graph } from "@rdf-toolkit/rdf/graphs";
 import { BlankNode, IRI, IRIOrBlankNode } from "@rdf-toolkit/rdf/terms";
 import { ParsedTriple } from "@rdf-toolkit/rdf/triples";
-import { Schema } from "@rdf-toolkit/schema";
+import { Class, Schema } from "@rdf-toolkit/schema";
 import { DiagnosticBag, TextDocument } from "@rdf-toolkit/text";
 import { SyntaxTree } from "@rdf-toolkit/turtle";
 import * as fs from "node:fs";
@@ -37,6 +37,7 @@ const ERROR_FILE_NAME = "404.html";
 const CSS_FILE_NAME = "style.css";
 const FONT_FILE_NAME = path.basename(fontAssetFilePath);
 const SCRIPT_FILE_NAME = path.basename(scriptAssetFilePath);
+const SEARCH_FILE_NAME = "index.json";
 
 class Website implements RenderContext {
     readonly dataset: ParsedTriple[][] = [];
@@ -55,13 +56,15 @@ class Website implements RenderContext {
 
     readonly outputs: Record<string, string> = {};
     readonly rootClasses: ReadonlySet<string> | null;
+    readonly searchEnabled: boolean;
 
-    constructor(readonly title: string, readonly baseURL: string, prefixes: Record<string, string>, readonly cleanUrls: boolean, rootClasses: Iterable<string> | undefined, readonly diagnostics: DiagnosticBag) {
+    constructor(readonly title: string, readonly baseURL: string, prefixes: Record<string, string>, readonly cleanUrls: boolean, rootClasses: Iterable<string> | undefined, searchEnabled: boolean, readonly diagnostics: DiagnosticBag) {
         this.graph = Graph.from(this.dataset);
         this.schema = Schema.decompile(this.dataset, this.graph);
         this.namespaces.push(prefixes);
         this.prefixes = new PrefixTable(this.namespaces);
         this.rootClasses = rootClasses ? new Set(rootClasses) : null;
+        this.searchEnabled = searchEnabled;
     }
 
     getPrefixes(): ReadonlyArray<[string, string]> {
@@ -124,13 +127,61 @@ class Website implements RenderContext {
     }
 }
 
-function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
+function create_open_tree_script(context: Website, classes: (IRIOrBlankNode | string)[]): HtmlElement {
+    // generate the source for a javascript function which sets the open attribute
+    // on all <details> elements in the document that are parents of the classes in the 'classes' array
+
+    // first, get all of the reachable classes from the 'classes' array
+    const reachable_classes: Class[] = [];
+    for (const class_ of classes) {
+        const iri = typeof class_ === "string" ? IRI.create(class_) : class_;
+        const defn = context.schema.classes.get(iri);
+        if (defn) {
+            get_reachable_classes(context, defn, reachable_classes);
+        }
+    }
+
+    // generate the source for a javascript function which sets the open attribute
+    // on all <details> elements in the document if the class is in the 'reachable_classes' array
+    const script = `
+        function set_open() {
+            const details = document.querySelectorAll("details");
+            const reachable_classes = [${reachable_classes.map(c => `"${c.id.value}"`).join(", ")}];
+            for (const detail of details) {
+                const iri = detail.getAttribute("iri");
+                if (reachable_classes.includes(iri)) {
+                    detail.open = true;
+                }
+            }
+        }
+        document.addEventListener("DOMContentLoaded", set_open);
+    `;
+
+    return <script>{script}</script>;
+}
+
+function get_reachable_classes(context: Website, class_: Class, reachable_classes: Class[]) {
+    reachable_classes.push(class_);
+    for (const parent_class of class_.subClassOf as IRIOrBlankNode[]) {
+        // get the class object from the IRI
+        const defn = context.schema.classes.get(parent_class);
+        // if it's not null, then call the function recursively
+        if (defn) {
+            get_reachable_classes(context, defn, reachable_classes);
+        }
+    }
+}
+
+function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent, expand?: Array<string>): HtmlContent {
+    // make a script to expand the classes in the 'expand' array automatically
+    const expand_class_js = create_open_tree_script(context, expand || []);
     return <html lang="en-US">
         <head>
             <meta charset="utf-8" />
             <title>{context.title}</title>
             {links}
             {scripts}
+            {expand_class_js}
         </head>
         <body>
             <nav>
@@ -185,22 +236,29 @@ function renderPage(iri: string, context: Website, links: HtmlContent, scripts: 
 
     const main = renderMain(subject, iri in context.documents ? context.documents[iri] : null, context);
 
-    return <html lang="en-US">
-        <head>
-            <meta charset="utf-8" />
-            <title>{title} &ndash; {context.title}</title>
-            {links}
-            {scripts}
-        </head>
-        <body>
-            <nav>
-                {navigation}
-            </nav>
-            <main>
-                {main}
-            </main>
-        </body>
-    </html>;
+    // from the context, get the IRI
+    const open_class_js = create_open_tree_script(context, [subject]);
+
+    // Render the HTML
+    return (
+        <html lang="en-US">
+            <head>
+                <meta charset="utf-8" />
+                <title>{title} &ndash; {context.title}</title>
+                {links}
+                {scripts}
+                {open_class_js}
+            </head>
+            <body>
+                <nav>
+                    {navigation}
+                </nav>
+                <main>
+                    {main}
+                </main>
+            </body>
+        </html>
+    );
 }
 
 function resolveHref(url: string, base: string): string {
@@ -220,6 +278,31 @@ function getPrefixes(project: Project): Record<string, string> {
     return prefixes;
 }
 
+interface SearchEntry {
+    readonly "href"?: string;
+    readonly "id": string;
+    readonly "name": string;
+    readonly "description"?: string;
+    readonly "deprecated"?: boolean;
+}
+
+function buildSearchEntryForClass(class_: Class, context: RenderContext): SearchEntry {
+    const prefixedName = context.lookupPrefixedName(class_.id.value);
+    return {
+        href: context.rewriteHrefAsData ? context.rewriteHrefAsData(class_.id.value) : undefined,
+        id: class_.id.value,
+        name: prefixedName ? prefixedName.prefixLabel + ":" + prefixedName.localName : class_.id.value,
+        description: class_.description,
+        deprecated: class_.deprecated,
+    };
+}
+
+function buildSearchIndex(schema: Schema, context: RenderContext): Array<SearchEntry> {
+    return Array.from(schema.classes.values())
+        .sort((a, b) => a.id.compareTo(b.id))
+        .map(class_ => buildSearchEntryForClass(class_, context));
+}
+
 export default function main(options: Options): void {
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
@@ -228,7 +311,7 @@ export default function main(options: Options): void {
     const icons = project.json.siteOptions?.icons || [];
     const assets = project.json.siteOptions?.assets || {};
 
-    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, getPrefixes(project), !!project.json.siteOptions?.cleanUrls, project.json.siteOptions?.roots, project.diagnostics);
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, getPrefixes(project), !!project.json.siteOptions?.cleanUrls, project.json.siteOptions?.roots, true, project.diagnostics);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
     context.beforecompile();
@@ -245,6 +328,7 @@ export default function main(options: Options): void {
     const links = <>
         {icons.map(iconConfig => <link rel="icon" type={iconConfig.type} sizes={iconConfig.sizes} href={resolveHref(path.basename(iconConfig.asset), context.baseURL)} />)}
         <link rel="stylesheet" href={resolveHref(CSS_FILE_NAME, context.baseURL)} />
+        {context.searchEnabled ? <link rel="preload" type="application/json" href={resolveHref(SEARCH_FILE_NAME, context.baseURL)} as="fetch" crossorigin="anonymous" /> : <></>}
     </>;
 
     const scripts = <>
@@ -257,6 +341,10 @@ export default function main(options: Options): void {
     site.write(FONT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, fontAssetFilePath)));
     site.write(SCRIPT_FILE_NAME, fs.readFileSync(path.resolve(modulePath, scriptAssetFilePath)));
 
+    if (context.searchEnabled) {
+        site.writeJSON(SEARCH_FILE_NAME, buildSearchIndex(context.schema, context));
+    }
+
     for (const iconConfig of icons) {
         site.write(path.basename(iconConfig.asset), project.package.read(iconConfig.asset));
     }
@@ -265,7 +353,8 @@ export default function main(options: Options): void {
         site.write(assets[assetPath], project.package.read(assetPath));
     }
 
-    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
+    // when rendering the Index, expand all of the siteOptions.expand IRIs
+    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation, project.json.siteOptions?.expand))));
     site.write(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
 
     for (const iri in context.outputs) {

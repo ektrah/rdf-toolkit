@@ -39,3 +39,71 @@ nav {
         color: var(--base07);
         text-decoration: none;
     }
+
+.search-container {
+    position: relative;
+}
+
+#search {
+    background: inherit;
+    border: 1px solid var(--base04);
+    border-radius: .5em;
+    font-size: smaller;
+    margin: 1em 0 0 0;
+    padding: 0.5em;
+    width: 100%;
+    outline: none;
+}
+
+    #search:placeholder-shown {
+        border-color: var(--base02);
+    }
+
+        #search:placeholder-shown ~ #results {
+            display: none;
+        }
+
+    #search:focus {
+        border-color: var(--base04);
+    }
+
+#results {
+    background-color: var(--base00);
+    border: 1px solid var(--base03);
+    left: 0;
+    margin: 3px .5em 0;
+    max-height: 300px;
+    overflow-y: auto;
+    overscroll-behavior: none;
+    position: absolute;
+    right: 0;
+    z-index: 1000;
+}
+
+    #results ul,
+    #results li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #results li {
+        border-top: 1px solid var(--base03);
+    }
+
+        #results li:first-child {
+            border-top: none;
+        }
+
+    #results a {
+        display: block;
+        overflow: hidden;
+        padding: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        #results a:hover {
+            text-decoration: none;
+            background: var(--base01);
+        }

@@ -32,6 +32,7 @@ export interface SiteConfig {
     outDir?: string;
     roots?: Array<string>;
     cleanUrls?: boolean;
+    expand?: Array<string>; // terms to expand automatically in the tree
 }
 
 export namespace SiteConfig {
@@ -45,7 +46,8 @@ export namespace SiteConfig {
             && (Is.undefined(candidate.baseURL) || Is.string(candidate.baseURL))
             && (Is.undefined(candidate.outDir) || Is.string(candidate.outDir))
             && (Is.undefined(candidate.roots) || Is.typedArray(candidate.roots, Is.string))
-            && (Is.undefined(candidate.cleanUrls) || Is.boolean(candidate.cleanUrls));
+            && (Is.undefined(candidate.cleanUrls) || Is.boolean(candidate.cleanUrls))
+            && (Is.undefined(candidate.expand) || Is.typedArray(candidate.expand, Is.string));
     }
 }
 

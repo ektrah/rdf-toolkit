@@ -149,7 +149,6 @@ function create_open_tree_script(context: Website, classes: (IRIOrBlankNode | st
             const reachable_classes = [${reachable_classes.map(c => `"${c.id.value}"`).join(", ")}];
             for (const detail of details) {
                 const iri = detail.getAttribute("iri");
-                console.log(iri);
                 if (reachable_classes.includes(iri)) {
                     detail.open = true;
                 }

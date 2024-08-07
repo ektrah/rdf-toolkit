@@ -228,6 +228,7 @@ interface SearchEntry {
     readonly "id": string;
     readonly "name": string;
     readonly "description"?: string;
+    readonly "deprecated"?: boolean;
 }
 
 function buildSearchEntryForClass(class_: Class, context: RenderContext): SearchEntry {
@@ -237,6 +238,7 @@ function buildSearchEntryForClass(class_: Class, context: RenderContext): Search
         id: class_.id.value,
         name: prefixedName ? prefixedName.prefixLabel + ":" + prefixedName.localName : class_.id.value,
         description: class_.description,
+        deprecated: class_.deprecated,
     };
 }
 

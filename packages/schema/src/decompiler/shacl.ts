@@ -30,8 +30,8 @@ export default function decompile(graph: Graph, builder: SchemaBuilder): void {
                 .concat(graph.objects(propertyShape, Shacl.xone).concatMap(x => splitOr(x, graph)))
                 .concat(graph.objects(propertyShape, Shacl.hasValue))
                 .concat(graph.objects(propertyShape, Shacl.node))
-                .concat(graph.objects(propertyShape, Shacl.nodeKind).concatMap(x => mapNodeKindToClass(x)))
-                .concat(graph.objects(propertyShape, Shacl.qualifiedValueShape).concatMap(x => extract(x, graph)));
+                .concat(graph.objects(propertyShape, Shacl.qualifiedValueShape).concatMap(x => extract(x, graph)))
+                .concatIfEmpty(graph.objects(propertyShape, Shacl.nodeKind).concatMap(x => mapNodeKindToClass(x)));
 
             const minCount = graph.objects(propertyShape, Shacl.minCount)
                 .concat(graph.objects(propertyShape, Shacl.qualifiedMinCount))

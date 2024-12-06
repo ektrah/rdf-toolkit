@@ -77,4 +77,6 @@
 
     .tree a {
         display: inline-block;
+        white-space: nowrap;
+        margin-right: .5em;
     }

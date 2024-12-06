@@ -68,14 +68,20 @@ else {
     dialog.showModal();
 
     function setLayoutsSize(clientX: number) { // eslint-disable-line no-inner-declarations
-        const width = Math.min(Math.max(clientX - 4, window.innerWidth * 0.15), window.innerWidth * 0.85) + "px";
+        const minWidth = 359; // to accommodate at least the main 4 tabs (Classes, Properties, Ontologies and Files)
 
-        navigationDivider.style.left = width;
-        navigationPane.style.width = width;
-        mainContent.style.marginLeft = width;
+        let width = Math.min(Math.max(clientX - 4, window.innerWidth * 0.15), window.innerWidth * 0.85);
+
+        if (width < minWidth) {
+            width = minWidth;
+        }
+
+        navigationDivider.style.left = width + "px";
+        navigationPane.style.width = width + "px";
+        mainContent.style.marginLeft = width + "px";
 
         if (window.localStorage) {
-            window.localStorage.setItem(navWidthStorageKey, width);
+            window.localStorage.setItem(navWidthStorageKey, width + "px");
         }
     }
 
@@ -269,9 +275,7 @@ else {
 
         if (window.localStorage) {
             const navWidth = Number.parseInt(window.localStorage.getItem(navWidthStorageKey) || "");
-            if (!Number.isNaN(navWidth)) {
-                setLayoutsSize(navWidth);
-            }
+            setLayoutsSize(navWidth || 0);
         }
 
         progress.className = "progress-bar loading";

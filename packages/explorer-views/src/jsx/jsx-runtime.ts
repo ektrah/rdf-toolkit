@@ -323,10 +323,10 @@ declare global {
             input: GlobalAttributes & {
                 //accept
                 //alt
-                //autocomplete
+                autocomplete?: "off" | Array<string>;
                 checked?: boolean;
                 //dirname
-                //disabled
+                disabled?: boolean;
                 //form
                 //formaction
                 //formenctype
@@ -336,16 +336,16 @@ declare global {
                 //height
                 //list
                 //max
-                //maxlength
+                maxlength?: number;
                 //min
-                //minlength
-                //multiple
+                minlength?: number;
+                multiple?: boolean;
                 name?: string;
-                //pattern
-                //placeholder
-                //readonly
-                //required
-                //size
+                pattern?: string;
+                placeholder?: string;
+                readonly?: boolean;
+                required?: boolean;
+                size?: number;
                 //src
                 //step
                 type?: InputType;

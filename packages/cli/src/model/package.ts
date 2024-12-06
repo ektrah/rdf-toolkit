@@ -22,13 +22,15 @@ export interface PackageConfig {
     dependencies?: unknown; // Record<string, string>
     devDependencies?: unknown; // Record<string, string>
 
-    ontologies?: unknown, // Record<DocumentUri, string>
+    "rdf:files"?: unknown, // Record<DocumentUri, string>
+    "rdf:prefixes"?: unknown, // Record<string, string>
 }
 
 export class Package extends Workspace {
     private _dependencies?: ReadonlyMap<string, Package | null>;
     private _files?: ReadonlyMap<DocumentUri, TextFile | null>;
     private _json?: PackageConfig;
+    private _prefixes?: ReadonlyMap<string, string>;
 
     constructor(packagePath: string, readonly containingProject: Project) {
         super(packagePath);
@@ -44,6 +46,10 @@ export class Package extends Workspace {
 
     get files(): ReadonlyMap<DocumentUri, TextFile | null> {
         return this._files ??= getFiles(this.json, this);
+    }
+
+    get prefixes(): ReadonlyMap<string, string> {
+        return this._prefixes ??= getPrefixes(this.json);
     }
 
     get version(): string | undefined {
@@ -66,9 +72,9 @@ function getDependencies(json: PackageConfig, containingProject: Project): Map<s
 function getFiles(json: PackageConfig, containingPackage: Package): Map<DocumentUri, TextFile | null> {
     const files = new Map<DocumentUri, TextFile | null>();
 
-    if (Is.record(json.ontologies, Is.string)) {
-        for (const documentURI in json.ontologies) {
-            const filePath = containingPackage.resolve(json.ontologies[documentURI]);
+    if (Is.record(json["rdf:files"], Is.string)) {
+        for (const documentURI in json["rdf:files"]) {
+            const filePath = containingPackage.resolve(json["rdf:files"][documentURI]);
 
             let file: TextFile | null = null;
             if (fs.existsSync(filePath)) {
@@ -87,4 +93,18 @@ function getPackageConfig(workspace: Workspace): PackageConfig {
         throw new Error("Invalid " + PACKAGE_JSON);
     }
     return value;
+}
+
+function getPrefixes(json: PackageConfig): Map<string, string> {
+    const prefixes = new Map<string, string>();
+
+    if (Is.record(json["rdf:prefixes"], Is.string)) {
+        for (const prefixLabel in json["rdf:prefixes"]) {
+            const namespaceIRI = json["rdf:prefixes"][prefixLabel];
+
+            prefixes.set(prefixLabel, namespaceIRI);
+        }
+    }
+
+    return prefixes;
 }

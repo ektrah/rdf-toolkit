@@ -8,6 +8,7 @@ import { Class, EntityKind, Ontology, Property, Schema } from "../main.js";
 
 const Dc11 = Vocabulary.create("http://purl.org/dc/elements/1.1/", ["description", "title", "date"]);
 const Dcterms = Vocabulary.create("http://purl.org/dc/terms/", ["description", "title", "created", "modified"]);
+const IofAv = Vocabulary.create("https://spec.industrialontologies.org/ontology/core/meta/AnnotationVocabulary/", ["naturalLanguageDefinition"]);
 const Qudt = Vocabulary.create("http://qudt.org/schema/qudt/", ["deprecated", "deprecatedProperty"]);
 const Skos = Vocabulary.create("http://www.w3.org/2004/02/skos/core#", ["definition"]);
 
@@ -28,6 +29,7 @@ export function getTitle(subject: IRIOrBlankNode, graph: Graph): string | undefi
 }
 
 const DescriptionProperties: ReadonlySet<IRI> = new Set([
+    IofAv.naturalLanguageDefinition,
     Skos.definition,
     Rdfs.comment,
     Shacl.description,

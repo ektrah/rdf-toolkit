@@ -40,18 +40,12 @@ const SCRIPT_FILE_NAME = path.basename(scriptAssetFilePath);
 
 class Website implements RenderContext {
     readonly dataset: ParsedTriple[][] = [];
-    readonly diagnostics: DiagnosticBag = DiagnosticBag.create();
     readonly documents: Record<string, TextDocument> = {};
 
     readonly namespaces: Record<string, string>[] = [{
         "_": "http://example.com/.well-known/genid/",
-        "dc11": "http://purl.org/dc/elements/1.1/",
-        "dcmitype": "http://purl.org/dc/dcmitype/",
-        "dcterms": "http://purl.org/dc/terms/",
-        "owl": "http://www.w3.org/2002/07/owl#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "sh": "http://www.w3.org/ns/shacl#",
         "xsd": "http://www.w3.org/2001/XMLSchema#",
     }];
 
@@ -62,9 +56,10 @@ class Website implements RenderContext {
     readonly outputs: Record<string, string> = {};
     readonly rootClasses: ReadonlySet<string> | null;
 
-    constructor(readonly title: string, readonly baseURL: string, readonly cleanUrls: boolean, rootClasses?: Iterable<string>) {
+    constructor(readonly title: string, readonly baseURL: string, prefixes: Record<string, string>, readonly cleanUrls: boolean, rootClasses: Iterable<string> | undefined, readonly diagnostics: DiagnosticBag) {
         this.graph = Graph.from(this.dataset);
         this.schema = Schema.decompile(this.dataset, this.graph);
+        this.namespaces.push(prefixes);
         this.prefixes = new PrefixTable(this.namespaces);
         this.rootClasses = rootClasses ? new Set(rootClasses) : null;
     }
@@ -214,6 +209,17 @@ function resolveHref(url: string, base: string): string {
     return result.startsWith(root) ? result.slice(root.length - 1) : result;
 }
 
+function getPrefixes(project: Project): Record<string, string> {
+    const prefixes: Record<string, string> = {};
+    for (const [prefixLabel, iriSet] of project.prefixes) {
+        const namespaceIRI = Ix.from(iriSet).singleOrDefault(null);
+        if (namespaceIRI) {
+            prefixes[prefixLabel] = namespaceIRI;
+        }
+    }
+    return prefixes;
+}
+
 export default function main(options: Options): void {
     const moduleFilePath = url.fileURLToPath(import.meta.url);
     const modulePath = path.dirname(moduleFilePath);
@@ -222,7 +228,7 @@ export default function main(options: Options): void {
     const icons = project.json.siteOptions?.icons || [];
     const assets = project.json.siteOptions?.assets || {};
 
-    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, !!project.json.siteOptions?.cleanUrls, project.json.siteOptions?.roots);
+    const context = new Website(project.json.siteOptions?.title || DEFAULT_TITLE, new URL(options.base || project.json.siteOptions?.baseURL || DEFAULT_BASE, DEFAULT_BASE).href, getPrefixes(project), !!project.json.siteOptions?.cleanUrls, project.json.siteOptions?.roots, project.diagnostics);
     const site = new Workspace(project.package.resolve(options.output || project.json.siteOptions?.outDir || "public"));
 
     context.beforecompile();

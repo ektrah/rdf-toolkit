@@ -8,9 +8,10 @@ export function hasErrors(diagnostics: DiagnosticBag, options: DiagnosticOptions
 
 export function printDiagnosticsAndExitOnError(diagnostics: DiagnosticBag, options: DiagnosticOptions): void {
     for (const [documentURI, diagnostic] of diagnostics) {
-        console.dir(diagnostic);
+        console.dir({ documentURI, diagnostic }, { depth: undefined });
     }
     if (hasErrors(diagnostics, options)) {
+        console.log(`${diagnostics.errors} error(s), ${diagnostics.warnings} warning(s)`);
         process.exit(1);
     }
 }

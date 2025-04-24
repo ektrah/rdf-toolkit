@@ -51,6 +51,7 @@ a {
 
     a[href='http://www.w3.org/2002/07/owl'],
     a[href^='http://www.w3.org/2002/07/owl#'],
+    a[href='http://www.w3.org/ns/shacl'],
     a[href^='http://www.w3.org/ns/shacl#'] {
         color: var(--base0B);
     }

@@ -7,17 +7,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
       - run: npm ci
       - run: npm run build
       - run: npm test
       - run: npm i @rdf-toolkit/cli
       - run: npx rdf make explorer
         working-directory: explorer
-      - uses: actions/upload-pages-artifact@v1
+      - id: deployment
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./explorer/public
 
@@ -33,4 +34,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4

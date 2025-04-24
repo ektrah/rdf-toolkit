@@ -14,13 +14,13 @@
     "@rdf-toolkit/schema": "0.1.0",
     "@rdf-toolkit/text": "0.1.0",
     "@rdf-toolkit/turtle": "0.1.0",
-    "commonmark": "^0.31.0"
+    "commonmark": "^0.31.2"
   },
   "devDependencies": {
     "@types/commonmark": "^0.27.9",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.5.2"
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
   }
 }

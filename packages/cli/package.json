@@ -25,8 +25,8 @@
     "@rdf-toolkit/schema": "0.1.0",
     "@rdf-toolkit/text": "0.1.0",
     "@rdf-toolkit/turtle": "0.1.0",
-    "commonmark": "^0.31.0",
-    "koa": "^2.15.3",
+    "commonmark": "^0.31.2",
+    "koa": "^2.16.1",
     "koa-send": "^5.0.1",
     "yargs": "^17.7.2"
   },
@@ -34,13 +34,13 @@
     "@types/commonmark": "^0.27.9",
     "@types/koa": "^2.15.0",
     "@types/koa-send": "^4.1.6",
-    "@types/node": "^20.14.9",
-    "@types/yargs": "^17.0.32",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "esbuild": "^0.22.0",
-    "eslint": "^8.57.0",
-    "rimraf": "^5.0.7",
-    "typescript": "^5.5.2"
+    "@types/node": "^22.14.1",
+    "@types/yargs": "^17.0.33",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "esbuild": "^0.25.3",
+    "eslint": "^9.25.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
   }
 }

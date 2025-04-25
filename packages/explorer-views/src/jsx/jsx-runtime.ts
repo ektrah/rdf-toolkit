@@ -371,6 +371,7 @@ declare global {
 
             details: GlobalAttributes & {
                 open?: boolean;
+                iri?: string;
             };
 
             summary: GlobalAttributes;

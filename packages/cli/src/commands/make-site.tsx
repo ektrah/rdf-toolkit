@@ -1,5 +1,5 @@
 import { RenderContext } from "@rdf-toolkit/explorer-views/context";
-import renderHTML, { HtmlContent } from "@rdf-toolkit/explorer-views/jsx/html";
+import renderHTML, { HtmlContent, HtmlElement } from "@rdf-toolkit/explorer-views/jsx/html";
 import renderMain from "@rdf-toolkit/explorer-views/pages/main";
 import renderNavigation from "@rdf-toolkit/explorer-views/pages/navigation";
 import renderFooter from "@rdf-toolkit/explorer-views/sections/footer";
@@ -124,13 +124,61 @@ class Website implements RenderContext {
     }
 }
 
-function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent): HtmlContent {
+function create_open_tree_script(context: Website, classes: (IRIOrBlankNode | string)[]): HtmlElement {
+    // generate the source for a javascript function which sets the open attribute
+    // on all <details> elements in the document that are parents of the classes in the 'classes' array
+
+    // first, get all of the reachable classes from the 'classes' array
+    const reachable_classes: Class[] = [];
+    for (const class_ of classes) {
+        const iri = typeof class_ === "string" ? IRI.create(class_) : class_;
+        const defn = context.schema.classes.get(iri);
+        if (defn) {
+            get_reachable_classes(context, defn, reachable_classes);
+        }
+    }
+
+    // generate the source for a javascript function which sets the open attribute
+    // on all <details> elements in the document if the class is in the 'reachable_classes' array
+    const script = `
+        function set_open() {
+            const details = document.querySelectorAll("details");
+            const reachable_classes = [${reachable_classes.map(c => `"${c.id.value}"`).join(", ")}];
+            for (const detail of details) {
+                const iri = detail.getAttribute("iri");
+                if (reachable_classes.includes(iri)) {
+                    detail.open = true;
+                }
+            }
+        }
+        document.addEventListener("DOMContentLoaded", set_open);
+    `;
+
+    return <script>{script}</script>;
+}
+
+function get_reachable_classes(context: Website, class_: Class, reachable_classes: Class[]) {
+    reachable_classes.push(class_);
+    for (const parent_class of class_.subClassOf as IRIOrBlankNode[]) {
+        // get the class object from the IRI
+        const defn = context.schema.classes.get(parent_class);
+        // if it's not null, then call the function recursively
+        if (defn) {
+            get_reachable_classes(context, defn, reachable_classes);
+        }
+    }
+}
+
+function renderIndex(context: Website, links: HtmlContent, scripts: HtmlContent, navigation: HtmlContent, expand?: Array<string>): HtmlContent {
+    // make a script to expand the classes in the 'expand' array automatically
+    const expand_class_js = create_open_tree_script(context, expand || []);
     return <html lang="en-US">
         <head>
             <meta charset="utf-8" />
             <title>{context.title}</title>
             {links}
             {scripts}
+            {expand_class_js}
         </head>
         <body>
             <nav>
@@ -185,22 +233,29 @@ function renderPage(iri: string, context: Website, links: HtmlContent, scripts: 
 
     const main = renderMain(subject, iri in context.documents ? context.documents[iri] : null, context);
 
-    return <html lang="en-US">
-        <head>
-            <meta charset="utf-8" />
-            <title>{title} &ndash; {context.title}</title>
-            {links}
-            {scripts}
-        </head>
-        <body>
-            <nav>
-                {navigation}
-            </nav>
-            <main>
-                {main}
-            </main>
-        </body>
-    </html>;
+    // from the context, get the IRI
+    const open_class_js = create_open_tree_script(context, [subject]);
+
+    // Render the HTML
+    return (
+        <html lang="en-US">
+            <head>
+                <meta charset="utf-8" />
+                <title>{title} &ndash; {context.title}</title>
+                {links}
+                {scripts}
+                {open_class_js}
+            </head>
+            <body>
+                <nav>
+                    {navigation}
+                </nav>
+                <main>
+                    {main}
+                </main>
+            </body>
+        </html>
+    );
 }
 
 function resolveHref(url: string, base: string): string {
@@ -265,7 +320,8 @@ export default function main(options: Options): void {
         site.write(assets[assetPath], project.package.read(assetPath));
     }
 
-    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation))));
+    // when rendering the Index, expand all of the siteOptions.expand IRIs
+    site.write(INDEX_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(renderIndex(context, links, scripts, navigation, project.json.siteOptions?.expand))));
     site.write(ERROR_FILE_NAME, Buffer.from("<!DOCTYPE html>\n" + renderHTML(render404(context, links, scripts, navigation))));
 
     for (const iri in context.outputs) {

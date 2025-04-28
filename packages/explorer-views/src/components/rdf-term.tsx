@@ -207,7 +207,7 @@ function renderCompactedIRI(iri: IRIOrBlankNode, context: RenderContext, options
             {options.linkContents || <>
                 {prefixedName.prefixLabel.length ? <span class="rdf-iri-prefixlabel">{prefixedName.prefixLabel}</span> : null}
                 <span class="rdf-iri-colon">:</span>
-                {prefixedName.localName.length ? <span class="rdf-iri-localname">{Ix.from<HtmlContent>(prefixedName.localName.split(/(?<=[^A-Z])(?=[A-Z])/)).intersperse(<wbr />)}</span> : null}
+                {prefixedName.localName.length ? <span class="rdf-iri-localname">{Ix.from<HtmlContent>(prefixedName.localName.split(/(?<=[^A-Z])(?=[A-Z])/)).intersperse(<> </>)}</span> : null}
             </>}
         </a>;
     }

@@ -21,6 +21,10 @@
             text-decoration: underline;
         }
 
+        .tabview .tabview-tabs label:last-of-type {
+            margin-right: 0;
+        }
+
     .tabview .tabview-pages > * {
         display: none;
         margin: 0;
